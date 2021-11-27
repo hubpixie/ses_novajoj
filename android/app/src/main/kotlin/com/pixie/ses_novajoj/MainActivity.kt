@@ -1,4 +1,4 @@
-package com.pixie.ses_novajoj
+package com.pixie.sesNovajoj
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -43,11 +43,31 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId "com.pixie.ses_novajoj"
+        applicationId "com.pixie.sesNovajoj"
         minSdkVersion flutter.minSdkVersion
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+    }
+
+    flavorDimensions "app"
+
+    productFlavors {
+        develop {
+            dimension "app"
+            resValue "string", "app_name", "Ses Novaĵoj (dev)"
+            versionNameSuffix "-dev"
+        }
+        staging {
+            dimension "app"
+            resValue "string", "app_name", "Ses Novaĵoj (stg)"
+            versionNameSuffix "-stg"
+        }	
+        product {
+            dimension "app"
+            resValue "string", "app_name", "Ses Novaĵoj"
+            applicationId "ccom.pixie.sesNovajoj"
+        }
     }
 
     buildTypes {
