@@ -1,7 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.pixie.ses_novajoj">
+    package="com.pixie.sesNovajoj">
+    <uses-permission android:name="android.permission.INTERNET"/>
    <application
-        android:label="ses_novajoj"
+        android:label="sesNovajoj"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
