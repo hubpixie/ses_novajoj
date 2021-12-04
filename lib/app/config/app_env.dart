@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 enum Flavor {
   web,
@@ -10,7 +11,10 @@ enum Flavor {
 class AppEnv {
   static Flavor? _flavor;
 
-  static void configure(Flavor flavor) {
+  static void configure(Flavor flavor) async {
+    WidgetsFlutterBinding.ensureInitialized();
+    await Firebase.initializeApp();
+
     _flavor = flavor;
   }
 

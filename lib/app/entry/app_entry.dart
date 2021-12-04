@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../scene/splash/splash_page_builder.dart';
+import 'package:ses_novajoj/utilities/firebase_util.dart';
+import 'package:ses_novajoj/scene/splash/splash_page_builder.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -13,6 +14,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.teal,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
+      navigatorObservers: <NavigatorObserver>[FirebaseUtil().observer],
       home: SplashPageBuilder().page,
     );
   }

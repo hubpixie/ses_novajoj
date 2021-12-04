@@ -23,6 +23,7 @@ if (flutterVersionName == null) {
 
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
+apply plugin: 'com.google.gms.google-services'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
@@ -44,7 +45,7 @@ android {
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "com.pixie.sesNovajoj"
-        minSdkVersion flutter.minSdkVersion
+        minSdkVersion 23//flutter.minSdkVersion
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
@@ -56,17 +57,19 @@ android {
         develop {
             dimension "app"
             resValue "string", "app_name", "Ses Novaĵoj (dev)"
+            applicationId "com.pixie.sesNovajoj.dev"
             versionNameSuffix "-dev"
         }
         staging {
             dimension "app"
             resValue "string", "app_name", "Ses Novaĵoj (stg)"
+            applicationId "com.pixie.sesNovajoj.stg"
             versionNameSuffix "-stg"
         }	
         product {
             dimension "app"
             resValue "string", "app_name", "Ses Novaĵoj"
-            applicationId "ccom.pixie.sesNovajoj"
+            applicationId "com.pixie.sesNovajoj"
         }
     }
 
@@ -85,4 +88,9 @@ flutter {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    // Import the BoM for the Firebase platform
+    implementation platform('com.google.firebase:firebase-bom:29.0.0')
+    // Declare the dependency for the Analytics library
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation 'com.google.firebase:firebase-analytics-ktx'
 }
