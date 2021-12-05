@@ -15,11 +15,12 @@ class _SplashPageState extends State<SplashPage> {
   void initState() {
     // it moves to Login View automatically.
     Future.delayed(const Duration(seconds: 2), () {
-      widget.presenter.startLogin();
+      // widget.presenter.startLogin();
+      widget.presenter.startTop(context);
     });
-    super.initState();
     // send viewEvent
     FirebaseUtil().sendViewEvent(route: AnalyticsRoute.splash);
+    super.initState();
   }
 
   @override

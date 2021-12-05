@@ -1,7 +1,8 @@
 import 'splash_router.dart';
 
 abstract class SplashPresenter {
-  void startLogin();
+  void startLogin(Object context);
+  void startTop(Object context);
 }
 
 class SplashPresenterImpl extends SplashPresenter {
@@ -9,7 +10,12 @@ class SplashPresenterImpl extends SplashPresenter {
 
   SplashPresenterImpl({required this.router});
   @override
-  void startLogin() {
-    router.gotoLogin();
+  void startLogin(Object context) {
+    router.gotoLogin(context);
+  }
+
+  @override
+  void startTop(Object context) {
+    router.gotoTop(context);
   }
 }
