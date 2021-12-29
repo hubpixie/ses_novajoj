@@ -9,7 +9,7 @@ enum AnalyticsEvent {
 
 enum AnalyticsRoute {
   splash,
-  home,
+  topList,
 }
 
 extension AnalyticsRouteInfo on AnalyticsRoute {
@@ -17,8 +17,8 @@ extension AnalyticsRouteInfo on AnalyticsRoute {
     switch (this) {
       case AnalyticsRoute.splash:
         return '/splash';
-      case AnalyticsRoute.home:
-        return '/home';
+      case AnalyticsRoute.topList:
+        return '/topList';
       default:
         return '';
     }
@@ -27,7 +27,7 @@ extension AnalyticsRouteInfo on AnalyticsRoute {
   String get screenClass {
     switch (this) {
       case AnalyticsRoute.splash:
-      case AnalyticsRoute.home:
+      case AnalyticsRoute.topList:
         return toString().split(".")[1];
       default:
         return '';
