@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:ses_novajoj/scene/tabs/tabs_presenter.dart';
 import 'package:ses_novajoj/utilities/firebase_util.dart';
 
+import 'package:ses_novajoj/scene/top_list/top_list_page_builder.dart';
+
 class TabsPage extends StatefulWidget {
   final TabsPresenter presenter;
   const TabsPage({Key? key, required this.presenter}) : super(key: key);
@@ -10,50 +12,6 @@ class TabsPage extends StatefulWidget {
   _TabsPageState createState() => _TabsPageState();
 }
 
-/*
-class _TabsPageState extends State<TabsPage> {
-  @override
-  void initState() {
-    // it moves to Login View automatically.
-    Future.delayed(const Duration(seconds: 2), () {
-      widget.presenter.startLogin();
-    });
-    super.initState();
-    // send viewEvent
-    //FirebaseUtil().sendViewEvent(route: AnalyticsRoute.tabs);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFABC5FD),
-      body: Stack(
-        alignment: Alignment.center,
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ClipRRect(
-              child: Image.asset(
-                'assets/images/ses_tabs.png',
-                fit: BoxFit.fill,
-              ),
-              borderRadius: BorderRadius.circular(8.0),
-            ),
-          ),
-          Align(
-            alignment: Alignment.center,
-            child: Container(
-              padding: const EdgeInsets.fromLTRB(0, 80, 0, 0),
-              child: CircularProgressIndicator(
-                backgroundColor: Colors.grey[850],
-              ),
-            ),
-          )
-        ],
-      ),
-    );
-  }
-}*/
 class _TabsPageState extends State<TabsPage> with WidgetsBindingObserver {
   int _selectedIndex = 0;
   static const List<String> _tabTitles = [
@@ -92,15 +50,10 @@ class _TabsPageState extends State<TabsPage> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF1B80F3),
-        title: Text(_tabTitles[_selectedIndex]),
-        automaticallyImplyLeading: false,
-      ),
       body: IndexedStack(
         index: _selectedIndex,
         children: <Widget>[
-          Container(),
+          TopListPageBuilder().page,
           Container(),
           Container(),
           Container(),
