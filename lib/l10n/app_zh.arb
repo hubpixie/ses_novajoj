@@ -1,0 +1,34 @@
+{
+    "@@locale": "zh",
+    
+    "appBarIconNameLatest": "即",
+    "appBarFullNameLatest": "即时新闻",
+    "@appBarIconNameLatest": {
+      "description": "Latest AppBar IconName"
+    },
+    "appBarIconNameOptic": "视",
+    "appBarFullNameOptic": "新闻视角",
+    "@appBarIconNameOptic": {
+      "description": "Optic AppBar IconName"
+    },
+    "appBarIconNameRecommending": "荐",
+    "appBarFullNameRecommending": "推荐新闻",
+    "@appBarIconNameRecommending": {
+      "description": "Recommending AppBar IconName"
+    },
+    "appBarIconNameHot": "热",
+    "appBarFullNameHot": "热力新闻",
+    "@appBarIconNameHot": {
+      "description": "Hot AppBar IconName"
+    },
+    "appBarIconNameCommenting": "评",
+    "appBarFullNameCommenting": "新闻述评",
+    "@appBarIconNameCommenting": {
+      "description": "Comment AppBar IconName"
+    },
+    "tabBarNameHome": "首页",
+    "tabBarNameBBS": "论坛",
+    "tabBarNameLocal": "本地",
+    "tabBarNameSearch": "检索",
+    "tabBarNameThreads": "热帖"
+    }

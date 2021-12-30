@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ses_novajoj/l10n/l10n.dart';
 import 'package:ses_novajoj/scene/top_list/top_list_presenter.dart';
 import 'package:ses_novajoj/utilities/firebase_util.dart';
 import 'package:ses_novajoj/scene/widgets/top_list_cell.dart';
@@ -14,6 +15,8 @@ class TopListPage extends StatefulWidget {
 
 class _TopListPageState extends State<TopListPage> {
   int _selectedIconIndex = 0;
+  late String _selectedAppBarTitle =
+      L10n.of(context)?.appBarFullNameLatest ?? '';
 
   @override
   void initState() {
@@ -24,7 +27,6 @@ class _TopListPageState extends State<TopListPage> {
 
   @override
   Widget build(BuildContext context) {
-    print('aaa');
     return Scaffold(
         appBar: AppBar(
           backgroundColor: const Color(0xFF1B80F3),
@@ -53,12 +55,12 @@ class _TopListPageState extends State<TopListPage> {
 
   Widget _buildAppBarTitleArea(BuildContext context) {
     return SizedBox(
-        width: 235,
+        width: 265,
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             SquareTextIconButton(
-              string: '新',
+              string: L10n.of(context)?.appBarIconNameLatest ?? '',
               index: 0,
               selected: _selectedIconIndex == 0,
               onCellSelecting: () {
@@ -66,7 +68,7 @@ class _TopListPageState extends State<TopListPage> {
               },
             ),
             SquareTextIconButton(
-              string: '观',
+              string: L10n.of(context)?.appBarIconNameOptic ?? '',
               index: 1,
               selected: _selectedIconIndex == 1,
               onCellSelecting: () {
@@ -74,7 +76,7 @@ class _TopListPageState extends State<TopListPage> {
               },
             ),
             SquareTextIconButton(
-              string: '荐',
+              string: L10n.of(context)?.appBarIconNameRecommending ?? '',
               index: 2,
               selected: _selectedIconIndex == 2,
               onCellSelecting: () {
@@ -82,7 +84,7 @@ class _TopListPageState extends State<TopListPage> {
               },
             ),
             SquareTextIconButton(
-              string: '热',
+              string: L10n.of(context)?.appBarIconNameHot ?? '',
               index: 3,
               selected: _selectedIconIndex == 3,
               onCellSelecting: () {
@@ -90,21 +92,21 @@ class _TopListPageState extends State<TopListPage> {
               },
             ),
             SquareTextIconButton(
-              string: '论',
+              string: L10n.of(context)?.appBarIconNameCommenting ?? '',
               index: 4,
               selected: _selectedIconIndex == 4,
               onCellSelecting: () {
                 _selectTextIcon(4);
               },
             ),
-            const SizedBox(
-                width: 110,
+            SizedBox(
+                width: 140,
                 height: 35,
                 child: IconButton(
-                    padding: EdgeInsets.only(left: 20),
+                    padding: const EdgeInsets.only(left: 5),
                     onPressed: null,
-                    icon: Text('即时新闻',
-                        style: TextStyle(fontWeight: FontWeight.bold)))),
+                    icon: Text(_selectedAppBarTitle,
+                        style: const TextStyle(fontWeight: FontWeight.bold)))),
           ],
         ));
   }
@@ -112,23 +114,31 @@ class _TopListPageState extends State<TopListPage> {
   List<Widget> _buildAppBarActionArea(BuildContext context) {
     return <Widget>[
       SizedBox(
-          width: 50,
-          height: 50,
+          width: 45,
+          height: 45,
           child: IconButton(
               padding: const EdgeInsets.all(0.0),
               color: Colors.white,
               onPressed: () {},
               icon: const Icon(Icons.refresh_rounded))),
-      const SizedBox(
-        width: 20,
+      SizedBox(
+        width: MediaQuery.of(context).size.width <= 375 ? 0 : 25,
         height: 50,
       )
     ];
   }
 
   void _selectTextIcon(int index) {
+    List<String> titles = [
+      L10n.of(context)?.appBarFullNameLatest ?? '',
+      L10n.of(context)?.appBarFullNameOptic ?? '',
+      L10n.of(context)?.appBarFullNameRecommending ?? '',
+      L10n.of(context)?.appBarFullNameHot ?? '',
+      L10n.of(context)?.appBarFullNameCommenting ?? '',
+    ];
     setState(() {
       _selectedIconIndex = index;
+      _selectedAppBarTitle = titles[index];
     });
   }
 }

@@ -1,0 +1,34 @@
+{
+  "@@locale": "en",
+  
+  "appBarIconNameLatest": "L",
+  "appBarFullNameLatest": "Latest",
+  "@appBarIconNameLatest": {
+    "description": "Latest AppBar IconName"
+  },
+  "appBarIconNameOptic": "O",
+  "appBarFullNameOptic": "Optic View",
+  "@appBarIconNameOptic": {
+    "description": "Optic AppBar IconName"
+  },
+  "appBarIconNameRecommending": "R",
+  "appBarFullNameRecommending": "Recommend",
+  "@appBarIconNameRecommending": {
+    "description": "Recommending AppBar IconName"
+  },
+  "appBarIconNameHot": "H",
+  "appBarFullNameHot": "Hot Reports",
+  "@appBarIconNameHot": {
+    "description": "Hot AppBar IconName"
+  },
+  "appBarIconNameCommenting": "C",
+  "appBarFullNameCommenting": "Comments",
+  "@appBarIconNameCommenting": {
+    "description": "Comment AppBar IconName"
+  },
+  "tabBarNameHome": "Home",
+  "tabBarNameBBS": "BBS",
+  "tabBarNameLocal": "Local",
+  "tabBarNameSearch": "Serch",
+  "tabBarNameThreads": "Threads"
+}

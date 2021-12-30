@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ses_novajoj/l10n/l10n.dart';
 import 'package:ses_novajoj/scene/tabs/tabs_presenter.dart';
 import 'package:ses_novajoj/utilities/firebase_util.dart';
 
@@ -14,12 +15,12 @@ class TabsPage extends StatefulWidget {
 
 class _TabsPageState extends State<TabsPage> with WidgetsBindingObserver {
   int _selectedIndex = 0;
-  static const List<String> _tabTitles = [
-    "Home",
-    "BBS",
-    "Local",
-    "Search",
-    "Threads"
+  late final List<String> _tabTitles = [
+    L10n.of(context)?.tabBarNameHome ?? '',
+    L10n.of(context)?.tabBarNameBBS ?? '',
+    L10n.of(context)?.tabBarNameLocal ?? '',
+    L10n.of(context)?.tabBarNameSearch ?? '',
+    L10n.of(context)?.tabBarNameThreads ?? ''
   ];
 
   @override
