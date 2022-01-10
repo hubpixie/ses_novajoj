@@ -4,6 +4,7 @@ enum ScreenRouteName {
   login,
   home,
   tabs,
+  topDetail,
 }
 
 extension ScreenRouteNameSummary on ScreenRouteName {
@@ -17,6 +18,8 @@ extension ScreenRouteNameSummary on ScreenRouteName {
         return '/';
       case ScreenRouteName.tabs:
         return 'tabs';
+      case ScreenRouteName.topDetail:
+        return 'topDetail';
       default:
         return '';
     }
@@ -31,6 +34,8 @@ extension ScreenRouteNameSummary on ScreenRouteName {
     switch (this) {
       case ScreenRouteName.home:
       case ScreenRouteName.login:
+      case ScreenRouteName.tabs:
+      case ScreenRouteName.topDetail:
         return toString().split(".").last;
       default:
         return null;

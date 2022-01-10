@@ -10,6 +10,7 @@ enum AnalyticsEvent {
 enum AnalyticsRoute {
   splash,
   topList,
+  topDetail,
 }
 
 extension AnalyticsRouteInfo on AnalyticsRoute {
@@ -19,6 +20,8 @@ extension AnalyticsRouteInfo on AnalyticsRoute {
         return '/splash';
       case AnalyticsRoute.topList:
         return '/topList';
+      case AnalyticsRoute.topDetail:
+        return '/topDetail';
       default:
         return '';
     }
@@ -28,6 +31,7 @@ extension AnalyticsRouteInfo on AnalyticsRoute {
     switch (this) {
       case AnalyticsRoute.splash:
       case AnalyticsRoute.topList:
+      case AnalyticsRoute.topDetail:
         return toString().split(".")[1];
       default:
         return '';
@@ -56,6 +60,8 @@ class FirebaseUtil {
 
   FirebaseAnalytics get analytics => _instance._analytics;
   FirebaseAnalyticsObserver get observer => _instance._observer;
+  List<FirebaseAnalyticsObserver> get observers =>
+      kIsWeb ? [] : [_instance._observer];
 
   /// 画面遷移時に画面名を送信
   Future<void> sendViewEvent({required AnalyticsRoute route}) async {

@@ -2,7 +2,7 @@ import 'top_list_router.dart';
 
 abstract class TopListPresenter {
   void startLogin(Object context);
-  void startTop(Object context);
+  void startTopDetail(Object context);
 }
 
 class TopListPresenterImpl extends TopListPresenter {
@@ -15,7 +15,7 @@ class TopListPresenterImpl extends TopListPresenter {
   }
 
   @override
-  void startTop(Object context) {
-    router.gotoTop(context);
+  void startTopDetail(Object context) {
+    router.gotoTopDetail(context);
   }
 }
