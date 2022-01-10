@@ -30,5 +30,6 @@
   "tabBarNameBBS": "BBS",
   "tabBarNameLocal": "Local",
   "tabBarNameSearch": "Serch",
-  "tabBarNameThreads": "Threads"
+  "tabBarNameThreads": "Threads",
+  "topDetailNewsSoourceLabel":"News source:"
 }

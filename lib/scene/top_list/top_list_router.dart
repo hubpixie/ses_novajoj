@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:ses_novajoj/scene/utilities/screen_route_enums.dart';
 import 'package:ses_novajoj/utilities/log_util.dart';
+import 'package:ses_novajoj/scene/utilities/page_parameter.dart';
 
 abstract class TopListRouter {
   void gotoLogin(Object context);
-  void gotoTop(Object context);
+  void gotoTopDetail(Object context);
 }
 
 final log = Log().logger;
@@ -18,8 +19,9 @@ class TopListRouterImpl extends TopListRouter {
   }
 
   @override
-  void gotoTop(Object context) {
-    log.info('gotoTop');
-    Navigator.pushNamed(context as BuildContext, ScreenRouteName.tabs.name);
+  void gotoTopDetail(Object context) {
+    log.info('gotoTopDetail');
+    Navigator.pushNamed(context as BuildContext, ScreenRouteName.topDetail.name,
+        arguments: {TopDetailParamKeys.url: 'http://www.google.com'});
   }
 }

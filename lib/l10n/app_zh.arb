@@ -30,5 +30,6 @@
     "tabBarNameBBS": "论坛",
     "tabBarNameLocal": "本地",
     "tabBarNameSearch": "检索",
-    "tabBarNameThreads": "热帖"
-    }
+    "tabBarNameThreads": "热帖",
+    "topDetailNewsSoourceLabel":"新闻来源："
+  }

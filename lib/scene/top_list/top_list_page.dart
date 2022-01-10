@@ -48,6 +48,7 @@ class _TopListPageState extends State<TopListPage> {
               itemBuilder: (context, index) => TopListCell(
                   onCellSelecting: () {
                     print('onCellSelecting = $index');
+                    widget.presenter.startTopDetail(context);
                   },
                   index: index)),
         ));
