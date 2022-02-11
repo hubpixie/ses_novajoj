@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:ses_novajoj/l10n/l10n.dart';
+import 'package:ses_novajoj/domain/utilities/bloc/bloc_provider.dart';
 import 'package:ses_novajoj/scene/top_list/top_list_presenter.dart';
+import 'package:ses_novajoj/scene/top_list/top_list_presenter_output.dart';
 import 'package:ses_novajoj/utilities/firebase_util.dart';
 import 'package:ses_novajoj/scene/widgets/top_list_cell.dart';
 import 'package:ses_novajoj/scene/widgets/square_text_icon_button.dart';
@@ -22,36 +24,51 @@ class _TopListPageState extends State<TopListPage> {
   void initState() {
     // send viewEvent
     FirebaseUtil().sendViewEvent(route: AnalyticsRoute.topList);
+    widget.presenter.eventViewReady();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          backgroundColor: const Color(0xFF1B80F3),
-          automaticallyImplyLeading: false,
-          leading: const SizedBox(width: 0),
-          title: _buildAppBarTitleArea(context),
-          actions: _buildAppBarActionArea(context),
-          centerTitle: false,
-          titleSpacing: 0,
-          leadingWidth: 10,
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF1B80F3),
+        automaticallyImplyLeading: false,
+        leading: const SizedBox(width: 0),
+        title: _buildAppBarTitleArea(context),
+        actions: _buildAppBarActionArea(context),
+        centerTitle: false,
+        titleSpacing: 0,
+        leadingWidth: 10,
+      ),
+      body: BlocProvider<TopListPresenter>(
+        bloc: widget.presenter,
+        child: SafeArea(
+          child: StreamBuilder<TopListPresenterOutput>(
+              stream: widget.presenter.stream,
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return Text("Loading ...");
+                }
+                final data = snapshot.data;
+                if (data is ShowNovaListModel) {
+                  return ListView.builder(
+                      itemCount: data.viewModelList.length,
+                      itemBuilder: (context, index) => TopListCell(
+                          item: data.viewModelList[index],
+                          onCellSelecting: () {
+                            print('onCellSelecting = $index');
+                            widget.presenter.startTopDetail(context);
+                          },
+                          index: index));
+                } else {
+                  assert(false, "unknown event $data");
+                  return Container(color: Colors.red);
+                }
+              }),
         ),
-        body: Container(
-          padding: const EdgeInsets.all(5.0),
-          decoration: const BoxDecoration(
-              border: Border(
-                  bottom: BorderSide(color: Color(0xffc5c5c5), width: 0.3))),
-          child: ListView.builder(
-              itemCount: 10,
-              itemBuilder: (context, index) => TopListCell(
-                  onCellSelecting: () {
-                    print('onCellSelecting = $index');
-                    widget.presenter.startTopDetail(context);
-                  },
-                  index: index)),
-        ));
+      ),
+    );
   }
 
   Widget _buildAppBarTitleArea(BuildContext context) {

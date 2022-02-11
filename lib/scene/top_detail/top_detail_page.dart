@@ -4,10 +4,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:ses_novajoj/scene/top_detail/top_detail_presenter.dart';
 import 'package:ses_novajoj/utilities/firebase_util.dart';
-import 'package:ses_novajoj/scene/utilities/page_parameter.dart';
+import 'package:ses_novajoj/scene/utilities/page_util/page_parameter.dart';
 import 'package:ses_novajoj/l10n/l10n.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'package:ses_novajoj/domain/entities/nova_item_detail.dart';
+import 'package:ses_novajoj/domain/entities/nova_detail_item.dart';
 
 class TopDetailPage extends StatefulWidget {
   final TopDetailPresenter presenter;
@@ -75,7 +75,7 @@ class _TopDetailPageState extends State<TopDetailPage> {
 <br />
 与此同时，由于国内局势出现动荡，哈萨克斯坦总统托卡耶夫已请求独联体集体安全条约组织（CSTO，简称集安组织）成员国帮助哈萨克斯坦应对“恐怖主义威胁”，集安组织各成员国也已派遣维和部队，抵达哈萨克斯坦执行任务。
 ''';
-    NovaItemDetail itemDetail = NovaItemDetail(
+    NovaDetailItem detailItem = NovaDetailItem(
         id: 0,
         urlString: 'http://urlString/',
         title: '被捕外国男子:收200多美元参加哈萨克斯坦抗议',
@@ -96,7 +96,7 @@ class _TopDetailPageState extends State<TopDetailPage> {
           // _buildBodyArea(context),
           // _buildCommentArea(context),
           // _buildRelationArea(context),
-          _buildContentArea(context, itemDetail: itemDetail)
+          _buildContentArea(context, detailItem: detailItem)
         ],
       ),
     );
@@ -141,7 +141,7 @@ class _TopDetailPageState extends State<TopDetailPage> {
     );
   }
 */
-  Widget _buildContentArea(BuildContext context, {NovaItemDetail? itemDetail}) {
+  Widget _buildContentArea(BuildContext context, {NovaDetailItem? detailItem}) {
     return Flexible(
       child: Wrap(
         children: <Widget>[
@@ -155,7 +155,7 @@ class _TopDetailPageState extends State<TopDetailPage> {
                 onWebViewCreated: (WebViewController controller) {
                   //_controller = controller;
                   controller.loadUrl(Uri.dataFromString(
-                          itemDetail?.toHtmlString() ?? '',
+                          detailItem?.toHtmlString() ?? '',
                           mimeType: 'text/html',
                           encoding: Encoding.getByName('utf-8'))
                       .toString());
