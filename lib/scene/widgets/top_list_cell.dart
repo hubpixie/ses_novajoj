@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:ses_novajoj/scene/top_list/top_list_presenter_output.dart';
 
 typedef CellSelectingDelegate = void Function();
 
 class TopListCell extends StatelessWidget {
-  //final TodoListRowViewModel row;
+  final NovaListRowViewModel item;
   final int index;
   final CellSelectingDelegate? onCellSelecting;
 
-  const TopListCell({Key? key, required this.index, this.onCellSelecting})
+  const TopListCell(
+      {Key? key, required this.item, required this.index, this.onCellSelecting})
       : super(key: key);
 
   @override
@@ -38,9 +40,8 @@ class TopListCell extends StatelessWidget {
                     child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                              "东京首次报告无出国记录而感染奥密克戎病例！东京首次报告无出国记录而感染奥密克戎病例！",
-                              style: TextStyle(
+                          Text(item.title,
+                              style: const TextStyle(
                                   fontSize: 16.0,
                                   fontWeight: FontWeight.bold,
                                   color: Color(0xff333333))),
@@ -49,30 +50,17 @@ class TopListCell extends StatelessWidget {
                             const Icon(Icons.chat_bubble_outline,
                                 size: 12, color: Colors.pinkAccent),
                             const SizedBox(width: 3),
-                            const Text("47",
-                                style: TextStyle(
+                            Text("${item.reads}",
+                                style: const TextStyle(
                                     fontSize: 12.0, color: Colors.pinkAccent)),
                             const SizedBox(width: 10),
-                            const Text("12/27(二) 8:12",
-                                style: TextStyle(
+                            Text(item.createAtText,
+                                style: const TextStyle(
                                     fontSize: 12.0,
                                     color: Colors.grey,
                                     textBaseline: TextBaseline.ideographic)),
                             const SizedBox(width: 10),
-                            Container(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 4.0),
-                              decoration: const BoxDecoration(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(5.0)),
-                                  color: Colors.black12),
-                              child: const Text("NEW",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 11.0,
-                                      color: Colors.redAccent,
-                                      letterSpacing: -0.5)),
-                            )
+                            _buildNewArrivalArea(isNew: item.isNew)
                           ])
                         ]))
               ]),
@@ -83,5 +71,22 @@ class TopListCell extends StatelessWidget {
               ),
               const SizedBox(height: 5),
             ])));
+  }
+
+  Widget _buildNewArrivalArea({required bool isNew}) {
+    return isNew
+        ? Container(
+            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+            decoration: const BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                color: Colors.black12),
+            child: Text(item.isNewText,
+                style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 11.0,
+                    color: Colors.redAccent,
+                    letterSpacing: -0.5)),
+          )
+        : Container();
   }
 }

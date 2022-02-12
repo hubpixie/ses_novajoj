@@ -1,6 +1,6 @@
 import 'nova_comment.dart';
 
-class NovaItemDetail {
+class NovaDetailItem {
   static const _kHtmlTemplateString = '''
 <html>
     <head>
@@ -41,7 +41,7 @@ class NovaItemDetail {
   String bodyString;
   String loadCommentAt;
   List<NovaComment>? comments;
-  NovaItemDetail(
+  NovaDetailItem(
       {required this.id,
       required this.urlString,
       required this.title,
