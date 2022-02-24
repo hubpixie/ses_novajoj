@@ -18,3 +18,9 @@ class NumberUtil {
     return rand.nextInt(max - min) + min;
   }
 }
+
+extension NumberUtilFromString on NumberUtil {
+  int? parseInt({required String string}) {
+    return int.tryParse(string);
+  }
+}

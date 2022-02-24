@@ -61,3 +61,13 @@ class DateUtil {
     return DateFormat('H:mm').format(datetime);
   }
 }
+
+extension DateUtilFromString on DateUtil {
+  DateTime? fromString(String dateString,
+      {String format = "MM/dd/yy", String locale = "zh_CN"}) {
+    Intl.defaultLocale = locale;
+
+    var formatter = DateFormat(format, locale);
+    return formatter.parse(dateString); // Convert dateString into date
+  }
+}

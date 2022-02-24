@@ -31,5 +31,7 @@
     "tabBarNameLocal": "本地",
     "tabBarNameSearch": "检索",
     "tabBarNameThreads": "热帖",
-    "topDetailNewsSoourceLabel":"新闻来源："
+    "topDetailNewsSoourceLabel":"新闻来源：",
+    "todayHotNews":"【本日热评】",
+    "todayPopularNews":"【本日热门】"
   }

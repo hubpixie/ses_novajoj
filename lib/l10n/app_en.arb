@@ -31,5 +31,7 @@
   "tabBarNameLocal": "Local",
   "tabBarNameSearch": "Serch",
   "tabBarNameThreads": "Threads",
-  "topDetailNewsSoourceLabel":"News source:"
+  "topDetailNewsSoourceLabel":"News source:",
+  "todayHotNews":"Today's Hot",
+  "todayPopularNews":"Today's Populary"
 }

@@ -13,6 +13,9 @@ class NovaListRowViewModel {
   String thunnailUrlString;
   String title;
   String urlString;
+  String source;
+  String commentUrlString;
+  int commentCount;
   DateTime createAt;
   String createAtText;
   int reads;
@@ -25,6 +28,9 @@ class NovaListRowViewModel {
         thunnailUrlString = model.thunnailUrlString,
         title = model.title,
         urlString = model.urlString,
+        source = model.source,
+        commentUrlString = model.commentUrlString,
+        commentCount = model.commentCount,
         createAt = model.createAt,
         createAtText = DateUtil().getDateMdeHmsString(date: model.createAt),
         reads = model.reads,
