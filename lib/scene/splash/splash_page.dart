@@ -45,6 +45,7 @@ class _SplashPageState extends State<SplashPage> {
             child: Container(
               padding: const EdgeInsets.fromLTRB(0, 80, 0, 0),
               child: CircularProgressIndicator(
+                color: Colors.amber,
                 backgroundColor: Colors.grey[850],
               ),
             ),

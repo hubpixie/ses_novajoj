@@ -17,14 +17,26 @@ class TopListPage extends StatefulWidget {
 
 class _TopListPageState extends State<TopListPage> {
   int _selectedIconIndex = 0;
-  late String _selectedAppBarTitle =
-      L10n.of(context)?.appBarFullNameLatest ?? '';
+
+  late final List<String> _appBarTitleList = [
+    L10n.of(context)?.appBarFullNameLatest ?? '',
+    L10n.of(context)?.appBarFullNameOptic ?? '',
+    L10n.of(context)?.appBarFullNameRecommending ?? '',
+    L10n.of(context)?.appBarFullNameHot ?? '',
+    L10n.of(context)?.appBarFullNameCommenting ?? '',
+  ];
+  String _prefixNovaTitle = '';
+  late final _prefixNovaTitleHot = L10n.of(context)?.todayHotNews ?? '';
+  late final _prefixNovaTitlePopulary =
+      L10n.of(context)?.todayPopularNews ?? '';
+
+  late String _selectedAppBarTitle = _appBarTitleList[_selectedIconIndex];
 
   @override
   void initState() {
     // send viewEvent
     FirebaseUtil().sendViewEvent(route: AnalyticsRoute.topList);
-    widget.presenter.eventViewReady();
+    widget.presenter.eventViewReady(targetUrlIndex: _selectedIconIndex);
     super.initState();
   }
 
@@ -47,8 +59,11 @@ class _TopListPageState extends State<TopListPage> {
           child: StreamBuilder<TopListPresenterOutput>(
               stream: widget.presenter.stream,
               builder: (context, snapshot) {
-                if (!snapshot.hasData) {
-                  return Text("Loading ...");
+                if (widget.presenter.isProcessing) {
+                  return Center(
+                      child: CircularProgressIndicator(
+                          color: Colors.amber,
+                          backgroundColor: Colors.grey[850]));
                 }
                 final data = snapshot.data;
                 if (data is ShowNovaListModel) {
@@ -57,8 +72,21 @@ class _TopListPageState extends State<TopListPage> {
                       itemBuilder: (context, index) => TopListCell(
                           item: data.viewModelList[index],
                           onCellSelecting: () {
-                            print('onCellSelecting = $index');
-                            widget.presenter.startTopDetail(context);
+                            widget.presenter.eventSelectDetail(context);
+                          },
+                          onThumbnailShowing: (thumbIndex) async {
+                            if (data.viewModelList[thumbIndex].thunnailUrlString
+                                .isNotEmpty) {
+                              return data
+                                  .viewModelList[thumbIndex].thunnailUrlString;
+                            }
+                            final retUrl = await widget.presenter
+                                .eventFetchThumbnail(
+                                    targetUrl: data
+                                        .viewModelList[thumbIndex].urlString);
+                            data.viewModelList[thumbIndex].thunnailUrlString =
+                                retUrl;
+                            return retUrl;
                           },
                           index: index));
                 } else {
@@ -137,7 +165,14 @@ class _TopListPageState extends State<TopListPage> {
           child: IconButton(
               padding: const EdgeInsets.all(0.0),
               color: Colors.white,
-              onPressed: () {},
+              onPressed: () {
+                // reload data
+                widget.presenter.eventViewReady(
+                    targetUrlIndex: _selectedIconIndex,
+                    prefixTitle: _prefixNovaTitle,
+                    isReloaded: true);
+                setState(() {});
+              },
               icon: const Icon(Icons.refresh_rounded))),
       SizedBox(
         width: MediaQuery.of(context).size.width <= 375 ? 0 : 25,
@@ -147,16 +182,22 @@ class _TopListPageState extends State<TopListPage> {
   }
 
   void _selectTextIcon(int index) {
-    List<String> titles = [
-      L10n.of(context)?.appBarFullNameLatest ?? '',
-      L10n.of(context)?.appBarFullNameOptic ?? '',
-      L10n.of(context)?.appBarFullNameRecommending ?? '',
-      L10n.of(context)?.appBarFullNameHot ?? '',
-      L10n.of(context)?.appBarFullNameCommenting ?? '',
-    ];
-    setState(() {
-      _selectedIconIndex = index;
-      _selectedAppBarTitle = titles[index];
+    _selectedIconIndex = index;
+    _selectedAppBarTitle = _appBarTitleList[index];
+    _prefixNovaTitle = () {
+      String retStr = "";
+      if (index == 3) {
+        retStr = _prefixNovaTitleHot;
+      } else if (index == 4) {
+        retStr = _prefixNovaTitlePopulary;
+      }
+      return retStr;
+    }();
+    // reload data
+    widget.presenter.eventViewReady(
+        targetUrlIndex: index, prefixTitle: _prefixNovaTitle, isReloaded: true);
+    Future.delayed(const Duration(seconds: 1), () {
+      setState(() {});
     });
   }
 }

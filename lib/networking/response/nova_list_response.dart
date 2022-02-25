@@ -1,4 +1,4 @@
-class NovaListItem {
+class NovaListItemRes {
   int id;
   String thunnailUrlString;
   String title;
@@ -11,7 +11,7 @@ class NovaListItem {
   bool isRead;
   bool isNew;
 
-  NovaListItem(
+  NovaListItemRes(
       {required this.id,
       required this.thunnailUrlString,
       required this.title,

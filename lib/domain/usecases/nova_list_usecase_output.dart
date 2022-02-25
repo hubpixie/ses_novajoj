@@ -14,6 +14,9 @@ class NovaListUseCaseRowModel {
   String thunnailUrlString;
   String title;
   String urlString;
+  String source;
+  String commentUrlString;
+  int commentCount;
   DateTime createAt;
   int reads;
   bool isRead;
@@ -24,6 +27,9 @@ class NovaListUseCaseRowModel {
         thunnailUrlString = entity.thunnailUrlString,
         title = entity.title,
         urlString = entity.urlString,
+        source = entity.source,
+        commentUrlString = entity.commentUrlString,
+        commentCount = entity.commentCount,
         createAt = entity.createAt,
         reads = entity.reads,
         isRead = entity.isRead,

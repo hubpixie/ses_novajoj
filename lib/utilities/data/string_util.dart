@@ -1,0 +1,27 @@
+import 'package:intl/intl.dart';
+
+class StringUtil {
+  static final StringUtil _instance = StringUtil._internal();
+  factory StringUtil() {
+    return _instance;
+  }
+  StringUtil._internal();
+
+  String substring(String string,
+      {required String start, required String end}) {
+    int pos1 = string.indexOf(start);
+    int pos2 = string.indexOf(end);
+    if (pos1 < 0) {
+      return string;
+    }
+    pos1 = pos1 + start.length;
+    if (pos2 < 0 || pos2 < pos1) {
+      return string;
+    }
+    return string.substring(pos1, pos2);
+  }
+
+  String thousandFormat(int value) {
+    return NumberFormat('###,000').format(value);
+  }
+}
