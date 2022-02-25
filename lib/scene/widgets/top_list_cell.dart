@@ -72,11 +72,12 @@ class TopListCell extends StatelessWidget {
                               children: [
                                 const SizedBox(width: 1, height: 20),
                                 Container(
-                                    width: _calculateAutoscaleWidth(item.source,
-                                        fontSize: 12),
+                                    width: _calculateAutoscaleWidth(
+                                        context, item.source, fontSize: 12),
                                     height: 18,
                                     alignment: Alignment.bottomLeft,
                                     child: Text(item.source,
+                                        overflow: TextOverflow.ellipsis,
                                         style: const TextStyle(
                                             fontSize: 12.0,
                                             color: Colors.black54))),
@@ -90,7 +91,7 @@ class TopListCell extends StatelessWidget {
                                 Container(
                                     height: 18,
                                     alignment: Alignment.bottomLeft,
-                                    child: Text("${item.reads}",
+                                    child: Text(item.readsText,
                                         style: const TextStyle(
                                             fontSize: 12.0,
                                             color: Colors.pinkAccent))),
@@ -132,13 +133,13 @@ class TopListCell extends StatelessWidget {
         : Container();
   }
 
-  double _calculateAutoscaleWidth(String text,
-      {required double fontSize, double maxWidth = 120}) {
+  double _calculateAutoscaleWidth(BuildContext context, String text,
+      {required double fontSize, double deltaWith = 240}) {
     final textPainter = TextPainter(textDirection: TextDirection.ltr);
     final style = TextStyle(fontSize: fontSize);
     textPainter.text = TextSpan(text: text, style: style);
     textPainter.layout();
-
+    double maxWidth = MediaQuery.of(context).size.width - deltaWith;
     return textPainter.width >= maxWidth ? maxWidth : textPainter.width;
   }
 }

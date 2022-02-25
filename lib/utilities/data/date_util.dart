@@ -17,7 +17,7 @@ class DateUtil {
     return formatter.format(datetime); // DateからString
   }
 
-  String getDateMdeHmsString({DateTime? date}) {
+  String getDateString({DateTime? date, format = 'M/d (E) H:mm:ss'}) {
     initializeDateFormatting("zh_CN");
 
     DateTime datetime = date ?? DateTime.now();
@@ -25,7 +25,7 @@ class DateUtil {
     String weekDayStr = wDayFormater.format(datetime);
     String weekDayLastStr =
         weekDayStr.length > 1 ? weekDayStr[weekDayStr.length - 1] : weekDayStr;
-    var formatter = DateFormat("M/d (E) H:mm:ss", "zh_CN");
+    var formatter = DateFormat(format, "zh_CN");
     String retStr = formatter.format(datetime);
 
     return retStr.replaceAll(weekDayStr, weekDayLastStr); // DateからString

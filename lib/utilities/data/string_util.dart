@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 class StringUtil {
   static final StringUtil _instance = StringUtil._internal();
   factory StringUtil() {
@@ -17,5 +19,9 @@ class StringUtil {
       return string;
     }
     return string.substring(pos1, pos2);
+  }
+
+  String thousandFormat(int value) {
+    return NumberFormat('###,000').format(value);
   }
 }

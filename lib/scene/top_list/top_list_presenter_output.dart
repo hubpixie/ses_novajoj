@@ -1,5 +1,6 @@
 import 'package:ses_novajoj/domain/usecases/nova_list_usecase_output.dart';
 import 'package:ses_novajoj/utilities/data/date_util.dart';
+import 'package:ses_novajoj/utilities/data/string_util.dart';
 
 abstract class TopListPresenterOutput {}
 
@@ -19,6 +20,7 @@ class NovaListRowViewModel {
   DateTime createAt;
   String createAtText;
   int reads;
+  String readsText;
   bool isRead;
   bool isNew;
   String isNewText;
@@ -32,8 +34,10 @@ class NovaListRowViewModel {
         commentUrlString = model.commentUrlString,
         commentCount = model.commentCount,
         createAt = model.createAt,
-        createAtText = DateUtil().getDateMdeHmsString(date: model.createAt),
+        createAtText =
+            DateUtil().getDateString(date: model.createAt, format: 'M/d (E)'),
         reads = model.reads,
+        readsText = StringUtil().thousandFormat(model.reads),
         isRead = model.isRead,
         isNew = model.isNew,
         isNewText = model.isNew ? 'NEW' : '';
