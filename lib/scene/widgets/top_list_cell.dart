@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ses_novajoj/scene/top_list/top_list_presenter_output.dart';
 
-typedef CellSelectingDelegate = void Function();
+typedef CellSelectingDelegate = void Function(int);
 typedef ThumbnameShowingDelegate = Future<String> Function(int);
 
 class TopListCell extends StatelessWidget {
@@ -22,7 +22,7 @@ class TopListCell extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
         onTap: () {
-          onCellSelecting?.call();
+          onCellSelecting?.call(index);
         },
         splashColor: Colors.black12,
         splashFactory: InkRipple.splashFactory,

@@ -13,7 +13,7 @@ abstract class TopListPresenter with SimpleBloc<TopListPresenterOutput> {
       {required int targetUrlIndex,
       String? prefixTitle,
       bool isReloaded = false});
-  void eventSelectDetail(Object context);
+  void eventSelectDetail(Object context, {Object? itemInfo});
   Future<String> eventFetchThumbnail({required String targetUrl});
 }
 
@@ -45,8 +45,8 @@ class TopListPresenterImpl extends TopListPresenter {
   }
 
   @override
-  void eventSelectDetail(Object context) {
-    router.gotoTopDetail(context);
+  void eventSelectDetail(Object context, {Object? itemInfo}) {
+    router.gotoTopDetail(context, itemInfo: itemInfo);
   }
 
   @override
@@ -59,8 +59,6 @@ class TopListPresenterImpl extends TopListPresenter {
       if (event is PresentModel) {
         streamAdd(ShowNovaListModel(
             event.model.map((row) => NovaListRowViewModel(row)).toList()));
-      } else if (event is PresentItemDetail) {
-        //router.routeShowItemDetail();
       }
       _isProcessing = false;
     });

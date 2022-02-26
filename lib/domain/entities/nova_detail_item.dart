@@ -1,4 +1,5 @@
 import 'package:ses_novajoj/utilities/data/user_types.dart';
+import 'package:ses_novajoj/utilities/data/date_util.dart';
 
 class NovaDetailItem {
   static const _kHtmlTemplateString = '''
@@ -12,6 +13,16 @@ class NovaDetailItem {
               max-width: 100%; 
               height: auto; 
           }
+          body 
+          {
+            min-height:100%; height:100%; 
+            overflow:scroll; 
+            display:block;
+            -webkit-transition: all .3s;
+            -moz-transition: all .3s;
+            -ms-transition: all .3s;
+            -o-transition: all .3s;
+          }       
         </style>
     </head>
     <body>
@@ -19,7 +30,7 @@ class NovaDetailItem {
 		<hr style="border-top: 1px solid #bbb;">  
 		<p style="text-align:center;">
 <!-- itemSource -->
-			{{itemSource}} 
+			{{itemSource}}  Latest Upated:{{createAt}} 
 		</p>      
 		<hr style="border-top: 1px solid #bbb;">  
         <div id='shownewsc' style="margin:15px;">
@@ -44,6 +55,10 @@ class NovaDetailItem {
   String toHtmlString() {
     String html = _kHtmlTemplateString.replaceAll(r'{{title}}', itemInfo.title);
     html = html.replaceAll(r'{{itemSource}}', itemInfo.source);
+    html = html.replaceAll(
+        r'{{createAt}}',
+        DateUtil().getDateString(
+            date: itemInfo.createAt, format: 'yyyy-MM-dd H:mm:ss'));
     html = html.replaceAll(r'{{author}}', itemInfo.author);
     html = html.replaceAll(r'{{body}}', bodyString);
     return html;

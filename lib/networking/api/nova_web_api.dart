@@ -6,6 +6,7 @@ import 'package:ses_novajoj/utilities/data/string_util.dart';
 import 'package:ses_novajoj/networking/api_client/base_api_client.dart';
 import 'package:ses_novajoj/networking/api_client/api_result.dart';
 import 'package:ses_novajoj/networking/request/nova_item_parameter.dart';
+import 'package:ses_novajoj/networking/request/nova_detalo_parameter.dart';
 import 'package:ses_novajoj/networking/response/nova_list_response.dart';
 import 'package:ses_novajoj/networking/response/nova_detalo_item_response.dart';
 import 'package:ses_novajoj/utilities/data/user_types.dart';

@@ -8,8 +8,6 @@ class PresentModel extends NovaListUseCaseOutput {
   PresentModel(this.model);
 }
 
-class PresentItemDetail extends NovaListUseCaseOutput {}
-
 class NovaListUseCaseRowModel {
   NovaItemInfo itemInfo;
 

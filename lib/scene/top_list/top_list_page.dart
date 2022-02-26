@@ -71,8 +71,10 @@ class _TopListPageState extends State<TopListPage> {
                       itemCount: data.viewModelList.length,
                       itemBuilder: (context, index) => TopListCell(
                           viewModel: data.viewModelList[index],
-                          onCellSelecting: () {
-                            widget.presenter.eventSelectDetail(context);
+                          onCellSelecting: (selIndex) {
+                            widget.presenter.eventSelectDetail(context,
+                                itemInfo:
+                                    data.viewModelList[selIndex].itemInfo);
                           },
                           onThumbnailShowing: (thumbIndex) async {
                             if (data.viewModelList[thumbIndex].itemInfo

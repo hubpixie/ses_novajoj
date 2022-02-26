@@ -21,6 +21,14 @@ class StringUtil {
     return string.substring(pos1, pos2);
   }
 
+  String subfix(String string, {int width = 0}) {
+    int start = string.length - width;
+    if (start > 0) {
+      return string.substring(start);
+    }
+    return string;
+  }
+
   String thousandFormat(int value) {
     return NumberFormat('###,##0').format(value);
   }
