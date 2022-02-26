@@ -70,22 +70,22 @@ class _TopListPageState extends State<TopListPage> {
                   return ListView.builder(
                       itemCount: data.viewModelList.length,
                       itemBuilder: (context, index) => TopListCell(
-                          item: data.viewModelList[index],
+                          viewModel: data.viewModelList[index],
                           onCellSelecting: () {
                             widget.presenter.eventSelectDetail(context);
                           },
                           onThumbnailShowing: (thumbIndex) async {
-                            if (data.viewModelList[thumbIndex].thunnailUrlString
-                                .isNotEmpty) {
-                              return data
-                                  .viewModelList[thumbIndex].thunnailUrlString;
+                            if (data.viewModelList[thumbIndex].itemInfo
+                                .thunnailUrlString.isNotEmpty) {
+                              return data.viewModelList[thumbIndex].itemInfo
+                                  .thunnailUrlString;
                             }
                             final retUrl = await widget.presenter
                                 .eventFetchThumbnail(
-                                    targetUrl: data
-                                        .viewModelList[thumbIndex].urlString);
-                            data.viewModelList[thumbIndex].thunnailUrlString =
-                                retUrl;
+                                    targetUrl: data.viewModelList[thumbIndex]
+                                        .itemInfo.urlString);
+                            data.viewModelList[thumbIndex].itemInfo
+                                .thunnailUrlString = retUrl;
                             return retUrl;
                           },
                           index: index));

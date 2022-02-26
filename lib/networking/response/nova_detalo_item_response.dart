@@ -1,9 +1,11 @@
 import 'package:ses_novajoj/utilities/data/user_types.dart';
 
-class NovaListItem {
+class NovaDetaloItemRes {
   NovaItemInfo itemInfo;
+  String bodyString;
 
-  NovaListItem({
+  NovaDetaloItemRes({
     required this.itemInfo,
+    required this.bodyString,
   });
 }

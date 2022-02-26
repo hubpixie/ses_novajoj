@@ -21,11 +21,11 @@ class NewsListUseCase with SimpleBloc<NovaListUseCaseOutput> {
         targetUrl: "https://www.6parknews.com/newspark/index.php?act=gold",
         docType: NovaDocType.list),
     FetchNewsListRepoInput(
-        targetUrl:
-            "https://www.6parknews.com/newspark/index.php?app=news&act=hotreply",
+        targetUrl: "https://www.6parknews.com/newspark/index.php?act=hotview",
         docType: NovaDocType.table),
     FetchNewsListRepoInput(
-        targetUrl: "https://www.6parknews.com/newspark/index.php?act=hotview",
+        targetUrl:
+            "https://www.6parknews.com/newspark/index.php?app=news&act=hotreply",
         docType: NovaDocType.table),
   ];
 
@@ -35,7 +35,7 @@ class NewsListUseCase with SimpleBloc<NovaListUseCaseOutput> {
     String prefixTitle_ = prefixTitle ?? '';
     for (var index = 0; index < list.length; index++) {
       if (index < 4) {
-        list[index].title = prefixTitle_ + list[index].title;
+        list[index].itemInfo.title = prefixTitle_ + list[index].itemInfo.title;
       }
     }
 

@@ -4,7 +4,6 @@ import 'package:ses_novajoj/networking/request/nova_item_parameter.dart';
 import 'package:ses_novajoj/domain/entities/nova_list_item.dart';
 import 'package:ses_novajoj/domain/repositories/nova_list_repository.dart';
 import 'package:ses_novajoj/networking/response/nova_list_response.dart';
-import 'package:ses_novajoj/utilities/data/number_ntil.dart';
 
 class NovaListRepositoryImpl extends NovaListRepository {
   final NovaWebApi _api;
@@ -12,27 +11,7 @@ class NovaListRepositoryImpl extends NovaListRepository {
   // sigleton
   static final NovaListRepositoryImpl _instance =
       NovaListRepositoryImpl._internal();
-  NovaListRepositoryImpl._internal() : _api = NovaWebApi() {
-    /*
-    novaItems.addAll([
-      NovaListItem(
-          id: 1,
-          thunnailUrlString: "thuilUrlString",
-          title: "title",
-          urlString: "urlString",
-          createAt: DateTime.now(),
-          reads: 12,
-          isNew: true),
-      NovaListItem(
-          id: 2,
-          thunnailUrlString: "thuilUrlString",
-          title: "title",
-          urlString: "urlString",
-          createAt: DateTime.now().add(const Duration(days: -1)),
-          reads: 12)
-    ]);
-    */
-  }
+  NovaListRepositoryImpl._internal() : _api = NovaWebApi();
   factory NovaListRepositoryImpl() => _instance;
 
   @override
@@ -49,16 +28,8 @@ class NovaListRepositoryImpl extends NovaListRepository {
     result.when(success: (response) {
       for (var item in response) {
         NovaListItem retItem = NovaListItem(
-            id: item.id,
-            thunnailUrlString: item.thunnailUrlString,
-            title: item.title,
-            urlString: item.urlString,
-            source: item.source,
-            commentUrlString: item.commentUrlString,
-            commentCount: item.commentCount,
-            createAt: item.createAt,
-            reads: item.reads,
-            isNew: item.isNew);
+          itemInfo: item.itemInfo,
+        );
         novaItems.add(retItem);
       }
     }, failure: (code, description) {

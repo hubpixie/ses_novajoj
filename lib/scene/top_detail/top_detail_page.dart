@@ -75,14 +75,15 @@ class _TopDetailPageState extends State<TopDetailPage> {
 <br />
 与此同时，由于国内局势出现动荡，哈萨克斯坦总统托卡耶夫已请求独联体集体安全条约组织（CSTO，简称集安组织）成员国帮助哈萨克斯坦应对“恐怖主义威胁”，集安组织各成员国也已派遣维和部队，抵达哈萨克斯坦执行任务。
 ''';
-    NovaDetailItem detailItem = NovaDetailItem(
-        id: 0,
-        urlString: 'http://urlString/',
-        title: '被捕外国男子:收200多美元参加哈萨克斯坦抗议',
-        itemSource: '新闻来源: 观察者网 于2022-01-09 5:25:48',
-        author: '【文/观察者网 熊超然】',
-        bodyString: bodyStr,
-        loadCommentAt: 'loadCommentAt');
+    NovaDetailItem? detailItem;
+    // NovaDetailItem detailItem = NovaDetailItem(
+    //     id: 0,
+    //     urlString: 'http://urlString/',
+    //     title: '被捕外国男子:收200多美元参加哈萨克斯坦抗议',
+    //     itemSource: '新闻来源: 观察者网 于2022-01-09 5:25:48',
+    //     author: '【文/观察者网 熊超然】',
+    //     bodyString: bodyStr,
+    //     loadCommentAt: 'loadCommentAt');
 
     return Scaffold(
       appBar: AppBar(

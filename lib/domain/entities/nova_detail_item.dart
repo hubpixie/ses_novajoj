@@ -1,4 +1,4 @@
-import 'nova_comment.dart';
+import 'package:ses_novajoj/utilities/data/user_types.dart';
 
 class NovaDetailItem {
   static const _kHtmlTemplateString = '''
@@ -33,28 +33,18 @@ class NovaDetailItem {
     </body>
 </html>    ''';
 
-  int id;
-  String urlString;
-  String title;
-  String itemSource;
-  String author;
+  NovaItemInfo itemInfo;
   String bodyString;
-  String loadCommentAt;
-  List<NovaComment>? comments;
-  NovaDetailItem(
-      {required this.id,
-      required this.urlString,
-      required this.title,
-      required this.itemSource,
-      required this.author,
-      required this.bodyString,
-      required this.loadCommentAt,
-      this.comments});
+
+  NovaDetailItem({
+    required this.itemInfo,
+    required this.bodyString,
+  });
 
   String toHtmlString() {
-    String html = _kHtmlTemplateString.replaceAll(r'{{title}}', title);
-    html = html.replaceAll(r'{{itemSource}}', itemSource);
-    html = html.replaceAll(r'{{author}}', author);
+    String html = _kHtmlTemplateString.replaceAll(r'{{title}}', itemInfo.title);
+    html = html.replaceAll(r'{{itemSource}}', itemInfo.source);
+    html = html.replaceAll(r'{{author}}', itemInfo.author);
     html = html.replaceAll(r'{{body}}', bodyString);
     return html;
   }

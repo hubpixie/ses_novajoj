@@ -7,7 +7,10 @@ import 'package:ses_novajoj/networking/api_client/base_api_client.dart';
 import 'package:ses_novajoj/networking/api_client/api_result.dart';
 import 'package:ses_novajoj/networking/request/nova_item_parameter.dart';
 import 'package:ses_novajoj/networking/response/nova_list_response.dart';
+import 'package:ses_novajoj/networking/response/nova_detalo_item_response.dart';
 import 'package:ses_novajoj/utilities/data/user_types.dart';
+
+part 'nova_web_api_detalo.dart';
 
 enum NovaDomainReason {
   notFound,
@@ -206,19 +209,21 @@ class NovaWebApi {
       reads = NumberUtil().parseInt(string: readsStr) ?? 0;
     }
 
-    retNovaItem = NovaListItemRes(
+    NovaItemInfo itemInfo = NovaItemInfo(
         id: id,
         thunnailUrlString: thunnailUrlString,
         title: title,
         urlString: urlString,
         source: source,
+        author: '',
+        createAt: createAt ?? DateTime.now(),
+        loadCommentAt: '',
         commentUrlString: commentUrlString,
         commentCount: commentCount,
-        createAt: createAt ?? DateTime.now(),
         reads: reads,
         isNew: isNew,
         isRead: isRead);
-    return retNovaItem;
+    return NovaListItemRes(itemInfo: itemInfo);
   }
 
   ///  <div id="d_list"  class="main_right_margin">
@@ -367,19 +372,21 @@ class NovaWebApi {
       commentUrlString = parentUrl + tmpUrl;
     }
 
-    retNovaItem = NovaListItemRes(
+    NovaItemInfo itemInfo = NovaItemInfo(
         id: id,
         thunnailUrlString: thunnailUrlString,
         title: title,
         urlString: urlString,
         source: source,
+        author: '',
+        createAt: createAt ?? DateTime.now(),
+        loadCommentAt: '',
         commentUrlString: commentUrlString,
         commentCount: commentCount,
-        createAt: createAt ?? DateTime.now(),
         reads: reads,
         isNew: isNew,
         isRead: isRead);
-    return retNovaItem;
+    return NovaListItemRes(itemInfo: itemInfo);
   }
 
   String _parentUrl({required String url}) {

@@ -22,6 +22,6 @@ class StringUtil {
   }
 
   String thousandFormat(int value) {
-    return NumberFormat('###,000').format(value);
+    return NumberFormat('###,##0').format(value);
   }
 }
