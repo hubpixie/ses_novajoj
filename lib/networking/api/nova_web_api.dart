@@ -1,15 +1,15 @@
 import 'package:html/parser.dart' as html_parser;
 import 'package:html/dom.dart';
-import 'package:ses_novajoj/utilities/data/date_util.dart';
-import 'package:ses_novajoj/utilities/data/number_ntil.dart';
-import 'package:ses_novajoj/utilities/data/string_util.dart';
+import 'package:ses_novajoj/foundation/data/date_util.dart';
+import 'package:ses_novajoj/foundation/data/number_ntil.dart';
+import 'package:ses_novajoj/foundation/data/string_util.dart';
+import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/networking/api_client/base_api_client.dart';
 import 'package:ses_novajoj/networking/api_client/api_result.dart';
 import 'package:ses_novajoj/networking/request/nova_item_parameter.dart';
 import 'package:ses_novajoj/networking/request/nova_detalo_parameter.dart';
 import 'package:ses_novajoj/networking/response/nova_list_response.dart';
 import 'package:ses_novajoj/networking/response/nova_detalo_item_response.dart';
-import 'package:ses_novajoj/utilities/data/user_types.dart';
 
 part 'nova_web_api_detalo.dart';
 

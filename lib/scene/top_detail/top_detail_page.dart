@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:ses_novajoj/utilities/log_util.dart';
+import 'package:ses_novajoj/foundation/log_util.dart';
+import 'package:ses_novajoj/foundation/firebase_util.dart';
+import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/domain/utilities/bloc/bloc_provider.dart';
-import 'package:ses_novajoj/utilities/firebase_util.dart';
-import 'package:ses_novajoj/utilities/data/user_types.dart';
 import 'package:ses_novajoj/scene/utilities/page_util/page_parameter.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 

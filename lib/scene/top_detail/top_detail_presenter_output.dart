@@ -1,6 +1,6 @@
-import 'package:ses_novajoj/utilities/data/date_util.dart';
-import 'package:ses_novajoj/utilities/data/user_types.dart';
-import 'package:ses_novajoj/utilities/data/string_util.dart';
+import 'package:ses_novajoj/foundation/data/date_util.dart';
+import 'package:ses_novajoj/foundation/data/user_types.dart';
+import 'package:ses_novajoj/foundation/data/string_util.dart';
 import 'package:ses_novajoj/domain/usecases/nova_detail_usecase_output.dart';
 
 abstract class TopDetailPresenterOutput {}
