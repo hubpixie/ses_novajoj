@@ -38,7 +38,7 @@ class AppError {
           type = AppErrorType.network;
           break;
         case DioErrorType.response:
-          // TODO(api): need define more http status;
+          // TODO_api: need define more http status;
           switch (error.response?.statusCode) {
             case HttpStatus.badRequest: // 400
               type = AppErrorType.badRequest;

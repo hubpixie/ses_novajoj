@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:ses_novajoj/domain/utilities/bloc/simple_bloc.dart';
+import 'package:ses_novajoj/domain/foundation/bloc/simple_bloc.dart';
 import 'package:ses_novajoj/domain/usecases/nova_list_usecase.dart';
 import 'package:ses_novajoj/domain/usecases/nova_list_usecase_output.dart';
 import 'top_list_router.dart';

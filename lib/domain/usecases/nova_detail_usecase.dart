@@ -1,5 +1,5 @@
 import 'package:ses_novajoj/domain/repositories/nova_detail_repository.dart';
-import 'package:ses_novajoj/domain/utilities/bloc/simple_bloc.dart';
+import 'package:ses_novajoj/domain/foundation/bloc/simple_bloc.dart';
 import 'package:ses_novajoj/domain/entities/nova_detail_item.dart';
 import 'package:ses_novajoj/data/repositories/nova_detail_repository.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';

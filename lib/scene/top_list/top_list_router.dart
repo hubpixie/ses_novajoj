@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:ses_novajoj/scene/utilities/page_util/page_parameter.dart';
-import 'package:ses_novajoj/scene/utilities/page_util/screen_route_enums.dart';
+import 'package:ses_novajoj/scene/foundation/page_util/page_parameter.dart';
+import 'package:ses_novajoj/scene/foundation/page_util/screen_route_enums.dart';
 
 abstract class TopListRouter {
   void gotoLogin(Object context);
