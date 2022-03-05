@@ -141,7 +141,10 @@ class TopListCell extends StatelessWidget {
     final style = TextStyle(fontSize: fontSize);
     textPainter.text = TextSpan(text: text, style: style);
     textPainter.layout();
-    double maxWidth = MediaQuery.of(context).size.width - deltaWith;
+    double maxWidth = (double screenWidth) {
+      double deltaWidth_ = screenWidth <= 320 ? 15 : 0;
+      return screenWidth - deltaWith - deltaWidth_;
+    }(MediaQuery.of(context).size.width);
     return textPainter.width >= maxWidth ? maxWidth : textPainter.width;
   }
 }

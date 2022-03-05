@@ -44,3 +44,15 @@ class NovaItemInfo {
       this.isRead = false,
       this.isNew = false});
 }
+
+abstract class PresenterOutput {}
+
+class PresentError extends PresenterOutput {
+  final int code;
+  final String message;
+  final String reason;
+
+  PresentError(this.code, this.message, this.reason);
+}
+
+class NetworkType {}

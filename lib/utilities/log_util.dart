@@ -12,3 +12,5 @@ class Log {
   static final _logger = SimpleLogger();
   final SimpleLogger logger = _logger;
 }
+
+final log = Log().logger;

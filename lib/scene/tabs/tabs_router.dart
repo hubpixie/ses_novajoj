@@ -4,8 +4,6 @@ abstract class TabsRouter {
   void gotoLogin();
 }
 
-final log = Log().logger;
-
 class TabsRouterImpl extends TabsRouter {
   TabsRouterImpl();
 

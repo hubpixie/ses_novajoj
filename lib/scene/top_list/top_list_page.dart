@@ -73,6 +73,7 @@ class _TopListPageState extends State<TopListPage> {
                           viewModel: data.viewModelList[index],
                           onCellSelecting: (selIndex) {
                             widget.presenter.eventSelectDetail(context,
+                                appBarTitle: _selectedAppBarTitle,
                                 itemInfo:
                                     data.viewModelList[selIndex].itemInfo);
                           },

@@ -1,12 +1,6 @@
-import 'package:flutter/material.dart';
-import 'package:ses_novajoj/scene/utilities/page_util/screen_route_enums.dart';
-import 'package:ses_novajoj/utilities/log_util.dart';
-
 abstract class TopDetailRouter {
   //void gotoTop(Object context);
 }
-
-final log = Log().logger;
 
 class TopDetailRouterImpl extends TopDetailRouter {
   TopDetailRouterImpl();

@@ -13,7 +13,8 @@ abstract class TopListPresenter with SimpleBloc<TopListPresenterOutput> {
       {required int targetUrlIndex,
       String? prefixTitle,
       bool isReloaded = false});
-  void eventSelectDetail(Object context, {Object? itemInfo});
+  void eventSelectDetail(Object context,
+      {required String appBarTitle, Object? itemInfo});
   Future<String> eventFetchThumbnail({required String targetUrl});
 }
 
@@ -45,8 +46,9 @@ class TopListPresenterImpl extends TopListPresenter {
   }
 
   @override
-  void eventSelectDetail(Object context, {Object? itemInfo}) {
-    router.gotoTopDetail(context, itemInfo: itemInfo);
+  void eventSelectDetail(Object context,
+      {required String appBarTitle, Object? itemInfo}) {
+    router.gotoTopDetail(context, appBarTitle: appBarTitle, itemInfo: itemInfo);
   }
 
   @override

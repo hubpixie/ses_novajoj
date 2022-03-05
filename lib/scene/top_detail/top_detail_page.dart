@@ -1,7 +1,6 @@
 import 'dart:convert';
-import 'dart:io';
-
 import 'package:flutter/material.dart';
+import 'package:ses_novajoj/utilities/log_util.dart';
 import 'package:ses_novajoj/domain/utilities/bloc/bloc_provider.dart';
 import 'package:ses_novajoj/utilities/firebase_util.dart';
 import 'package:ses_novajoj/utilities/data/user_types.dart';
@@ -21,6 +20,7 @@ class TopDetailPage extends StatefulWidget {
 
 class _TopDetailPageState extends State<TopDetailPage> {
   late Map? _parameters;
+  late String _appBarTitle;
   late NovaItemInfo? _itemInfo;
   bool _buildIsFirst = true;
 
@@ -29,7 +29,6 @@ class _TopDetailPageState extends State<TopDetailPage> {
     super.initState();
     // send viewEvent
     FirebaseUtil().sendViewEvent(route: AnalyticsRoute.topDetail);
-    if (Platform.isAndroid) WebView.platform = AndroidWebView();
     _buildIsFirst = true;
   }
 
@@ -41,7 +40,9 @@ class _TopDetailPageState extends State<TopDetailPage> {
     }
     return Scaffold(
       appBar: AppBar(
+        title: Text(_appBarTitle),
         backgroundColor: const Color(0xFF1B80F3),
+        centerTitle: true,
       ),
       body: BlocProvider<TopDetailPresenter>(
         bloc: widget.presenter,
@@ -101,12 +102,14 @@ class _TopDetailPageState extends State<TopDetailPage> {
 
   void _getParameters() {
     _parameters = ModalRoute.of(context)?.settings.arguments as Map?;
+    _appBarTitle =
+        _parameters?[TopDetailParamKeys.appBarTitle] as String? ?? '';
     _itemInfo = _parameters?[TopDetailParamKeys.itemInfo] as NovaItemInfo?;
 
     if (_itemInfo != null) {
       widget.presenter.eventViewReady(_itemInfo!);
     } else {
-      print('top_detail_page: parameter is error!');
+      log.warning('top_detail_page: parameter is error!');
     }
   }
 }
