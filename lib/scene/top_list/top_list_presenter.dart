@@ -60,9 +60,11 @@ class TopListPresenterImpl extends TopListPresenter {
     return useCase.stream.listen((event) {
       if (event is PresentModel) {
         streamAdd(ShowNovaListModel(
-            event.model.map((row) => NovaListRowViewModel(row)).toList()));
+            viewModelList:
+                event.model?.map((row) => NovaListRowViewModel(row)).toList(),
+            error: event.error));
+        _isProcessing = false;
       }
-      _isProcessing = false;
     });
   }
 }

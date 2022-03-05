@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:ses_novajoj/l10n/l10n.dart';
+import 'package:ses_novajoj/foundation/data/user_types.dart';
+import 'package:ses_novajoj/scene/foundation/use_l10n.dart';
 import 'package:ses_novajoj/foundation/firebase_util.dart';
 import 'package:ses_novajoj/domain/foundation/bloc/bloc_provider.dart';
 import 'package:ses_novajoj/scene/top_list/top_list_presenter.dart';
 import 'package:ses_novajoj/scene/top_list/top_list_presenter_output.dart';
 import 'package:ses_novajoj/scene/widgets/top_list_cell.dart';
 import 'package:ses_novajoj/scene/widgets/square_text_icon_button.dart';
+import 'package:ses_novajoj/scene/widgets/error_view.dart';
 
 class TopListPage extends StatefulWidget {
   final TopListPresenter presenter;
@@ -19,16 +21,16 @@ class _TopListPageState extends State<TopListPage> {
   int _selectedIconIndex = 0;
 
   late final List<String> _appBarTitleList = [
-    L10n.of(context)?.appBarFullNameLatest ?? '',
-    L10n.of(context)?.appBarFullNameOptic ?? '',
-    L10n.of(context)?.appBarFullNameRecommending ?? '',
-    L10n.of(context)?.appBarFullNameHot ?? '',
-    L10n.of(context)?.appBarFullNameCommenting ?? '',
+    UseL10n.of(context)?.appBarFullNameLatest ?? '',
+    UseL10n.of(context)?.appBarFullNameOptic ?? '',
+    UseL10n.of(context)?.appBarFullNameRecommending ?? '',
+    UseL10n.of(context)?.appBarFullNameHot ?? '',
+    UseL10n.of(context)?.appBarFullNameCommenting ?? '',
   ];
   String _prefixNovaTitle = '';
-  late final _prefixNovaTitleHot = L10n.of(context)?.todayHotNews ?? '';
+  late final _prefixNovaTitleHot = UseL10n.of(context)?.todayHotNews ?? '';
   late final _prefixNovaTitlePopulary =
-      L10n.of(context)?.todayPopularNews ?? '';
+      UseL10n.of(context)?.todayPopularNews ?? '';
 
   late String _selectedAppBarTitle = _appBarTitleList[_selectedIconIndex];
 
@@ -67,31 +69,43 @@ class _TopListPageState extends State<TopListPage> {
                 }
                 final data = snapshot.data;
                 if (data is ShowNovaListModel) {
-                  return ListView.builder(
-                      itemCount: data.viewModelList.length,
-                      itemBuilder: (context, index) => TopListCell(
-                          viewModel: data.viewModelList[index],
-                          onCellSelecting: (selIndex) {
-                            widget.presenter.eventSelectDetail(context,
-                                appBarTitle: _selectedAppBarTitle,
-                                itemInfo:
-                                    data.viewModelList[selIndex].itemInfo);
-                          },
-                          onThumbnailShowing: (thumbIndex) async {
-                            if (data.viewModelList[thumbIndex].itemInfo
-                                .thunnailUrlString.isNotEmpty) {
-                              return data.viewModelList[thumbIndex].itemInfo
-                                  .thunnailUrlString;
+                  if (data.viewModelList != null) {
+                    return ListView.builder(
+                        itemCount: data.viewModelList?.length,
+                        itemBuilder: (context, index) => TopListCell(
+                            viewModel: data.viewModelList![index],
+                            onCellSelecting: (selIndex) {
+                              widget.presenter.eventSelectDetail(context,
+                                  appBarTitle: _selectedAppBarTitle,
+                                  itemInfo:
+                                      data.viewModelList![selIndex].itemInfo);
+                            },
+                            onThumbnailShowing: (thumbIndex) async {
+                              if (data.viewModelList![thumbIndex].itemInfo
+                                  .thunnailUrlString.isNotEmpty) {
+                                return data.viewModelList![thumbIndex].itemInfo
+                                    .thunnailUrlString;
+                              }
+                              final retUrl = await widget.presenter
+                                  .eventFetchThumbnail(
+                                      targetUrl: data.viewModelList![thumbIndex]
+                                          .itemInfo.urlString);
+                              data.viewModelList![thumbIndex].itemInfo
+                                  .thunnailUrlString = retUrl;
+                              return retUrl;
+                            },
+                            index: index));
+                  } else {
+                    return ErrorView(
+                      message: UseL10n.localizedTextWithError(context,
+                          error: data.error),
+                      onFirstButtonTap: data.error?.type == AppErrorType.network
+                          ? () {
+                              _selectTextIcon(_selectedIconIndex, force: true);
                             }
-                            final retUrl = await widget.presenter
-                                .eventFetchThumbnail(
-                                    targetUrl: data.viewModelList[thumbIndex]
-                                        .itemInfo.urlString);
-                            data.viewModelList[thumbIndex].itemInfo
-                                .thunnailUrlString = retUrl;
-                            return retUrl;
-                          },
-                          index: index));
+                          : null,
+                    );
+                  }
                 } else {
                   assert(false, "unknown event $data");
                   return Container(color: Colors.red);
@@ -109,7 +123,7 @@ class _TopListPageState extends State<TopListPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             SquareTextIconButton(
-              string: L10n.of(context)?.appBarIconNameLatest ?? '',
+              string: UseL10n.of(context)?.appBarIconNameLatest ?? '',
               index: 0,
               selected: _selectedIconIndex == 0,
               onCellSelecting: () {
@@ -117,7 +131,7 @@ class _TopListPageState extends State<TopListPage> {
               },
             ),
             SquareTextIconButton(
-              string: L10n.of(context)?.appBarIconNameOptic ?? '',
+              string: UseL10n.of(context)?.appBarIconNameOptic ?? '',
               index: 1,
               selected: _selectedIconIndex == 1,
               onCellSelecting: () {
@@ -125,7 +139,7 @@ class _TopListPageState extends State<TopListPage> {
               },
             ),
             SquareTextIconButton(
-              string: L10n.of(context)?.appBarIconNameRecommending ?? '',
+              string: UseL10n.of(context)?.appBarIconNameRecommending ?? '',
               index: 2,
               selected: _selectedIconIndex == 2,
               onCellSelecting: () {
@@ -133,7 +147,7 @@ class _TopListPageState extends State<TopListPage> {
               },
             ),
             SquareTextIconButton(
-              string: L10n.of(context)?.appBarIconNameHot ?? '',
+              string: UseL10n.of(context)?.appBarIconNameHot ?? '',
               index: 3,
               selected: _selectedIconIndex == 3,
               onCellSelecting: () {
@@ -141,7 +155,7 @@ class _TopListPageState extends State<TopListPage> {
               },
             ),
             SquareTextIconButton(
-              string: L10n.of(context)?.appBarIconNameCommenting ?? '',
+              string: UseL10n.of(context)?.appBarIconNameCommenting ?? '',
               index: 4,
               selected: _selectedIconIndex == 4,
               onCellSelecting: () {
@@ -184,10 +198,13 @@ class _TopListPageState extends State<TopListPage> {
     ];
   }
 
-  void _selectTextIcon(int index) {
-    if (index == _selectedIconIndex) {
-      return;
+  void _selectTextIcon(int index, {bool force = false}) {
+    if (force == false) {
+      if (index == _selectedIconIndex) {
+        return;
+      }
     }
+
     _selectedIconIndex = index;
     _selectedAppBarTitle = _appBarTitleList[index];
     _prefixNovaTitle = () {

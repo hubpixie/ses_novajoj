@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:ses_novajoj/foundation/data/app_error.dart';
+import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'result.freezed.dart';

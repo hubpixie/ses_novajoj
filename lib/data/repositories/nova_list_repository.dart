@@ -15,7 +15,7 @@ class NovaListRepositoryImpl extends NovaListRepository {
   factory NovaListRepositoryImpl() => _instance;
 
   @override
-  Future<List<NovaListItem>> fetchNewsList(
+  Future<Result<List<NovaListItem>>> fetchNewsList(
       {required FetchNewsListRepoInput input}) async {
     // Future.delayed(
     //     Duration(milliseconds: NumberUtil().randomInt(min: 2500, max: 3500)));
@@ -23,6 +23,7 @@ class NovaListRepositoryImpl extends NovaListRepository {
         parameter: NovaItemParameter(
             targetUrl: input.targetUrl, docType: input.docType));
 
+    late Result<List<NovaListItem>> ret;
     List<NovaListItem> novaItems = <NovaListItem>[];
     result.when(success: (response) {
       for (var item in response) {
@@ -31,24 +32,30 @@ class NovaListRepositoryImpl extends NovaListRepository {
         );
         novaItems.add(retItem);
       }
+      ret = Result.success(data: novaItems);
     }, failure: (error) {
-      assert(false, "Unresolved error: $error");
+      ret = Result.failure(error: error);
     });
-    return novaItems;
+
+    return ret;
   }
 
   @override
-  Future<String> fetchThumbUrl({required FetchNewsListRepoInput input}) async {
+  Future<Result<String>> fetchThumbUrl(
+      {required FetchNewsListRepoInput input}) async {
     Result<String> result = await _api.fetchNovaItemThumbUrl(
         parameter: NovaItemParameter(
             targetUrl: input.targetUrl, docType: input.docType));
 
+    late Result<String> ret;
     String retUrl = "";
     result.when(success: (response) {
       retUrl = response;
+      ret = Result.success(data: retUrl);
     }, failure: (error) {
-      assert(false, "Unresolved error: $error");
+      ret = Result.failure(error: error);
     });
-    return retUrl;
+
+    return ret;
   }
 }

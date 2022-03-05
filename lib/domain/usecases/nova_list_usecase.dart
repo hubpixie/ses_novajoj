@@ -30,23 +30,36 @@ class NewsListUseCase with SimpleBloc<NovaListUseCaseOutput> {
   ];
 
   void fetchNewsList({required int targetUrlIndex, String? prefixTitle}) async {
-    List<NovaListItem> list =
+    final result =
         await repository.fetchNewsList(input: _inputUrlData[targetUrlIndex]);
-    String prefixTitle_ = prefixTitle ?? '';
-    for (var index = 0; index < list.length; index++) {
-      if (index < 4) {
-        list[index].itemInfo.title = prefixTitle_ + list[index].itemInfo.title;
-      }
-    }
 
-    streamAdd(PresentModel(
-        list.map((entity) => NovaListUseCaseRowModel(entity)).toList()));
+    result.when(success: (value) {
+      List<NovaListItem> list = value;
+      String prefixTitle_ = prefixTitle ?? '';
+      for (var index = 0; index < list.length; index++) {
+        if (index < 4) {
+          list[index].itemInfo.title =
+              prefixTitle_ + list[index].itemInfo.title;
+        }
+      }
+      streamAdd(PresentModel(
+          model:
+              list.map((entity) => NovaListUseCaseRowModel(entity)).toList()));
+    }, failure: (error) {
+      streamAdd(PresentModel(error: error));
+    });
   }
 
   Future<String> fetchThumbUrl({required String itemUrl}) async {
-    String retUrl = await repository.fetchThumbUrl(
+    final result = await repository.fetchThumbUrl(
         input: FetchNewsListRepoInput(
             targetUrl: itemUrl, docType: NovaDocType.thumb));
+    String retUrl = '';
+    result.when(
+        success: (value) {
+          retUrl = value;
+        },
+        failure: (error) {});
     return retUrl;
   }
 }

@@ -4,7 +4,7 @@ import 'package:ses_novajoj/foundation/log_util.dart';
 import 'package:ses_novajoj/foundation/firebase_util.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/domain/foundation/bloc/bloc_provider.dart';
-import 'package:ses_novajoj/scene/foundation/page_util/page_parameter.dart';
+import 'package:ses_novajoj/scene/foundation/page/page_parameter.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import 'package:ses_novajoj/scene/top_detail/top_detail_presenter.dart';
