@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:ses_novajoj/scene/top_list/top_list_presenter_output.dart';
 
-typedef CellSelectingDelegate = void Function();
+typedef CellSelectingDelegate = void Function(int);
 typedef ThumbnameShowingDelegate = Future<String> Function(int);
 
 class TopListCell extends StatelessWidget {
-  final NovaListRowViewModel item;
+  final NovaListRowViewModel viewModel;
   final int index;
   final CellSelectingDelegate? onCellSelecting;
   final ThumbnameShowingDelegate? onThumbnailShowing;
 
   const TopListCell(
       {Key? key,
-      required this.item,
+      required this.viewModel,
       required this.index,
       this.onCellSelecting,
       this.onThumbnailShowing})
@@ -22,7 +22,7 @@ class TopListCell extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
         onTap: () {
-          onCellSelecting?.call();
+          onCellSelecting?.call(index);
         },
         splashColor: Colors.black12,
         splashFactory: InkRipple.splashFactory,
@@ -40,7 +40,7 @@ class TopListCell extends StatelessWidget {
                           String thumbUrl =
                               await onThumbnailShowing?.call(index) ?? '';
                           return thumbUrl;
-                        }(item.urlString),
+                        }(viewModel.itemInfo.urlString),
                         builder: (context, snapshot) {
                           String blankUrl =
                               "assets/images/icon_top_cell_blank.png";
@@ -61,7 +61,7 @@ class TopListCell extends StatelessWidget {
                     child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(item.title,
+                          Text(viewModel.itemInfo.title,
                               style: const TextStyle(
                                   fontSize: 16.0,
                                   fontWeight: FontWeight.bold,
@@ -73,10 +73,11 @@ class TopListCell extends StatelessWidget {
                                 const SizedBox(width: 1, height: 20),
                                 Container(
                                     width: _calculateAutoscaleWidth(
-                                        context, item.source, fontSize: 12),
+                                        context, viewModel.itemInfo.source,
+                                        fontSize: 12),
                                     height: 18,
                                     alignment: Alignment.bottomLeft,
-                                    child: Text(item.source,
+                                    child: Text(viewModel.itemInfo.source,
                                         overflow: TextOverflow.ellipsis,
                                         style: const TextStyle(
                                             fontSize: 12.0,
@@ -91,19 +92,20 @@ class TopListCell extends StatelessWidget {
                                 Container(
                                     height: 18,
                                     alignment: Alignment.bottomLeft,
-                                    child: Text(item.readsText,
+                                    child: Text(viewModel.readsText,
                                         style: const TextStyle(
                                             fontSize: 12.0,
                                             color: Colors.pinkAccent))),
                                 const SizedBox(width: 10),
-                                Text(item.createAtText,
+                                Text(viewModel.createAtText,
                                     style: const TextStyle(
                                         fontSize: 12.0,
                                         color: Colors.grey,
                                         textBaseline:
                                             TextBaseline.ideographic)),
                                 const SizedBox(width: 10),
-                                _buildNewArrivalArea(isNew: item.isNew)
+                                _buildNewArrivalArea(
+                                    isNew: viewModel.itemInfo.isNew)
                               ])
                         ]))
               ]),
@@ -123,7 +125,7 @@ class TopListCell extends StatelessWidget {
             decoration: const BoxDecoration(
                 borderRadius: BorderRadius.all(Radius.circular(5.0)),
                 color: Colors.black12),
-            child: Text(item.isNewText,
+            child: Text(viewModel.isNewText,
                 style: const TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 11.0,
@@ -139,7 +141,10 @@ class TopListCell extends StatelessWidget {
     final style = TextStyle(fontSize: fontSize);
     textPainter.text = TextSpan(text: text, style: style);
     textPainter.layout();
-    double maxWidth = MediaQuery.of(context).size.width - deltaWith;
+    double maxWidth = (double screenWidth) {
+      double deltaWidth_ = screenWidth <= 320 ? 15 : 0;
+      return screenWidth - deltaWith - deltaWidth_;
+    }(MediaQuery.of(context).size.width);
     return textPainter.width >= maxWidth ? maxWidth : textPainter.width;
   }
 }

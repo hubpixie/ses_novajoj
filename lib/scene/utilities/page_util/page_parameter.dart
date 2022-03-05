@@ -1,4 +1,4 @@
-enum TopDetailParamKeys { url }
+enum TopDetailParamKeys { appBarTitle, itemInfo }
 
 class PageParameter<T> {
   PageParameter({required this.key, this.value});

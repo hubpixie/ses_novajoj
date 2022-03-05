@@ -7,14 +7,12 @@ abstract class SplashRouter {
   void gotoTop(Object context);
 }
 
-final log = Log().logger;
-
 class SplashRouterImpl extends SplashRouter {
   SplashRouterImpl();
 
   @override
   void gotoLogin(Object context) {
-    log.info('gotoLogin');
+    //log.info('gotoLogin');
   }
 
   @override
