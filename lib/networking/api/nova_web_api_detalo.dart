@@ -4,7 +4,7 @@ extension NovaWebApiDetail on NovaWebApi {
   ///
   /// api entry: fetchNovaDetail
   ///
-  Future<Result<NovaDetaloItemRes?, NovaDomainReason>> fetchNovaDetail(
+  Future<Result<NovaDetaloItemRes>> fetchNovaDetail(
       {required NovaDetaloParameter parameter}) async {
     try {
       // send request for fetching nova list.
@@ -21,11 +21,11 @@ extension NovaWebApiDetail on NovaWebApi {
             detailElement: document.getElementById("shownewsc"));
       }
 
-      return Result.success(retVal);
-    } on NovaDomainReason catch (reason) {
-      return Result.domainIssue(reason);
-    } catch (e) {
-      return Result.failure(0, e.toString());
+      return Result.success(data: retVal!);
+    } on AppErrorType catch (type) {
+      return Result.failure(error: AppError(type: type));
+    } on Exception catch (error) {
+      return Result.failure(error: AppError.from(error));
     }
   }
 
@@ -64,17 +64,18 @@ extension NovaWebApiDetail on NovaWebApi {
   ///   </table>
   /// </div>
   ///
-  Future<Result<NovaDetaloItemRes?, NovaDomainReason>> _parseDetailItems(
+  Future<Result<NovaDetaloItemRes>> _parseDetailItems(
       {required NovaDetaloParameter parameter,
       Element? rootElement,
       Element? detailElement}) async {
     try {
-      NovaDetaloItemRes? retVal = NovaDetaloItemRes(
+      NovaDetaloItemRes retVal = NovaDetaloItemRes(
           itemInfo: parameter.itemInfo,
           bodyString: detailElement?.innerHtml ?? '');
       String source = parameter.itemInfo.source;
       if (rootElement?.children == null) {
-        throw Exception(NovaDomainReason.notFound);
+        log.severe('rootElement?.children == null');
+        throw Exception(AppErrorType.parserError);
       }
 
       // createAt (detail)
@@ -117,11 +118,11 @@ extension NovaWebApiDetail on NovaWebApi {
         return retStr;
       }();
 
-      return Result.success(retVal);
-    } on NovaDomainReason catch (reason) {
-      return Result.domainIssue(reason);
-    } catch (e) {
-      return Result.failure(0, e.toString());
+      return Result.success(data: retVal);
+    } on AppErrorType catch (type) {
+      return Result.failure(error: AppError(type: type));
+    } on Exception catch (error) {
+      return Result.failure(error: AppError.from(error));
     }
   }
 }

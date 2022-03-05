@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:ses_novajoj/l10n/l10n.dart';
+import 'package:ses_novajoj/foundation/firebase_util.dart';
 import 'package:ses_novajoj/domain/utilities/bloc/bloc_provider.dart';
 import 'package:ses_novajoj/scene/top_list/top_list_presenter.dart';
 import 'package:ses_novajoj/scene/top_list/top_list_presenter_output.dart';
-import 'package:ses_novajoj/utilities/firebase_util.dart';
 import 'package:ses_novajoj/scene/widgets/top_list_cell.dart';
 import 'package:ses_novajoj/scene/widgets/square_text_icon_button.dart';
 

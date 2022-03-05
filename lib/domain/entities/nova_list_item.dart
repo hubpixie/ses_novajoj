@@ -1,4 +1,4 @@
-import 'package:ses_novajoj/utilities/data/user_types.dart';
+import 'package:ses_novajoj/foundation/data/user_types.dart';
 
 class NovaListItem {
   NovaItemInfo itemInfo;

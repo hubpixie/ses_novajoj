@@ -2,7 +2,7 @@ import 'package:ses_novajoj/domain/repositories/nova_list_repository.dart';
 import 'package:ses_novajoj/domain/utilities/bloc/simple_bloc.dart';
 import 'package:ses_novajoj/domain/entities/nova_list_item.dart';
 import 'package:ses_novajoj/data/repositories/nova_list_repository.dart';
-import 'package:ses_novajoj/utilities/data/user_types.dart';
+import 'package:ses_novajoj/foundation/data/user_types.dart';
 
 import 'nova_list_usecase_output.dart';
 

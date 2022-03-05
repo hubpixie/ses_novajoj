@@ -1,5 +1,5 @@
-import 'package:ses_novajoj/utilities/data/user_types.dart';
-import 'package:ses_novajoj/utilities/data/date_util.dart';
+import 'package:ses_novajoj/foundation/data/user_types.dart';
+import 'package:ses_novajoj/foundation/data/date_util.dart';
 
 class NovaDetailItem {
   static const _kHtmlTemplateString = '''

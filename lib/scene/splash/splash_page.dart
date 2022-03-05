@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ses_novajoj/scene/splash/splash_presenter.dart';
-import 'package:ses_novajoj/utilities/firebase_util.dart';
+import 'package:ses_novajoj/foundation/firebase_util.dart';
 
 class SplashPage extends StatefulWidget {
   final SplashPresenter presenter;

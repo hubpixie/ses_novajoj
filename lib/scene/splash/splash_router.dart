@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ses_novajoj/scene/utilities/page_util/screen_route_enums.dart';
-import 'package:ses_novajoj/utilities/log_util.dart';
+import 'package:ses_novajoj/foundation/log_util.dart';
 
 abstract class SplashRouter {
   void gotoLogin(Object context);

@@ -1,11 +1,13 @@
 import 'package:html/parser.dart' as html_parser;
 import 'package:html/dom.dart';
+import 'package:ses_novajoj/foundation//log_util.dart';
+import 'package:ses_novajoj/foundation/data/app_error.dart';
 import 'package:ses_novajoj/foundation/data/date_util.dart';
 import 'package:ses_novajoj/foundation/data/number_ntil.dart';
 import 'package:ses_novajoj/foundation/data/string_util.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
+import 'package:ses_novajoj/foundation/data/result.dart';
 import 'package:ses_novajoj/networking/api_client/base_api_client.dart';
-import 'package:ses_novajoj/networking/api_client/api_result.dart';
 import 'package:ses_novajoj/networking/request/nova_item_parameter.dart';
 import 'package:ses_novajoj/networking/request/nova_detalo_parameter.dart';
 import 'package:ses_novajoj/networking/response/nova_list_response.dart';
@@ -13,18 +15,13 @@ import 'package:ses_novajoj/networking/response/nova_detalo_item_response.dart';
 
 part 'nova_web_api_detalo.dart';
 
-enum NovaDomainReason {
-  notFound,
-  parseFailure,
-}
-
 class NovaWebApi {
   static const int _kThumbLimit = 5;
 
   ///
   /// api entry: fetchNovaList
   ///
-  Future<Result<List<NovaListItemRes>, NovaDomainReason>> fetchNovaList(
+  Future<Result<List<NovaListItemRes>>> fetchNovaList(
       {required NovaItemParameter parameter}) async {
     try {
       // send request for fetching nova list.
@@ -44,11 +41,11 @@ class NovaWebApi {
             rootElement: document.getElementById("d_list"));
       }
 
-      return Result.success(retArr);
-    } on NovaDomainReason catch (reason) {
-      return Result.domainIssue(reason);
-    } catch (e) {
-      return Result.failure(0, e.toString());
+      return Result.success(data: retArr);
+    } on AppErrorType catch (type) {
+      return Result.failure(error: AppError(type: type));
+    } on Exception catch (error) {
+      return Result.failure(error: AppError.from(error));
     }
   }
 
@@ -78,7 +75,7 @@ class NovaWebApi {
   /// 			</div>
   /// 			</div>
   ///
-  Future<Result<String, NovaDomainReason>> fetchNovaItemThumbUrl(
+  Future<Result<String>> fetchNovaItemThumbUrl(
       {required NovaItemParameter parameter}) async {
     try {
       // send request for fetching nova item's thumb url.
@@ -89,16 +86,17 @@ class NovaWebApi {
       final document = html_parser.parse(response.body);
       final imgElements = document.getElementsByTagName('img');
       if (imgElements.isEmpty) {
-        throw Exception(NovaDomainReason.notFound);
+        log.warning('imgElements.isEmpty');
+        throw Exception(AppErrorType.parserError);
       }
       final imgElement = imgElements
           .firstWhere((element) => element.attributes['onload'] != null);
       String retStr = imgElement.attributes['src'] ?? '';
-      return Result.success(retStr);
-    } on NovaDomainReason catch (reason) {
-      return Result.domainIssue(reason);
-    } catch (e) {
-      return Result.failure(0, e.toString());
+      return Result.success(data: retStr);
+    } on AppErrorType catch (type) {
+      return Result.failure(error: AppError(type: type));
+    } on Exception catch (error) {
+      return Result.failure(error: AppError.from(error));
     }
   }
 
@@ -113,19 +111,21 @@ class NovaWebApi {
   ///       <li><a href="https://www.6parknews.com/newspark/view.php?app=news&act=view&nid=532638">新闻新闻新闻新闻新闻新闻新闻新闻新闻新闻新闻新闻新闻(图)</a> - 加拿大留学生问吧  (5348 bytes)  - <i>02/13/22</i>  (2099 reads)  <a class='list_reimg' href='index.php?act=newsreply&nid=532638'>1</a></li>
   ///     </ul>
   /// </div>
-  Future<Result<List<NovaListItemRes>, NovaDomainReason>> _parseLiItems(
+  Future<Result<List<NovaListItemRes>>> _parseLiItems(
       {required NovaItemParameter parameter, Element? rootElement}) async {
     try {
       List<NovaListItemRes> retArr = [];
 
       if (rootElement?.children == null) {
-        throw Exception(NovaDomainReason.notFound);
+        log.severe('rootElement?.children');
+        throw Exception(AppErrorType.parserError);
       }
       final ulElement = rootElement?.children
           .firstWhere((element) => element.localName == 'ul');
 
       if (ulElement?.children == null) {
-        throw Exception(NovaDomainReason.notFound);
+        log.severe('ulElement?.children');
+        throw Exception(AppErrorType.parserError);
       }
       int index = 0;
       for (Element li in ulElement?.children ?? []) {
@@ -137,11 +137,11 @@ class NovaWebApi {
         }
       }
 
-      return Result.success(retArr);
-    } on NovaDomainReason catch (reason) {
-      return Result.domainIssue(reason);
-    } catch (e) {
-      return Result.failure(0, e.toString());
+      return Result.success(data: retArr);
+    } on AppErrorType catch (type) {
+      return Result.failure(error: AppError(type: type));
+    } on Exception catch (error) {
+      return Result.failure(error: AppError.from(error));
     }
   }
 
@@ -173,16 +173,14 @@ class NovaWebApi {
       }
       // thumbUrlString
       if (urlString.isNotEmpty && index < _kThumbLimit) {
-        Result<String, NovaDomainReason> thumbUrlResult =
-            await fetchNovaItemThumbUrl(
-                parameter: NovaItemParameter(
-                    targetUrl: urlString, docType: NovaDocType.thumb));
+        Result<String> thumbUrlResult = await fetchNovaItemThumbUrl(
+            parameter: NovaItemParameter(
+                targetUrl: urlString, docType: NovaDocType.thumb));
         thumbUrlResult.when(
             success: (value) {
               thunnailUrlString = value;
             },
-            failure: (code, description) {},
-            domainIssue: (reason) {});
+            failure: (value) {});
       }
     }
 
@@ -236,19 +234,21 @@ class NovaWebApi {
   /// 	    <tr ><td>第4位</td><td><a href="https://www.6parknews.com/newspark/view.php?app=news&act=view&nid=533246">新闻新闻新闻新闻新闻新闻新闻新闻新闻新闻(组图)</a> <i>02/16/22</i></td><td><center>161002 reads</center></td><td><center>89 次</center></td><td><center><a href="index.php?act=newsreply&nid=533246">查看评论</a></center></td></tr>
   ///     </table>
   /// </div>
-  Future<Result<List<NovaListItemRes>, NovaDomainReason>> _parseTrItems(
+  Future<Result<List<NovaListItemRes>>> _parseTrItems(
       {required NovaItemParameter parameter, Element? rootElement}) async {
     try {
       List<NovaListItemRes> retArr = [];
 
       if (rootElement?.children == null) {
-        throw Exception(NovaDomainReason.notFound);
+        log.severe('rootElement?.children');
+        throw Exception(AppErrorType.parserError);
       }
 
       Element? tableElement = rootElement?.children
           .firstWhere((element) => element.localName == 'table');
       if (tableElement?.children == null) {
-        throw Exception(NovaDomainReason.notFound);
+        log.severe('tableElement?.children');
+        throw Exception(AppErrorType.parserError);
       } else if (tableElement?.children.first.localName == 'tbody') {
         tableElement = tableElement?.children.first;
       }
@@ -276,11 +276,11 @@ class NovaWebApi {
         }
       }
 
-      return Result.success(retArr);
-    } on NovaDomainReason catch (reason) {
-      return Result.domainIssue(reason);
-    } catch (e) {
-      return Result.failure(0, e.toString());
+      return Result.success(data: retArr);
+    } on AppErrorType catch (type) {
+      return Result.failure(error: AppError(type: type));
+    } on Exception catch (error) {
+      return Result.failure(error: AppError.from(error));
     }
   }
 
@@ -334,16 +334,14 @@ class NovaWebApi {
       }
       // thumbUrlString
       if (urlString.isNotEmpty && index < _kThumbLimit) {
-        Result<String, NovaDomainReason> thumbUrlResult =
-            await fetchNovaItemThumbUrl(
-                parameter: NovaItemParameter(
-                    targetUrl: urlString, docType: NovaDocType.thumb));
+        Result<String> thumbUrlResult = await fetchNovaItemThumbUrl(
+            parameter: NovaItemParameter(
+                targetUrl: urlString, docType: NovaDocType.thumb));
         thumbUrlResult.when(
             success: (value) {
               thunnailUrlString = value;
             },
-            failure: (code, description) {},
-            domainIssue: (reason) {});
+            failure: (value) {});
       }
 
       // createAt

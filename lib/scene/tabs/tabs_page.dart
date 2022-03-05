@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ses_novajoj/l10n/l10n.dart';
+import 'package:ses_novajoj/foundation/log_util.dart';
 import 'package:ses_novajoj/scene/tabs/tabs_presenter.dart';
-import 'package:ses_novajoj/utilities/firebase_util.dart';
-import 'package:ses_novajoj/utilities/log_util.dart';
-
 import 'package:ses_novajoj/scene/top_list/top_list_page_builder.dart';
 
 class TabsPage extends StatefulWidget {

@@ -1,4 +1,4 @@
-import 'package:ses_novajoj/networking/api_client/api_result.dart';
+import 'package:ses_novajoj/foundation/data/result.dart';
 import 'package:ses_novajoj/networking/api/nova_web_api.dart';
 import 'package:ses_novajoj/networking/request/nova_item_parameter.dart';
 import 'package:ses_novajoj/domain/entities/nova_list_item.dart';
@@ -19,10 +19,9 @@ class NovaListRepositoryImpl extends NovaListRepository {
       {required FetchNewsListRepoInput input}) async {
     // Future.delayed(
     //     Duration(milliseconds: NumberUtil().randomInt(min: 2500, max: 3500)));
-    Result<List<NovaListItemRes>, NovaDomainReason> result =
-        await _api.fetchNovaList(
-            parameter: NovaItemParameter(
-                targetUrl: input.targetUrl, docType: input.docType));
+    Result<List<NovaListItemRes>> result = await _api.fetchNovaList(
+        parameter: NovaItemParameter(
+            targetUrl: input.targetUrl, docType: input.docType));
 
     List<NovaListItem> novaItems = <NovaListItem>[];
     result.when(success: (response) {
@@ -32,27 +31,23 @@ class NovaListRepositoryImpl extends NovaListRepository {
         );
         novaItems.add(retItem);
       }
-    }, failure: (code, description) {
-      assert(false, "Unresolved error: $description");
-    }, domainIssue: (reason) {
-      assert(false, "Unexpected Semantic error: reason $reason");
+    }, failure: (error) {
+      assert(false, "Unresolved error: $error");
     });
     return novaItems;
   }
 
   @override
   Future<String> fetchThumbUrl({required FetchNewsListRepoInput input}) async {
-    Result<String, NovaDomainReason> result = await _api.fetchNovaItemThumbUrl(
+    Result<String> result = await _api.fetchNovaItemThumbUrl(
         parameter: NovaItemParameter(
             targetUrl: input.targetUrl, docType: input.docType));
 
     String retUrl = "";
     result.when(success: (response) {
       retUrl = response;
-    }, failure: (code, description) {
-      assert(false, "Unresolved error: $description");
-    }, domainIssue: (reason) {
-      assert(false, "Unexpected Semantic error: reason $reason");
+    }, failure: (error) {
+      assert(false, "Unresolved error: $error");
     });
     return retUrl;
   }
