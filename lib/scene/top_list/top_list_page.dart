@@ -185,6 +185,9 @@ class _TopListPageState extends State<TopListPage> {
   }
 
   void _selectTextIcon(int index) {
+    if (index == _selectedIconIndex) {
+      return;
+    }
     _selectedIconIndex = index;
     _selectedAppBarTitle = _appBarTitleList[index];
     _prefixNovaTitle = () {
