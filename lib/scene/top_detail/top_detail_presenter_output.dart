@@ -5,10 +5,10 @@ import 'package:ses_novajoj/domain/usecases/nova_detail_usecase_output.dart';
 
 abstract class TopDetailPresenterOutput {}
 
-class ShowNovaDetailModel extends TopDetailPresenterOutput {
+class ShowNovaDetailPageModel extends TopDetailPresenterOutput {
   final NovaDetailViewModel? viewModel;
   final AppError? error;
-  ShowNovaDetailModel({this.viewModel, this.error});
+  ShowNovaDetailPageModel({this.viewModel, this.error});
 }
 
 class NovaDetailViewModel {

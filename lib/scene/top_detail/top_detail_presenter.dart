@@ -22,10 +22,10 @@ class TopDetailPresenterImpl extends TopDetailPresenter {
     useCase.stream.listen((event) {
       if (event is PresentModel) {
         if (event.error == null) {
-          streamAdd(ShowNovaDetailModel(
+          streamAdd(ShowNovaDetailPageModel(
               viewModel: NovaDetailViewModel(event.model!)));
         } else {
-          streamAdd(ShowNovaDetailModel(error: event.error));
+          streamAdd(ShowNovaDetailPageModel(error: event.error));
         }
       }
       _isProcessing = false;

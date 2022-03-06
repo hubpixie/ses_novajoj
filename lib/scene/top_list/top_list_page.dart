@@ -68,7 +68,7 @@ class _TopListPageState extends State<TopListPage> {
                           backgroundColor: Colors.grey[850]));
                 }
                 final data = snapshot.data;
-                if (data is ShowNovaListModel) {
+                if (data is ShowListPageModel) {
                   if (data.error == null) {
                     return ListView.builder(
                         itemCount: data.viewModelList?.length,

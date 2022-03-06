@@ -66,7 +66,7 @@ class _TopDetailPageState extends State<TopDetailPage> {
                         backgroundColor: Colors.grey[850]));
               }
               final data = snapshot.data;
-              if (data is ShowNovaDetailModel) {
+              if (data is ShowNovaDetailPageModel) {
                 if (data.error == null) {
                   return Column(
                     children: [

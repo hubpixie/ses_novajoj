@@ -64,7 +64,7 @@ class TopListPresenterImpl extends TopListPresenter {
   StreamSubscription<NovaListUseCaseOutput> _addStreamListener() {
     return useCase.stream.listen((event) {
       if (event is PresentModel) {
-        streamAdd(ShowNovaListModel(
+        streamAdd(ShowListPageModel(
             viewModelList:
                 event.model?.map((row) => NovaListRowViewModel(row)).toList(),
             error: event.error));

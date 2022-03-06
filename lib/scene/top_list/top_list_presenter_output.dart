@@ -5,10 +5,10 @@ import 'package:ses_novajoj/domain/usecases/nova_list_usecase_output.dart';
 
 abstract class TopListPresenterOutput {}
 
-class ShowNovaListModel extends TopListPresenterOutput {
+class ShowListPageModel extends TopListPresenterOutput {
   final List<NovaListRowViewModel>? viewModelList;
   final AppError? error;
-  ShowNovaListModel({this.viewModelList, this.error});
+  ShowListPageModel({this.viewModelList, this.error});
 }
 
 class NovaListRowViewModel {
