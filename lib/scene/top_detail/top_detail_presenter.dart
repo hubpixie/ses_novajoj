@@ -21,7 +21,12 @@ class TopDetailPresenterImpl extends TopDetailPresenter {
       : useCase = NewsDetailUseCase() {
     useCase.stream.listen((event) {
       if (event is PresentModel) {
-        streamAdd(ShowNovaDetailModel(NovaDetailViewModel(event.model)));
+        if (event.error == null) {
+          streamAdd(ShowNovaDetailModel(
+              viewModel: NovaDetailViewModel(event.model!)));
+        } else {
+          streamAdd(ShowNovaDetailModel(error: event.error));
+        }
       }
       _isProcessing = false;
     });

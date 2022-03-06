@@ -38,7 +38,7 @@ class _TopListPageState extends State<TopListPage> {
   void initState() {
     // send viewEvent
     FirebaseUtil().sendViewEvent(route: AnalyticsRoute.topList);
-    widget.presenter.eventViewReady(targetUrlIndex: _selectedIconIndex);
+    _loadData();
     super.initState();
   }
 
@@ -69,7 +69,7 @@ class _TopListPageState extends State<TopListPage> {
                 }
                 final data = snapshot.data;
                 if (data is ShowNovaListModel) {
-                  if (data.viewModelList != null) {
+                  if (data.error == null) {
                     return ListView.builder(
                         itemCount: data.viewModelList?.length,
                         itemBuilder: (context, index) => TopListCell(
@@ -77,8 +77,10 @@ class _TopListPageState extends State<TopListPage> {
                             onCellSelecting: (selIndex) {
                               widget.presenter.eventSelectDetail(context,
                                   appBarTitle: _selectedAppBarTitle,
-                                  itemInfo:
-                                      data.viewModelList![selIndex].itemInfo);
+                                  itemInfo: data.viewModelList![selIndex]
+                                      .itemInfo, completeHandler: () {
+                                _loadData(isReloaded: true);
+                              });
                             },
                             onThumbnailShowing: (thumbIndex) async {
                               if (data.viewModelList![thumbIndex].itemInfo
@@ -101,7 +103,8 @@ class _TopListPageState extends State<TopListPage> {
                           error: data.error),
                       onFirstButtonTap: data.error?.type == AppErrorType.network
                           ? () {
-                              _selectTextIcon(_selectedIconIndex, force: true);
+                              _selectTextIcon(_selectedIconIndex,
+                                  isReloaded: true);
                             }
                           : null,
                     );
@@ -184,11 +187,7 @@ class _TopListPageState extends State<TopListPage> {
               color: Colors.white,
               onPressed: () {
                 // reload data
-                widget.presenter.eventViewReady(
-                    targetUrlIndex: _selectedIconIndex,
-                    prefixTitle: _prefixNovaTitle,
-                    isReloaded: true);
-                setState(() {});
+                _loadData(isReloaded: true);
               },
               icon: const Icon(Icons.refresh_rounded))),
       SizedBox(
@@ -198,29 +197,40 @@ class _TopListPageState extends State<TopListPage> {
     ];
   }
 
-  void _selectTextIcon(int index, {bool force = false}) {
-    if (force == false) {
+  void _selectTextIcon(int index, {bool isReloaded = false}) {
+    if (isReloaded == false) {
       if (index == _selectedIconIndex) {
         return;
+      } else {
+        _selectedIconIndex = index;
+        _selectedAppBarTitle = _appBarTitleList[index];
+        _prefixNovaTitle = () {
+          String retStr = "";
+          if (index == 3) {
+            retStr = _prefixNovaTitleHot;
+          } else if (index == 4) {
+            retStr = _prefixNovaTitlePopulary;
+          }
+          return retStr;
+        }();
       }
     }
 
-    _selectedIconIndex = index;
-    _selectedAppBarTitle = _appBarTitleList[index];
-    _prefixNovaTitle = () {
-      String retStr = "";
-      if (index == 3) {
-        retStr = _prefixNovaTitleHot;
-      } else if (index == 4) {
-        retStr = _prefixNovaTitlePopulary;
-      }
-      return retStr;
-    }();
     // reload data
+    _loadData(isReloaded: true);
+  }
+
+  void _loadData({bool isReloaded = false}) {
+    // fetch data
     widget.presenter.eventViewReady(
-        targetUrlIndex: index, prefixTitle: _prefixNovaTitle, isReloaded: true);
-    Future.delayed(const Duration(seconds: 1), () {
-      setState(() {});
-    });
+        targetUrlIndex: _selectedIconIndex,
+        prefixTitle: _prefixNovaTitle,
+        isReloaded: isReloaded);
+
+    if (isReloaded) {
+      Future.delayed(Duration.zero, () {
+        setState(() {});
+      });
+    }
   }
 }

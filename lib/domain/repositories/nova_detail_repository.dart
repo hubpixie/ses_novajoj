@@ -1,5 +1,6 @@
 import 'package:ses_novajoj/domain/entities/nova_detail_item.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
+import 'package:ses_novajoj/foundation/data/result.dart';
 
 class FetchNewsDetailRepoInput {
   NovaItemInfo itemInfo;
@@ -9,6 +10,6 @@ class FetchNewsDetailRepoInput {
 }
 
 abstract class NovaDetailRepository {
-  Future<NovaDetailItem> fetchNewsDetail(
+  Future<Result<NovaDetailItem>> fetchNewsDetail(
       {required FetchNewsDetailRepoInput input});
 }

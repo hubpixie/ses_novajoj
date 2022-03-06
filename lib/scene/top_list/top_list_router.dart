@@ -5,7 +5,7 @@ import 'package:ses_novajoj/scene/foundation/page/screen_route_enums.dart';
 abstract class TopListRouter {
   void gotoLogin(Object context);
   void gotoTopDetail(Object context,
-      {required String appBarTitle, Object? itemInfo});
+      {required String appBarTitle, Object? itemInfo, Object? completeHandler});
 }
 
 class TopListRouterImpl extends TopListRouter {
@@ -18,11 +18,17 @@ class TopListRouterImpl extends TopListRouter {
 
   @override
   void gotoTopDetail(Object context,
-      {required String appBarTitle, Object? itemInfo}) {
+      {required String appBarTitle,
+      Object? itemInfo,
+      Object? completeHandler}) {
     Navigator.pushNamed(context as BuildContext, ScreenRouteName.topDetail.name,
         arguments: {
           TopDetailParamKeys.appBarTitle: appBarTitle,
           TopDetailParamKeys.itemInfo: itemInfo
-        });
+        }).then((value) {
+      if (completeHandler != null && completeHandler is Function) {
+        completeHandler.call();
+      }
+    });
   }
 }

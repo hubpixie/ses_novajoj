@@ -3,8 +3,9 @@ import 'package:ses_novajoj/foundation/data/user_types.dart';
 class NovaDetailUseCaseOutput {}
 
 class PresentModel extends NovaDetailUseCaseOutput {
-  final NovaDetailUseCaseModel model;
-  PresentModel(this.model);
+  final NovaDetailUseCaseModel? model;
+  final AppError? error;
+  PresentModel({this.model, this.error});
 }
 
 class NovaDetailUseCaseModel {

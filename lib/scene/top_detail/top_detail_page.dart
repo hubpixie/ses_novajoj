@@ -4,11 +4,13 @@ import 'package:ses_novajoj/foundation/log_util.dart';
 import 'package:ses_novajoj/foundation/firebase_util.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/domain/foundation/bloc/bloc_provider.dart';
+import 'package:ses_novajoj/scene/foundation/use_l10n.dart';
 import 'package:ses_novajoj/scene/foundation/page/page_parameter.dart';
-import 'package:webview_flutter/webview_flutter.dart';
-
 import 'package:ses_novajoj/scene/top_detail/top_detail_presenter.dart';
 import 'package:ses_novajoj/scene/top_detail/top_detail_presenter_output.dart';
+
+import 'package:webview_flutter/webview_flutter.dart';
+import 'package:ses_novajoj/scene/widgets/error_view.dart';
 
 class TopDetailPage extends StatefulWidget {
   final TopDetailPresenter presenter;
@@ -19,25 +21,33 @@ class TopDetailPage extends StatefulWidget {
 }
 
 class _TopDetailPageState extends State<TopDetailPage> {
+  bool _pageLoadIsFirst = true;
+
   late Map? _parameters;
   late String _appBarTitle;
   late NovaItemInfo? _itemInfo;
-  bool _buildIsFirst = true;
 
   @override
   void initState() {
     super.initState();
     // send viewEvent
     FirebaseUtil().sendViewEvent(route: AnalyticsRoute.topDetail);
-    _buildIsFirst = true;
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_buildIsFirst) {
-      _buildIsFirst = false;
-      _getParameters();
+    if (_pageLoadIsFirst) {
+      _pageLoadIsFirst = false;
+      // get page paratmers via ModalRoute
+      _parameters = ModalRoute.of(context)?.settings.arguments as Map?;
+      _appBarTitle =
+          _parameters?[TopDetailParamKeys.appBarTitle] as String? ?? '';
+      _itemInfo = _parameters?[TopDetailParamKeys.itemInfo] as NovaItemInfo?;
+
+      // fetch data
+      _loadData();
     }
+
     return Scaffold(
       appBar: AppBar(
         title: Text(_appBarTitle),
@@ -57,11 +67,24 @@ class _TopDetailPageState extends State<TopDetailPage> {
               }
               final data = snapshot.data;
               if (data is ShowNovaDetailModel) {
-                return Column(
-                  children: [
-                    _buildContentArea(context, detailItem: data.viewModel)
-                  ],
-                );
+                if (data.error == null) {
+                  return Column(
+                    children: [
+                      _buildContentArea(context, detailItem: data.viewModel)
+                    ],
+                  );
+                } else {
+                  return ErrorView(
+                    message: UseL10n.localizedTextWithError(context,
+                        error: data.error),
+                    onFirstButtonTap: data.error?.type == AppErrorType.network
+                        ? () {
+                            _loadData();
+                            setState(() {});
+                          }
+                        : null,
+                  );
+                }
               } else {
                 assert(false, "unknown event $data");
                 return Container(color: Colors.red);
@@ -100,12 +123,7 @@ class _TopDetailPageState extends State<TopDetailPage> {
     );
   }
 
-  void _getParameters() {
-    _parameters = ModalRoute.of(context)?.settings.arguments as Map?;
-    _appBarTitle =
-        _parameters?[TopDetailParamKeys.appBarTitle] as String? ?? '';
-    _itemInfo = _parameters?[TopDetailParamKeys.itemInfo] as NovaItemInfo?;
-
+  void _loadData() {
     if (_itemInfo != null) {
       widget.presenter.eventViewReady(_itemInfo!);
     } else {
