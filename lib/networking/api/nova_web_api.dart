@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:html/parser.dart' as html_parser;
 import 'package:html/dom.dart';
 import 'package:ses_novajoj/foundation//log_util.dart';
@@ -26,6 +27,9 @@ class NovaWebApi {
       // send request for fetching nova list.
       final response =
           await BaseApiClient.client.get(Uri.parse(parameter.targetUrl));
+      if (response.statusCode >= HttpStatus.badRequest) {
+        throw Exception(response.statusCode);
+      }
       // prepares to parse nova list from response.body.
       final document = html_parser.parse(response.body);
       List<NovaListItemRes> retArr = [];
@@ -41,11 +45,12 @@ class NovaWebApi {
       }
 
       return Result.success(data: retArr);
-    } on AppErrorType catch (type) {
-      return Result.failure(error: AppError(type: type));
+    } on AppError catch (error) {
+      return Result.failure(error: error);
     } on Exception catch (error) {
       log.severe('$error');
-      return Result.failure(error: AppError.from(error));
+      return Result.failure(
+          error: AppError.from(error, statusCode: error.getCode()));
     }
   }
 
@@ -81,22 +86,27 @@ class NovaWebApi {
       // send request for fetching nova item's thumb url.
       final response =
           await BaseApiClient.client.get(Uri.parse(parameter.targetUrl));
+      if (response.statusCode >= HttpStatus.badRequest) {
+        throw Exception(response.statusCode);
+      }
 
       // prepares to parse nova list from response.body.
       final document = html_parser.parse(response.body);
       final imgElements = document.getElementsByTagName('img');
       if (imgElements.isEmpty) {
         log.warning('imgElements.isEmpty');
-        throw Exception(AppErrorType.parserError);
+        throw AppError(
+            type: AppErrorType.dataError, reason: FailureReason.missingImgNode);
       }
       final imgElement = imgElements
           .firstWhere((element) => element.attributes['onload'] != null);
       String retStr = imgElement.attributes['src'] ?? '';
       return Result.success(data: retStr);
-    } on AppErrorType catch (type) {
-      return Result.failure(error: AppError(type: type));
+    } on AppError catch (error) {
+      return Result.failure(error: error);
     } on Exception catch (error) {
-      return Result.failure(error: AppError.from(error));
+      return Result.failure(
+          error: AppError.from(error, statusCode: error.getCode()));
     }
   }
 
@@ -118,14 +128,18 @@ class NovaWebApi {
 
       if (rootElement?.children == null) {
         log.severe('rootElement?.children');
-        throw Exception(AppErrorType.parserError);
+        throw AppError(
+            type: AppErrorType.dataError,
+            reason: FailureReason.missingRootNode);
       }
       final ulElement = rootElement?.children
           .firstWhere((element) => element.localName == 'ul');
 
       if (ulElement?.children == null) {
         log.severe('ulElement?.children');
-        throw Exception(AppErrorType.parserError);
+        throw AppError(
+            type: AppErrorType.dataError,
+            reason: FailureReason.missingListNode);
       }
       int index = 0;
       for (Element li in ulElement?.children ?? []) {
@@ -138,8 +152,8 @@ class NovaWebApi {
       }
 
       return Result.success(data: retArr);
-    } on AppErrorType catch (type) {
-      return Result.failure(error: AppError(type: type));
+    } on AppError catch (error) {
+      return Result.failure(error: error);
     } on Exception catch (error) {
       return Result.failure(error: AppError.from(error));
     }
@@ -241,14 +255,18 @@ class NovaWebApi {
 
       if (rootElement?.children == null) {
         log.severe('rootElement?.children');
-        throw Exception(AppErrorType.parserError);
+        throw AppError(
+            type: AppErrorType.dataError,
+            reason: FailureReason.missingRootNode);
       }
 
       Element? tableElement = rootElement?.children
           .firstWhere((element) => element.localName == 'table');
       if (tableElement?.children == null) {
         log.severe('tableElement?.children');
-        throw Exception(AppErrorType.parserError);
+        throw AppError(
+            type: AppErrorType.dataError,
+            reason: FailureReason.missingTableNode);
       } else if (tableElement?.children.first.localName == 'tbody') {
         tableElement = tableElement?.children.first;
       }
@@ -277,8 +295,8 @@ class NovaWebApi {
       }
 
       return Result.success(data: retArr);
-    } on AppErrorType catch (type) {
-      return Result.failure(error: AppError(type: type));
+    } on AppError catch (error) {
+      return Result.failure(error: error);
     } on Exception catch (error) {
       return Result.failure(error: AppError.from(error));
     }

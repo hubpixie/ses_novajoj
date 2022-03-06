@@ -10,6 +10,9 @@ extension NovaWebApiDetail on NovaWebApi {
       // send request for fetching nova list.
       final response = await BaseApiClient.client
           .get(Uri.parse(parameter.itemInfo.urlString));
+      if (response.statusCode >= HttpStatus.badRequest) {
+        throw Exception(response.statusCode);
+      }
       // prepares to parse nova list from response.body.
       final document = html_parser.parse(response.body);
       NovaDetaloItemRes? retVal;
@@ -22,10 +25,11 @@ extension NovaWebApiDetail on NovaWebApi {
       }
 
       return Result.success(data: retVal!);
-    } on AppErrorType catch (type) {
-      return Result.failure(error: AppError(type: type));
+    } on AppError catch (error) {
+      return Result.failure(error: error);
     } on Exception catch (error) {
-      return Result.failure(error: AppError.from(error));
+      return Result.failure(
+          error: AppError.from(error, statusCode: error.getCode()));
     }
   }
 
@@ -75,7 +79,9 @@ extension NovaWebApiDetail on NovaWebApi {
       String source = parameter.itemInfo.source;
       if (rootElement?.children == null) {
         log.severe('rootElement?.children == null');
-        throw Exception(AppErrorType.parserError);
+        throw AppError(
+            type: AppErrorType.dataError,
+            reason: FailureReason.missingRootNode);
       }
 
       // createAt (detail)
@@ -119,8 +125,8 @@ extension NovaWebApiDetail on NovaWebApi {
       }();
 
       return Result.success(data: retVal);
-    } on AppErrorType catch (type) {
-      return Result.failure(error: AppError(type: type));
+    } on AppError catch (error) {
+      return Result.failure(error: error);
     } on Exception catch (error) {
       return Result.failure(error: AppError.from(error));
     }
