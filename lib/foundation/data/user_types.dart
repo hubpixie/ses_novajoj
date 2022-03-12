@@ -1,4 +1,3 @@
-import 'dart:ffi';
 import 'dart:io';
 
 enum NovaDocType { list, table, thumb, detail }
@@ -104,7 +103,7 @@ class AppError {
     return retStr;
   }
 
-  factory AppError.from(Exception error, {int? statusCode}) {
+  factory AppError.fromException(Exception error) {
     AppErrorType type = AppErrorType.unknown;
     String msg = '';
     String innerMsg = '';
@@ -114,29 +113,37 @@ class AppError {
       type = AppErrorType.network;
       innerMsg = err.message;
     }
-    if (statusCode != null) {
-      switch (statusCode) {
-        case HttpStatus.badRequest: // 400
-          type = AppErrorType.badRequest;
-          break;
-        case HttpStatus.unauthorized: // 401
-          type = AppErrorType.unauthorized;
-          break;
-        case HttpStatus.requestTimeout: // 408
-          type = AppErrorType.timeout;
-          break;
-        case HttpStatus.internalServerError: // 500
-        case HttpStatus.badGateway: // 502
-        case HttpStatus.serviceUnavailable: // 503
-        case HttpStatus.gatewayTimeout: // 504
-          type = AppErrorType.server;
-          break;
-        default:
-          type = AppErrorType.unknown;
-          break;
-      }
-    }
 
+    return AppError(
+        type: type, message: msg, innerMessage: innerMsg, reason: reason);
+  }
+
+  factory AppError.fromStatusCode(int statusCode) {
+    AppErrorType type = AppErrorType.unknown;
+    String msg = '';
+    String innerMsg = '';
+    FailureReason reason = FailureReason.exception;
+
+    switch (statusCode) {
+      case HttpStatus.badRequest: // 400
+        type = AppErrorType.badRequest;
+        break;
+      case HttpStatus.unauthorized: // 401
+        type = AppErrorType.unauthorized;
+        break;
+      case HttpStatus.requestTimeout: // 408
+        type = AppErrorType.timeout;
+        break;
+      case HttpStatus.internalServerError: // 500
+      case HttpStatus.badGateway: // 502
+      case HttpStatus.serviceUnavailable: // 503
+      case HttpStatus.gatewayTimeout: // 504
+        type = AppErrorType.server;
+        break;
+      default:
+        type = AppErrorType.unknown;
+        break;
+    }
     return AppError(
         type: type, message: msg, innerMessage: innerMsg, reason: reason);
   }

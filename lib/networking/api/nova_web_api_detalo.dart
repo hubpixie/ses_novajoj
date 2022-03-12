@@ -7,11 +7,19 @@ extension NovaWebApiDetail on NovaWebApi {
   Future<Result<NovaDetaloItemRes>> fetchNovaDetail(
       {required NovaDetaloParameter parameter}) async {
     try {
+      // check network state
+      final networkState = await BaseApiClient.connectivityState();
+      if (networkState == ConnectivityResult.none) {
+        throw const SocketException('Network is unavailable!');
+      }
+
       // send request for fetching nova list.
       final response = await BaseApiClient.client
           .get(Uri.parse(parameter.itemInfo.urlString));
+
       if (response.statusCode >= HttpStatus.badRequest) {
-        throw Exception(response.statusCode);
+        return Result.failure(
+            error: AppError.fromStatusCode(response.statusCode));
       }
       // prepares to parse nova list from response.body.
       final document = html_parser.parse(response.body);
@@ -28,8 +36,9 @@ extension NovaWebApiDetail on NovaWebApi {
     } on AppError catch (error) {
       return Result.failure(error: error);
     } on Exception catch (error) {
-      return Result.failure(
-          error: AppError.from(error, statusCode: error.getCode()));
+      return Result.failure(error: AppError.fromException(error));
+    } catch (error) {
+      return Result.failure(error: AppError.fromException(Exception()));
     }
   }
 
@@ -128,7 +137,7 @@ extension NovaWebApiDetail on NovaWebApi {
     } on AppError catch (error) {
       return Result.failure(error: error);
     } on Exception catch (error) {
-      return Result.failure(error: AppError.from(error));
+      return Result.failure(error: AppError.fromException(error));
     }
   }
 }

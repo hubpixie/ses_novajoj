@@ -16,7 +16,7 @@ abstract class Result<T> with _$Result<T> {
     try {
       return Result.success(data: body());
     } on Exception catch (e) {
-      return Result.failure(error: AppError.from(e));
+      return Result.failure(error: AppError.fromException(e));
     }
   }
 
@@ -24,7 +24,7 @@ abstract class Result<T> with _$Result<T> {
     try {
       return Result.success(data: await future());
     } on Exception catch (e) {
-      return Result.failure(error: AppError.from(e));
+      return Result.failure(error: AppError.fromException(e));
     }
   }
 
@@ -61,5 +61,6 @@ abstract class Result<T> with _$Result<T> {
 extension ResultObjectExt<T> on T {
   Result<T> get asSuccess => Result.success(data: this);
 
-  Result<T> asFailure(Exception e) => Result.failure(error: AppError.from(e));
+  Result<T> asFailure(Exception e) =>
+      Result.failure(error: AppError.fromException(e));
 }

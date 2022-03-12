@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:io';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:html/parser.dart' as html_parser;
 import 'package:html/dom.dart';
 import 'package:ses_novajoj/foundation//log_util.dart';
@@ -24,11 +26,18 @@ class NovaWebApi {
   Future<Result<List<NovaListItemRes>>> fetchNovaList(
       {required NovaItemParameter parameter}) async {
     try {
+      // check network state
+      final networkState = await BaseApiClient.connectivityState();
+      if (networkState == ConnectivityResult.none) {
+        throw const SocketException('Network is unavailable!');
+      }
+
       // send request for fetching nova list.
       final response =
           await BaseApiClient.client.get(Uri.parse(parameter.targetUrl));
       if (response.statusCode >= HttpStatus.badRequest) {
-        throw Exception(response.statusCode);
+        return Result.failure(
+            error: AppError.fromStatusCode(response.statusCode));
       }
       // prepares to parse nova list from response.body.
       final document = html_parser.parse(response.body);
@@ -49,8 +58,7 @@ class NovaWebApi {
       return Result.failure(error: error);
     } on Exception catch (error) {
       log.severe('$error');
-      return Result.failure(
-          error: AppError.from(error, statusCode: error.getCode()));
+      return Result.failure(error: AppError.fromException(error));
     }
   }
 
@@ -87,7 +95,8 @@ class NovaWebApi {
       final response =
           await BaseApiClient.client.get(Uri.parse(parameter.targetUrl));
       if (response.statusCode >= HttpStatus.badRequest) {
-        throw Exception(response.statusCode);
+        return Result.failure(
+            error: AppError.fromStatusCode(response.statusCode));
       }
 
       // prepares to parse nova list from response.body.
@@ -105,8 +114,7 @@ class NovaWebApi {
     } on AppError catch (error) {
       return Result.failure(error: error);
     } on Exception catch (error) {
-      return Result.failure(
-          error: AppError.from(error, statusCode: error.getCode()));
+      return Result.failure(error: AppError.fromException(error));
     }
   }
 
@@ -155,7 +163,7 @@ class NovaWebApi {
     } on AppError catch (error) {
       return Result.failure(error: error);
     } on Exception catch (error) {
-      return Result.failure(error: AppError.from(error));
+      return Result.failure(error: AppError.fromException(error));
     }
   }
 
@@ -298,7 +306,7 @@ class NovaWebApi {
     } on AppError catch (error) {
       return Result.failure(error: error);
     } on Exception catch (error) {
-      return Result.failure(error: AppError.from(error));
+      return Result.failure(error: AppError.fromException(error));
     }
   }
 

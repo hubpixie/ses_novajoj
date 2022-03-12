@@ -21,13 +21,18 @@ class TopListRouterImpl extends TopListRouter {
       {required String appBarTitle,
       Object? itemInfo,
       Object? completeHandler}) {
+    DateTime startDate = DateTime.now();
     Navigator.pushNamed(context as BuildContext, ScreenRouteName.topDetail.name,
         arguments: {
           TopDetailParamKeys.appBarTitle: appBarTitle,
           TopDetailParamKeys.itemInfo: itemInfo
         }).then((value) {
       if (completeHandler != null && completeHandler is Function) {
-        completeHandler.call();
+        DateTime endDate = DateTime.now();
+        if (startDate.add(const Duration(minutes: 3)).millisecondsSinceEpoch <
+            endDate.millisecondsSinceEpoch) {
+          completeHandler.call();
+        }
       }
     });
   }
