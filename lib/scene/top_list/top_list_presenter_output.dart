@@ -1,13 +1,14 @@
+import 'package:ses_novajoj/foundation/data/date_util.dart';
+import 'package:ses_novajoj/foundation/data/user_types.dart';
+import 'package:ses_novajoj/foundation/data/string_util.dart';
 import 'package:ses_novajoj/domain/usecases/nova_list_usecase_output.dart';
-import 'package:ses_novajoj/utilities/data/date_util.dart';
-import 'package:ses_novajoj/utilities/data/user_types.dart';
-import 'package:ses_novajoj/utilities/data/string_util.dart';
 
 abstract class TopListPresenterOutput {}
 
-class ShowNovaListModel extends TopListPresenterOutput {
-  final List<NovaListRowViewModel> viewModelList;
-  ShowNovaListModel(this.viewModelList);
+class ShowListPageModel extends TopListPresenterOutput {
+  final List<NovaListRowViewModel>? viewModelList;
+  final AppError? error;
+  ShowListPageModel({this.viewModelList, this.error});
 }
 
 class NovaListRowViewModel {

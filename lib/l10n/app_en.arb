@@ -33,5 +33,6 @@
   "tabBarNameThreads": "Threads",
   "topDetailNewsSoourceLabel":"News source:",
   "todayHotNews":"Today's Hot",
-  "todayPopularNews":"Today's Reply"
+  "todayPopularNews":"Today's Reply",
+  "msgNetworkUnavailable": "Network is unavailable, please try again later"
 }

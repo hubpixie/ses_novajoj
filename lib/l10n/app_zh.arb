@@ -33,5 +33,6 @@
     "tabBarNameThreads": "热帖",
     "topDetailNewsSoourceLabel":"新闻来源：",
     "todayHotNews":"【本日热门】",
-    "todayPopularNews":"【本日社评】"
+    "todayPopularNews":"【本日社评】",
+    "msgNetworkUnavailable":"当前网络无法连接，请稍后重试！"
   }

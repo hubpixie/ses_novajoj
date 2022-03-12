@@ -1,5 +1,5 @@
-import 'package:ses_novajoj/utilities/data/user_types.dart';
-import 'package:ses_novajoj/domain/utilities/bloc/simple_bloc.dart';
+import 'package:ses_novajoj/foundation/data/user_types.dart';
+import 'package:ses_novajoj/domain/foundation/bloc/simple_bloc.dart';
 import 'package:ses_novajoj/domain/usecases/nova_detail_usecase.dart';
 import 'package:ses_novajoj/domain/usecases/nova_detail_usecase_output.dart';
 import 'top_detail_presenter_output.dart';
@@ -21,7 +21,12 @@ class TopDetailPresenterImpl extends TopDetailPresenter {
       : useCase = NewsDetailUseCase() {
     useCase.stream.listen((event) {
       if (event is PresentModel) {
-        streamAdd(ShowNovaDetailModel(NovaDetailViewModel(event.model)));
+        if (event.error == null) {
+          streamAdd(ShowNovaDetailPageModel(
+              viewModel: NovaDetailViewModel(event.model!)));
+        } else {
+          streamAdd(ShowNovaDetailPageModel(error: event.error));
+        }
       }
       _isProcessing = false;
     });

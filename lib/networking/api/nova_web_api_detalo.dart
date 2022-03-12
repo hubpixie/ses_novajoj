@@ -4,12 +4,23 @@ extension NovaWebApiDetail on NovaWebApi {
   ///
   /// api entry: fetchNovaDetail
   ///
-  Future<Result<NovaDetaloItemRes?, NovaDomainReason>> fetchNovaDetail(
+  Future<Result<NovaDetaloItemRes>> fetchNovaDetail(
       {required NovaDetaloParameter parameter}) async {
     try {
+      // check network state
+      final networkState = await BaseApiClient.connectivityState();
+      if (networkState == ConnectivityResult.none) {
+        throw const SocketException('Network is unavailable!');
+      }
+
       // send request for fetching nova list.
       final response = await BaseApiClient.client
           .get(Uri.parse(parameter.itemInfo.urlString));
+
+      if (response.statusCode >= HttpStatus.badRequest) {
+        return Result.failure(
+            error: AppError.fromStatusCode(response.statusCode));
+      }
       // prepares to parse nova list from response.body.
       final document = html_parser.parse(response.body);
       NovaDetaloItemRes? retVal;
@@ -21,11 +32,13 @@ extension NovaWebApiDetail on NovaWebApi {
             detailElement: document.getElementById("shownewsc"));
       }
 
-      return Result.success(retVal);
-    } on NovaDomainReason catch (reason) {
-      return Result.domainIssue(reason);
-    } catch (e) {
-      return Result.failure(0, e.toString());
+      return Result.success(data: retVal!);
+    } on AppError catch (error) {
+      return Result.failure(error: error);
+    } on Exception catch (error) {
+      return Result.failure(error: AppError.fromException(error));
+    } catch (error) {
+      return Result.failure(error: AppError.fromException(Exception()));
     }
   }
 
@@ -64,17 +77,20 @@ extension NovaWebApiDetail on NovaWebApi {
   ///   </table>
   /// </div>
   ///
-  Future<Result<NovaDetaloItemRes?, NovaDomainReason>> _parseDetailItems(
+  Future<Result<NovaDetaloItemRes>> _parseDetailItems(
       {required NovaDetaloParameter parameter,
       Element? rootElement,
       Element? detailElement}) async {
     try {
-      NovaDetaloItemRes? retVal = NovaDetaloItemRes(
+      NovaDetaloItemRes retVal = NovaDetaloItemRes(
           itemInfo: parameter.itemInfo,
           bodyString: detailElement?.innerHtml ?? '');
       String source = parameter.itemInfo.source;
       if (rootElement?.children == null) {
-        throw Exception(NovaDomainReason.notFound);
+        log.severe('rootElement?.children == null');
+        throw AppError(
+            type: AppErrorType.dataError,
+            reason: FailureReason.missingRootNode);
       }
 
       // createAt (detail)
@@ -117,11 +133,11 @@ extension NovaWebApiDetail on NovaWebApi {
         return retStr;
       }();
 
-      return Result.success(retVal);
-    } on NovaDomainReason catch (reason) {
-      return Result.domainIssue(reason);
-    } catch (e) {
-      return Result.failure(0, e.toString());
+      return Result.success(data: retVal);
+    } on AppError catch (error) {
+      return Result.failure(error: error);
+    } on Exception catch (error) {
+      return Result.failure(error: AppError.fromException(error));
     }
   }
 }

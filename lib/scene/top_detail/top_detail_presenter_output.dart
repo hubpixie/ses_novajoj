@@ -1,13 +1,14 @@
-import 'package:ses_novajoj/utilities/data/date_util.dart';
-import 'package:ses_novajoj/utilities/data/user_types.dart';
-import 'package:ses_novajoj/utilities/data/string_util.dart';
+import 'package:ses_novajoj/foundation/data/date_util.dart';
+import 'package:ses_novajoj/foundation/data/user_types.dart';
+import 'package:ses_novajoj/foundation/data/string_util.dart';
 import 'package:ses_novajoj/domain/usecases/nova_detail_usecase_output.dart';
 
 abstract class TopDetailPresenterOutput {}
 
-class ShowNovaDetailModel extends TopDetailPresenterOutput {
-  final NovaDetailViewModel viewModel;
-  ShowNovaDetailModel(this.viewModel);
+class ShowNovaDetailPageModel extends TopDetailPresenterOutput {
+  final NovaDetailViewModel? viewModel;
+  final AppError? error;
+  ShowNovaDetailPageModel({this.viewModel, this.error});
 }
 
 class NovaDetailViewModel {

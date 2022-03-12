@@ -1,5 +1,6 @@
+import 'package:ses_novajoj/foundation/data/user_types.dart';
+import 'package:ses_novajoj/foundation/data/result.dart';
 import 'package:ses_novajoj/domain/entities/nova_list_item.dart';
-import 'package:ses_novajoj/utilities/data/user_types.dart';
 
 class FetchNewsListRepoInput {
   String targetUrl;
@@ -9,7 +10,7 @@ class FetchNewsListRepoInput {
 }
 
 abstract class NovaListRepository {
-  Future<List<NovaListItem>> fetchNewsList(
+  Future<Result<List<NovaListItem>>> fetchNewsList(
       {required FetchNewsListRepoInput input});
-  Future<String> fetchThumbUrl({required FetchNewsListRepoInput input});
+  Future<Result<String>> fetchThumbUrl({required FetchNewsListRepoInput input});
 }

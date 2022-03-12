@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ses_novajoj/scene/utilities/page_util/screen_route_enums.dart';
+import 'package:ses_novajoj/scene/foundation/page/screen_route_enums.dart';
 import 'package:ses_novajoj/scene/splash/splash_page_builder.dart';
 import 'package:ses_novajoj/scene/tabs/tabs_page_builder.dart';
 import 'package:ses_novajoj/scene/top_detail/top_detail_page_builder.dart';

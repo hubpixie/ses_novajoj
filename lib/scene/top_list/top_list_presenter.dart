@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:ses_novajoj/domain/utilities/bloc/simple_bloc.dart';
+import 'package:ses_novajoj/domain/foundation/bloc/simple_bloc.dart';
 import 'package:ses_novajoj/domain/usecases/nova_list_usecase.dart';
 import 'package:ses_novajoj/domain/usecases/nova_list_usecase_output.dart';
 import 'top_list_router.dart';
@@ -14,7 +14,7 @@ abstract class TopListPresenter with SimpleBloc<TopListPresenterOutput> {
       String? prefixTitle,
       bool isReloaded = false});
   void eventSelectDetail(Object context,
-      {required String appBarTitle, Object? itemInfo});
+      {required String appBarTitle, Object? itemInfo, Object? completeHandler});
   Future<String> eventFetchThumbnail({required String targetUrl});
 }
 
@@ -47,8 +47,13 @@ class TopListPresenterImpl extends TopListPresenter {
 
   @override
   void eventSelectDetail(Object context,
-      {required String appBarTitle, Object? itemInfo}) {
-    router.gotoTopDetail(context, appBarTitle: appBarTitle, itemInfo: itemInfo);
+      {required String appBarTitle,
+      Object? itemInfo,
+      Object? completeHandler}) {
+    router.gotoTopDetail(context,
+        appBarTitle: appBarTitle,
+        itemInfo: itemInfo,
+        completeHandler: completeHandler);
   }
 
   @override
@@ -59,10 +64,12 @@ class TopListPresenterImpl extends TopListPresenter {
   StreamSubscription<NovaListUseCaseOutput> _addStreamListener() {
     return useCase.stream.listen((event) {
       if (event is PresentModel) {
-        streamAdd(ShowNovaListModel(
-            event.model.map((row) => NovaListRowViewModel(row)).toList()));
+        streamAdd(ShowListPageModel(
+            viewModelList:
+                event.model?.map((row) => NovaListRowViewModel(row)).toList(),
+            error: event.error));
+        _isProcessing = false;
       }
-      _isProcessing = false;
     });
   }
 }
