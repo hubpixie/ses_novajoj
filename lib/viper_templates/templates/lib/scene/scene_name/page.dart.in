@@ -1,0 +1,63 @@
+import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:{{project_name}}/foundation/data/user_types.dart';
+import 'package:{{project_name}}/domain/foundation/bloc/bloc_provider.dart';
+import 'package:{{project_name}}/scene/foundation/use_l10n.dart';
+import 'package:{{project_name}}/scene/foundation/page/page_parameter.dart';
+import 'package:{{project_name}}/scene/{{scene_name.path}}/{{scene_name.path}}_presenter.dart';
+import 'package:{{project_name}}/scene/{{scene_name.path}}/{{scene_name.path}}_presenter_output.dart';
+
+class {{scene_name.class}}Page extends StatefulWidget {
+  final {{scene_name.class}}Presenter presenter;
+  const {{scene_name.class}}Page({Key? key, required this.presenter}) : super(key: key);
+
+  @override
+  _{{scene_name.class}}PageState createState() => _{{scene_name.class}}PageState();
+}
+
+class _{{scene_name.class}}PageState extends State<{{scene_name.class}}Page> {
+
+  @override
+  void initState() {
+    super.initState();
+    // TODO: Initialize your variables.
+    widget.presenter.eventViewReady(input: {{scene_name.class}}PresenterInput());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+      return Scaffold(
+      appBar: AppBar(
+        title: const Text("title"),
+      ),
+      body: BlocProvider<{{scene_name.class}}Presenter>(
+        bloc: widget.presenter,
+        child: StreamBuilder<{{scene_name.class}}PresenterOutput>(
+            stream: widget.presenter.stream,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(
+                    child: CircularProgressIndicator(
+                        color: Colors.amber,
+                        backgroundColor: Colors.grey[850]));
+              }
+              final data = snapshot.data;
+              if (data is Show{{scene_name.class}}PageModel) {
+                if (data.error == null) {
+                  return Column(
+                    children: [
+                      Text("${data.viewModel}")
+                    ],
+                  );
+                } else {
+                  return Text("${data.error}");
+                }
+              } else {
+                assert(false, "unknown event $data");
+                return Container(color: Colors.red);
+              }
+            }),
+      ),
+    );
+  }
+}

@@ -1,0 +1,20 @@
+import 'package:{{project_name}}/foundation/data/user_types.dart';
+import 'package:{{project_name}}/domain/usecases/{{usecase_name.path}}_usecase_output.dart';
+
+abstract class {{scene_name.class}}PresenterOutput {}
+
+class Show{{scene_name.class}}PageModel extends {{scene_name.class}}PresenterOutput {
+  final {{scene_name.class}}ViewModel? viewModel;
+  final AppError? error;
+  Show{{scene_name.class}}PageModel({this.viewModel, this.error});
+}
+
+class {{scene_name.class}}ViewModel {
+  int id; 
+
+  {{scene_name.class}}ViewModel({{usecase_name.class}}UseCaseModel model)
+      : id = model.id/*,
+       name = model.name,
+      ...
+      */;
+}

@@ -1,0 +1,15 @@
+import 'package:{{project_name}}/domain/entities/{{entity_name.path}}_item.dart';
+import 'package:{{project_name}}/foundation/data/user_types.dart';
+import 'package:{{project_name}}/foundation/data/result.dart';
+
+class Fetch{{repo_name.class}}RepoInput {
+  Object id;
+  String string;
+
+  Fetch{{repo_name.class}}RepoInput({required this.id, required this.string});
+}
+
+abstract class {{repo_name.class}}Repository {
+  Future<Result<{{entity_name.class}}Item>> fetch{{entity_name.class}}(
+      {required Fetch{{repo_name.class}}RepoInput input});
+}

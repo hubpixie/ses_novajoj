@@ -1,0 +1,25 @@
+import 'package:flutter/material.dart';
+import 'package:{{project_name}}/scene/foundation/page/screen_route_enums.dart';
+import 'package:{{project_name}}/scene/{{scene_name.path}}/{{scene_name.path}}_page_builder.dart';
+
+class ScreenRouteManager {
+  static Route<dynamic> generateRoute(RouteSettings? settings) {
+    ScreenRouteName sr =
+        ScreenRouteNameSummary.fromString(settings?.name ?? '');
+    switch (sr) {
+      /*case ScreenRouteName.splash:
+        return MaterialPageRoute(
+            builder: (_) => SplashPageBuilder().page, settings: settings);*/
+      case ScreenRouteName.{{router_name_enum}}:
+        return MaterialPageRoute(
+            builder: (_) => {{scene_name.class}}PageBuilder().page, settings: settings);
+      default:
+        return MaterialPageRoute(
+            builder: (_) => Scaffold(
+                  body: Center(
+                    child: Text('No route defined for ${settings?.name}'),
+                  ),
+                ));
+    }
+  }
+}

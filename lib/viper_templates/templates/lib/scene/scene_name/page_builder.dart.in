@@ -1,0 +1,17 @@
+import '{{scene_name.path}}_page.dart';
+import '{{scene_name.path}}_presenter.dart';
+import '{{scene_name.path}}_router.dart';
+
+class {{scene_name.class}}PageBuilder {
+  final {{scene_name.class}}Page page;
+
+  {{scene_name.class}}PageBuilder._(this.page);
+
+  factory {{scene_name.class}}PageBuilder() {
+    final router = {{scene_name.class}}RouterImpl();
+    final presenter = {{scene_name.class}}PresenterImpl(router: router);
+    final page = {{scene_name.class}}Page(presenter: presenter);
+
+    return {{scene_name.class}}PageBuilder._(page);
+  }
+}

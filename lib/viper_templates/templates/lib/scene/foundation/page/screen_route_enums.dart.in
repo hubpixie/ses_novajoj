@@ -1,10 +1,7 @@
 /// Router Name Enum
 enum ScreenRouteName {
   splash,
-  login,
-  home,
-  tabs,
-  topDetail,
+  {{router_name_enum}},
 }
 
 extension ScreenRouteNameSummary on ScreenRouteName {
@@ -12,14 +9,8 @@ extension ScreenRouteNameSummary on ScreenRouteName {
     switch (this) {
       case ScreenRouteName.splash:
         return 'splash';
-      case ScreenRouteName.login:
-        return 'login';
-      case ScreenRouteName.home:
-        return '/';
-      case ScreenRouteName.tabs:
-        return 'tabs';
-      case ScreenRouteName.topDetail:
-        return 'topDetail';
+      case ScreenRouteName.{{router_name_enum}}:
+        return '{{router_name_enum}}';
       default:
         return '';
     }
@@ -32,10 +23,8 @@ extension ScreenRouteNameSummary on ScreenRouteName {
 
   String? get stringClass {
     switch (this) {
-      case ScreenRouteName.home:
-      case ScreenRouteName.login:
-      case ScreenRouteName.tabs:
-      case ScreenRouteName.topDetail:
+      case ScreenRouteName.splash:
+      case ScreenRouteName.{{router_name_enum}}:
         return toString().split(".").last;
       default:
         return null;

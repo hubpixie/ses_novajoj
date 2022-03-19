@@ -1,0 +1,13 @@
+abstract class {{scene_name.class}}Router {
+  //void gotoTop(Object context);
+}
+
+class {{scene_name.class}}RouterImpl extends {{scene_name.class}}Router {
+  {{scene_name.class}}RouterImpl();
+
+  // @override
+  // void gotoTop(Object context) {
+  //   log.info('gotoTop');
+  //   Navigator.pushNamed(context as BuildContext, ScreenRouteName.tabs.name);
+  // }
+}
