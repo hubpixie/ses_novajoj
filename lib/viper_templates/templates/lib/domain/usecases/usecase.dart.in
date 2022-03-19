@@ -1,0 +1,33 @@
+import 'package:{{project_name}}/domain/foundation/bloc/simple_bloc.dart';
+import 'package:{{project_name}}/domain/repositories/{{repo_name.path}}_repository.dart';
+import 'package:{{project_name}}/data/repositories/{{repo_name.path}}_repository.dart';
+import 'package:{{project_name}}/foundation/data/user_types.dart';
+
+import '{{usecase_name.path}}_usecase_output.dart';
+
+class {{usecase_name.class}}UseCaseInput {
+
+}
+
+abstract class {{usecase_name.class}}UseCase with SimpleBloc<{{usecase_name.class}}UseCaseOutput> {
+  void fetch{{usecase_name.class}}({required {{usecase_name.class}}UseCaseInput input});
+}
+
+class {{usecase_name.class}}UseCaseImpl extends {{usecase_name.class}}UseCase {
+  final {{repo_name.class}}RepositoryImpl repository;
+  {{usecase_name.class}}UseCaseImpl() : repository = {{repo_name.class}}RepositoryImpl();
+
+  @override
+  void fetch{{usecase_name.class}}({required {{usecase_name.class}}UseCaseInput input}) async {
+    final result = await repository.fetch{{repo_name.class}}(
+        input: Fetch{{repo_name.class}}RepoInput(
+            id: 9999, string: "99999" /* // TODO: dummy code*/));
+
+    result.when(success: (value) {
+      streamAdd(
+          PresentModel(model: {{usecase_name.class}}UseCaseModel(9999, value.toString() /* // TODO: dummy code*/)));
+    }, failure: (error) {
+      streamAdd(PresentModel(error: error));
+    });
+  }
+}

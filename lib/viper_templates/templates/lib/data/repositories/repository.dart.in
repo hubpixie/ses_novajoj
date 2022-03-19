@@ -1,0 +1,31 @@
+import 'package:{{project_name}}/foundation/data/result.dart';
+//import 'package:{{project_name}}/networking/api/my_web_api.dart';
+// import 'package:{{project_name}}/networking/response/{{request_name.path}}_response.dart';
+// import 'package:{{project_name}}/networking/request/{{response_name.path}}_parameter.dart';
+import 'package:{{project_name}}/domain/entities/{{entity_name.path}}_item.dart';
+import 'package:{{project_name}}/domain/repositories/{{repo_name.path}}_repository.dart';
+
+/// TODO: This is dummy Web API class.
+/// You should  web api class is defined in its dart file, like `my_web_api.dart`
+class MyWebApi {}
+
+class {{repo_name.class}}RepositoryImpl extends {{repo_name.class}}Repository {
+  final MyWebApi _api;
+
+  // sigleton
+  static final {{repo_name.class}}RepositoryImpl _instance =
+      {{repo_name.class}}RepositoryImpl._internal();
+  {{repo_name.class}}RepositoryImpl._internal() : _api = MyWebApi();
+  factory {{repo_name.class}}RepositoryImpl() => _instance;
+
+  @override
+  Future<Result<{{entity_name.class}}Item>> fetch{{entity_name.class}}(
+
+      {required Fetch{{repo_name.class}}RepoInput input}) async {
+    Result<{{entity_name.class}}Item> result =
+        Result.success(data: {{entity_name.class}}Item(id: 9999, string: "9999"));    // TODO: call api
+
+    // TODO: change api result for `{{repo_name.class}}' repository
+    return result;
+  }
+}

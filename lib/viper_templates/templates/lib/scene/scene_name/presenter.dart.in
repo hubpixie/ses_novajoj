@@ -1,0 +1,39 @@
+import 'package:{{project_name}}/foundation/data/user_types.dart';
+import 'package:{{project_name}}/domain/foundation/bloc/simple_bloc.dart';
+import 'package:{{project_name}}/domain/usecases/{{usecase_name.path}}_usecase.dart';
+import 'package:{{project_name}}/domain/usecases/{{usecase_name.path}}_usecase_output.dart';
+import '{{scene_name.path}}_presenter_output.dart';
+
+import '{{scene_name.path}}_router.dart';
+
+class {{scene_name.class}}PresenterInput {
+
+}
+
+abstract class {{scene_name.class}}Presenter with SimpleBloc<{{scene_name.class}}PresenterOutput> {
+  void eventViewReady({required {{scene_name.class}}PresenterInput input});
+}
+
+class {{scene_name.class}}PresenterImpl extends {{scene_name.class}}Presenter {
+  final {{usecase_name.class}}UseCase useCase;
+  final {{scene_name.class}}Router router;
+
+  {{scene_name.class}}PresenterImpl({required this.router})
+      : useCase = {{usecase_name.class}}UseCaseImpl() {
+    useCase.stream.listen((event) {
+      if (event is PresentModel) {
+        if (event.error == null) {
+          streamAdd(Show{{scene_name.class}}PageModel(
+              viewModel: {{scene_name.class}}ViewModel(event.model!)));
+        } else {
+          streamAdd(Show{{scene_name.class}}PageModel(error: event.error));
+        }
+      }
+    });
+  }
+
+  @override
+  void eventViewReady({required {{scene_name.class}}PresenterInput input}) {
+    useCase.fetch{{usecase_name.class}}(input: {{usecase_name.class}}UseCaseInput());
+  }
+}

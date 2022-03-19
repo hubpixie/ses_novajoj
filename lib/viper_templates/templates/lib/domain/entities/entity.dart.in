@@ -1,0 +1,12 @@
+import 'package:{{project_name}}/foundation/data/user_types.dart';
+import 'package:{{project_name}}/foundation/data/date_util.dart';
+
+class {{entity_name.class}}Item {
+  int id;
+  String string;
+
+  {{entity_name.class}}Item({
+    required this.id,
+    required this.string,
+  });
+}

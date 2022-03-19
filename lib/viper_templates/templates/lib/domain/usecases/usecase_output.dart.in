@@ -1,0 +1,16 @@
+import 'package:{{project_name}}/foundation/data/user_types.dart';
+
+abstract class  {{usecase_name.class}}UseCaseOutput {}
+
+class PresentModel extends {{usecase_name.class}}UseCaseOutput {
+  final {{usecase_name.class}}UseCaseModel? model;
+  final AppError? error;
+  PresentModel({this.model, this.error});
+}
+
+class {{usecase_name.class}}UseCaseModel {
+  int id;
+  String string;
+
+  {{usecase_name.class}}UseCaseModel(this.id, this.string);
+}

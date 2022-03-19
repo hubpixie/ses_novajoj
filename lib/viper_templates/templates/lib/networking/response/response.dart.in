@@ -1,0 +1,11 @@
+import 'package:{{project_name}}/foundation/data/user_types.dart';
+
+class {{response_name.class}}ItemRes {
+  Object itemInfo;
+  String string;
+
+  {{response_name.class}}ItemRes({
+    required this.itemInfo,
+    required this.string,
+  });
+}

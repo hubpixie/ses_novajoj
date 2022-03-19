@@ -1,0 +1,8 @@
+import 'package:{{project_name}}/foundation/data/user_types.dart';
+
+class {{request_name.class}}Parameter {
+  Object itemInfo;
+  String string;
+
+  {{request_name.class}}Parameter({required this.itemInfo, required this.string});
+}
