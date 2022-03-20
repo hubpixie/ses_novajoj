@@ -34,5 +34,17 @@
   "topDetailNewsSoourceLabel":"News source:",
   "todayHotNews":"Today's Hot",
   "todayPopularNews":"Today's Reply",
-  "msgNetworkUnavailable": "Network is unavailable, please try again later"
+  "localListAppBarTitle":"Local News",
+  "localListMenuAll":"All",
+  "localListMenuUs":"US",
+  "localListMenuCa":"Canada",
+  "localListMenuAu":"Australia",
+  "localListMenuNz":"New Zealand",
+  "localListMenuUk":"UK",
+  "localListMenuDe":"German",
+  "localListMenuJp":"Japan",
+  "localListMenuSg":"Singapore",
+  "localListMenuFr":"France",
+  "localListMenuIe":"Irelandcd",
+"msgNetworkUnavailable": "Network is unavailable, please try again later"
 }

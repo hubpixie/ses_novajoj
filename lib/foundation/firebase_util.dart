@@ -11,6 +11,7 @@ enum AnalyticsRoute {
   splash,
   topList,
   topDetail,
+  localList,
 }
 
 extension AnalyticsRouteInfo on AnalyticsRoute {

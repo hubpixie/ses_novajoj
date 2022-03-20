@@ -17,7 +17,7 @@
       "description": "Recommending AppBar IconName"
     },
     "appBarIconNameHot": "热",
-    "appBarFullNameHot": "热力新闻",
+    "appBarFullNameHot": "热点新闻",
     "@appBarIconNameHot": {
       "description": "Hot AppBar IconName"
     },
@@ -32,7 +32,19 @@
     "tabBarNameSearch": "检索",
     "tabBarNameThreads": "热帖",
     "topDetailNewsSoourceLabel":"新闻来源：",
-    "todayHotNews":"【本日热门】",
+    "todayHotNews":"【本日热点】",
     "todayPopularNews":"【本日社评】",
+    "localListAppBarTitle":"本地新闻",
+    "localListMenuAll":"汇总",
+    "localListMenuUs":"美国",
+    "localListMenuCa":"加拿大",
+    "localListMenuAu":"澳大利亚",
+    "localListMenuNz":"新西兰",
+    "localListMenuUk":"英国",
+    "localListMenuDe":"德国",
+    "localListMenuJp":"日本",
+    "localListMenuSg":"新加坡",
+    "localListMenuFr":"法国",
+    "localListMenuIe":"爱尔兰",
     "msgNetworkUnavailable":"当前网络无法连接，请稍后重试！"
   }

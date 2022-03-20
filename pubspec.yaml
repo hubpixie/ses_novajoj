@@ -37,6 +37,7 @@ dependencies:
   intl: ^0.17.0
   freezed_annotation:
   html:
+  menu_button:
   connectivity_plus:
 
   # The following adds the Cupertino Icons font to your application.

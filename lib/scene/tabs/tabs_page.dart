@@ -3,6 +3,7 @@ import 'package:ses_novajoj/l10n/l10n.dart';
 import 'package:ses_novajoj/foundation/log_util.dart';
 import 'package:ses_novajoj/scene/tabs/tabs_presenter.dart';
 import 'package:ses_novajoj/scene/top_list/top_list_page_builder.dart';
+import 'package:ses_novajoj/scene/local_list/local_list_page_builder.dart';
 
 class TabsPage extends StatefulWidget {
   final TabsPresenter presenter;
@@ -60,7 +61,7 @@ class _TabsPageState extends State<TabsPage> with WidgetsBindingObserver {
             children: <Widget>[
               TopListPageBuilder().page,
               Container(),
-              Container(),
+              LocalListPageBuilder().page,
               Container(),
               Container(),
             ],

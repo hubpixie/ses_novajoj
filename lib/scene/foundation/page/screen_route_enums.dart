@@ -1,11 +1,5 @@
 /// Router Name Enum
-enum ScreenRouteName {
-  splash,
-  login,
-  home,
-  tabs,
-  topDetail,
-}
+enum ScreenRouteName { splash, login, home, tabs, topDetail, localList }
 
 extension ScreenRouteNameSummary on ScreenRouteName {
   String get name {
@@ -20,6 +14,8 @@ extension ScreenRouteNameSummary on ScreenRouteName {
         return 'tabs';
       case ScreenRouteName.topDetail:
         return 'topDetail';
+      case ScreenRouteName.localList:
+        return 'localList';
       default:
         return '';
     }
@@ -36,6 +32,7 @@ extension ScreenRouteNameSummary on ScreenRouteName {
       case ScreenRouteName.login:
       case ScreenRouteName.tabs:
       case ScreenRouteName.topDetail:
+      case ScreenRouteName.localList:
         return toString().split(".").last;
       default:
         return null;
