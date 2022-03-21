@@ -27,7 +27,7 @@ class TopListCell extends StatelessWidget {
         splashColor: Colors.black12,
         splashFactory: InkRipple.splashFactory,
         child: Container(
-            padding: const EdgeInsets.all(2.0),
+            padding: const EdgeInsets.only(left: 2.0, right: 2.0),
             child: Column(children: [
               Row(children: [
                 Container(
@@ -51,7 +51,12 @@ class TopListCell extends StatelessWidget {
                           if (snapshot.data is String) {
                             thumbUrl = snapshot.data as String? ?? "";
                           }
-                          return Image.network(thumbUrl);
+                          if (thumbUrl.isNotEmpty && thumbUrl != blankUrl) {
+                            return Image.network(thumbUrl,
+                                errorBuilder: (context, object, stackTrace) =>
+                                    Image.asset(blankUrl));
+                          }
+                          return Image.asset(blankUrl);
                         },
                       )),
                 ),

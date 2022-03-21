@@ -44,7 +44,7 @@
     "localListMenuDe":"德国",
     "localListMenuJp":"日本",
     "localListMenuSg":"新加坡",
-    "localListMenuFr":"法国",
     "localListMenuIe":"爱尔兰",
+    "localListMenuEu":"欧洲其他",
     "msgNetworkUnavailable":"当前网络无法连接，请稍后重试！"
   }

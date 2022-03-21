@@ -4,7 +4,6 @@ import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/domain/foundation/bloc/bloc_provider.dart';
 import 'package:ses_novajoj/foundation/firebase_util.dart';
 import 'package:ses_novajoj/scene/foundation/use_l10n.dart';
-import 'package:ses_novajoj/scene/foundation/page/page_parameter.dart';
 import 'package:ses_novajoj/scene/local_list/local_list_presenter.dart';
 import 'package:ses_novajoj/scene/local_list/local_list_presenter_output.dart';
 import 'package:ses_novajoj/scene/widgets/local_list_cell.dart';
@@ -21,13 +20,12 @@ class LocalListPage extends StatefulWidget {
 enum _MenuItemValueKey { key, text }
 
 class _LocalListPageState extends State<LocalListPage> {
-  late String? _selectMenuItemText = UseL10n.of(context)?.localListMenuAll;
-  int _selectMenuItemIndex = 0;
+  late String? _selectedMenuItemText = UseL10n.of(context)?.localListMenuAll;
+  int _selectedMenuItemIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    // TODO: Initialize your variables.
     FirebaseUtil().sendViewEvent(route: AnalyticsRoute.localList);
     _loadData();
   }
@@ -61,7 +59,7 @@ class _LocalListPageState extends State<LocalListPage> {
                 if (data.error == null) {
                   return ListView.builder(
                       itemCount: data.viewModelList?.length,
-                      itemBuilder: (context, index) => TopListCell(
+                      itemBuilder: (context, index) => LocalListCell(
                           viewModel: data.viewModelList![index],
                           onCellSelecting: (selIndex) {
                             // widget.presenter.eventSelectDetail(context,
@@ -85,7 +83,7 @@ class _LocalListPageState extends State<LocalListPage> {
                                             .itemInfo.urlString));
                             data.viewModelList![thumbIndex].itemInfo
                                 .thunnailUrlString = retUrl;
-                            return "retUrl";
+                            return retUrl;
                           },
                           index: index));
                 } else {
@@ -149,11 +147,11 @@ class _LocalListPageState extends State<LocalListPage> {
       },
       {
         _MenuItemValueKey.key: index++,
-        _MenuItemValueKey.text: UseL10n.of(context)?.localListMenuFr
+        _MenuItemValueKey.text: UseL10n.of(context)?.localListMenuIe
       },
       {
         _MenuItemValueKey.key: index++,
-        _MenuItemValueKey.text: UseL10n.of(context)?.localListMenuIe
+        _MenuItemValueKey.text: UseL10n.of(context)?.localListMenuEu
       },
     ];
 
@@ -168,7 +166,7 @@ class _LocalListPageState extends State<LocalListPage> {
           children: <Widget>[
             Flexible(
               child: Text(
-                _selectMenuItemText ?? "",
+                _selectedMenuItemText ?? "",
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                     color: Colors.white, fontWeight: FontWeight.w600),
@@ -194,7 +192,6 @@ class _LocalListPageState extends State<LocalListPage> {
     return SizedBox(
         width: 280,
         child: Row(
-          //mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: <Widget>[
             MenuButton<Map>(
@@ -218,18 +215,18 @@ class _LocalListPageState extends State<LocalListPage> {
                 color: Colors.grey[350],
               ),
               onItemSelected: (Map value) {
-                setState(() {
-                  _selectMenuItemText = value[_MenuItemValueKey.text];
-                });
+                if (_selectedMenuItemIndex != value[_MenuItemValueKey.key]) {
+                  _selectedMenuItemIndex = value[_MenuItemValueKey.key];
+                  _selectedMenuItemText = value[_MenuItemValueKey.text];
+                  _loadData(isReloaded: true);
+                }
               },
               decoration: BoxDecoration(
                   border: Border.all(color: Colors.grey[300]!),
                   borderRadius: const BorderRadius.all(
                     Radius.circular(3.0),
                   )),
-              onMenuButtonToggle: (bool isToggle) {
-                print(isToggle);
-              },
+              onMenuButtonToggle: (bool isToggle) {},
               popupHeight: 250,
             ),
             //const SizedBox(width: 10),
@@ -269,12 +266,10 @@ class _LocalListPageState extends State<LocalListPage> {
     // fetch data
     widget.presenter.eventViewReady(
         input: LocalListPresenterInput(
-            itemIndex: _selectMenuItemIndex, isReloaded: isReloaded));
+            itemIndex: _selectedMenuItemIndex, isReloaded: isReloaded));
 
-    if (isReloaded) {
-      Future.delayed(Duration.zero, () {
-        setState(() {});
-      });
-    }
+    Future.delayed(Duration.zero, () {
+      setState(() {});
+    });
   }
 }

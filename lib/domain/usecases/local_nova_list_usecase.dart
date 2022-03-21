@@ -52,10 +52,10 @@ class LocalNovaListUseCaseImpl extends LocalNovaListUseCase {
         targetUrl: "https://local.6parknews.com/index.php?type_id=9",
         docType: NovaDocType.list),
     FetchLocalNovaListRepoInput(
-        targetUrl: "https://local.6parknews.com/index.php?type_id=7",
+        targetUrl: "https://local.6parknews.com/index.php?type_id=10",
         docType: NovaDocType.list),
     FetchLocalNovaListRepoInput(
-        targetUrl: "https://local.6parknews.com/index.php?type_id=10",
+        targetUrl: "https://local.6parknews.com/index.php?type_id=7",
         docType: NovaDocType.list),
   ];
 
