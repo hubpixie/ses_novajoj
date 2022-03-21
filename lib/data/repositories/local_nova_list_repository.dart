@@ -4,10 +4,6 @@ import 'package:ses_novajoj/networking/response/local_nova_list_response.dart';
 import 'package:ses_novajoj/networking/request/local_nova_item_parameter.dart';
 import 'package:ses_novajoj/domain/entities/local_nova_list_item.dart';
 import 'package:ses_novajoj/domain/repositories/local_nova_list_repository.dart';
-import 'package:ses_novajoj/foundation/data/user_types.dart';
-
-/// TODO: This is dummy Web API class.
-/// You should  web api class is defined in its dart file, like `my_web_api.dart`
 
 class LocalNovaListRepositoryImpl extends LocalNovaListRepository {
   final LocalNovaWebApi _api;
@@ -42,6 +38,7 @@ class LocalNovaListRepositoryImpl extends LocalNovaListRepository {
     return ret;
   }
 
+  @override
   Future<Result<String>> fetchThumbUrl(
       {required FetchLocalNovaListRepoInput input}) async {
     Result<String> result = await _api.fetchNovaItemThumbUrl(
