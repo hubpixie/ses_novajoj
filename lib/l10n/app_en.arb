@@ -44,7 +44,7 @@
   "localListMenuDe":"German",
   "localListMenuJp":"Japan",
   "localListMenuSg":"Singapore",
-  "localListMenuFr":"France",
   "localListMenuIe":"Irelandcd",
+  "localListMenuEu":"European",
 "msgNetworkUnavailable": "Network is unavailable, please try again later"
 }

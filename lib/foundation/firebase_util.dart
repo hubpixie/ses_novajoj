@@ -23,6 +23,8 @@ extension AnalyticsRouteInfo on AnalyticsRoute {
         return '/topList';
       case AnalyticsRoute.topDetail:
         return '/topDetail';
+      case AnalyticsRoute.localList:
+        return '/localList';
       default:
         return '';
     }
@@ -33,6 +35,7 @@ extension AnalyticsRouteInfo on AnalyticsRoute {
       case AnalyticsRoute.splash:
       case AnalyticsRoute.topList:
       case AnalyticsRoute.topDetail:
+      case AnalyticsRoute.localList:
         return toString().split(".")[1];
       default:
         return '';

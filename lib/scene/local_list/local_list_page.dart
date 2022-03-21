@@ -61,7 +61,7 @@ class _LocalListPageState extends State<LocalListPage> {
                 if (data.error == null) {
                   return ListView.builder(
                       itemCount: data.viewModelList?.length,
-                      itemBuilder: (context, index) => TopListCell(
+                      itemBuilder: (context, index) => LocalListCell(
                           viewModel: data.viewModelList![index],
                           onCellSelecting: (selIndex) {
                             // widget.presenter.eventSelectDetail(context,
@@ -85,7 +85,7 @@ class _LocalListPageState extends State<LocalListPage> {
                                             .itemInfo.urlString));
                             data.viewModelList![thumbIndex].itemInfo
                                 .thunnailUrlString = retUrl;
-                            return "retUrl";
+                            return retUrl;
                           },
                           index: index));
                 } else {
@@ -149,11 +149,11 @@ class _LocalListPageState extends State<LocalListPage> {
       },
       {
         _MenuItemValueKey.key: index++,
-        _MenuItemValueKey.text: UseL10n.of(context)?.localListMenuFr
+        _MenuItemValueKey.text: UseL10n.of(context)?.localListMenuIe
       },
       {
         _MenuItemValueKey.key: index++,
-        _MenuItemValueKey.text: UseL10n.of(context)?.localListMenuIe
+        _MenuItemValueKey.text: UseL10n.of(context)?.localListMenuEu
       },
     ];
 
@@ -194,7 +194,6 @@ class _LocalListPageState extends State<LocalListPage> {
     return SizedBox(
         width: 280,
         child: Row(
-          //mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: <Widget>[
             MenuButton<Map>(
@@ -218,9 +217,11 @@ class _LocalListPageState extends State<LocalListPage> {
                 color: Colors.grey[350],
               ),
               onItemSelected: (Map value) {
-                setState(() {
+                if (_selectMenuItemIndex != value[_MenuItemValueKey.key]) {
+                  _selectMenuItemIndex = value[_MenuItemValueKey.key];
                   _selectMenuItemText = value[_MenuItemValueKey.text];
-                });
+                  _loadData(isReloaded: true);
+                }
               },
               decoration: BoxDecoration(
                   border: Border.all(color: Colors.grey[300]!),
@@ -271,10 +272,8 @@ class _LocalListPageState extends State<LocalListPage> {
         input: LocalListPresenterInput(
             itemIndex: _selectMenuItemIndex, isReloaded: isReloaded));
 
-    if (isReloaded) {
-      Future.delayed(Duration.zero, () {
-        setState(() {});
-      });
-    }
+    Future.delayed(Duration.zero, () {
+      setState(() {});
+    });
   }
 }
