@@ -192,6 +192,7 @@ analysis_benchmark.json
 .flutter-plugins-dependencies
 **/generated_plugin_registrant.dart
 **/l10n/*.dart
+**/*.dart.gen
 .packages
 .pub-cache/
 .pub/
