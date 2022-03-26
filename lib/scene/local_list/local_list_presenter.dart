@@ -19,6 +19,8 @@ class LocalListPresenterInput {
 
 abstract class LocalListPresenter with SimpleBloc<LocalListPresenterOutput> {
   void eventViewReady({required LocalListPresenterInput input});
+  void eventSelectDetail(Object context,
+      {required String appBarTitle, Object? itemInfo, Object? completeHandler});
   Future<String> eventFetchThumbnail({required LocalListPresenterInput input});
 }
 
@@ -42,6 +44,17 @@ class LocalListPresenterImpl extends LocalListPresenter {
     }
     useCase.fetchLocalNovaList(
         input: LocalNovaListUseCaseInput(itemIndex: input.itemIndex));
+  }
+
+  @override
+  void eventSelectDetail(Object context,
+      {required String appBarTitle,
+      Object? itemInfo,
+      Object? completeHandler}) {
+    router.gotoTopDetail(context,
+        appBarTitle: appBarTitle,
+        itemInfo: itemInfo,
+        completeHandler: completeHandler);
   }
 
   @override

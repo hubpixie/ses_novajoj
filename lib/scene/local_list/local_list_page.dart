@@ -62,12 +62,12 @@ class _LocalListPageState extends State<LocalListPage> {
                       itemBuilder: (context, index) => LocalListCell(
                           viewModel: data.viewModelList![index],
                           onCellSelecting: (selIndex) {
-                            // widget.presenter.eventSelectDetail(context,
-                            //     appBarTitle: _selectMenuItemText,
-                            //     itemInfo: data.viewModelList![selIndex]
-                            //         .itemInfo, completeHandler: () {
-                            //   _loadData(isReloaded: true);
-                            // });
+                            widget.presenter.eventSelectDetail(context,
+                                appBarTitle: _selectedMenuItemText ?? "",
+                                itemInfo: data.viewModelList![selIndex]
+                                    .itemInfo, completeHandler: () {
+                              _loadData(isReloaded: true);
+                            });
                           },
                           onThumbnailShowing: (thumbIndex) async {
                             if (data.viewModelList![thumbIndex].itemInfo
@@ -252,7 +252,7 @@ class _LocalListPageState extends State<LocalListPage> {
               color: Colors.white,
               onPressed: () {
                 // reload data
-                //_loadData(isReloaded: true);
+                _loadData(isReloaded: true);
               },
               icon: const Icon(Icons.refresh_rounded))),
       SizedBox(

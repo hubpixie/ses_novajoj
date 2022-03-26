@@ -68,6 +68,10 @@ extension DateUtilFromString on DateUtil {
     Intl.defaultLocale = locale;
 
     var formatter = DateFormat(format, locale);
-    return formatter.parse(dateString); // Convert dateString into date
+    try {
+      return formatter.parse(dateString); // Convert dateString into date
+    } catch (ex) {
+      return null;
+    }
   }
 }
