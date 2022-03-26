@@ -110,8 +110,34 @@ class LocalNovaWebApi {
           return imgSrc.contains("www.popo8.com");
         }
         return ret;
-      });
+      }, orElse: () => imgElements.first);
       String retStr = imgElement.attributes['src'] ?? '';
+      return Result.success(data: retStr);
+    } on AppError catch (error) {
+      return Result.failure(error: error);
+    } on Exception catch (error) {
+      return Result.failure(error: AppError.fromException(error));
+    }
+  }
+
+  Future<Result<String>> _fetchNovaItemTitle(
+      {required LocalNovaItemParameter parameter}) async {
+    try {
+      // send request for fetching nova item's thumb url.
+      final response =
+          await BaseApiClient.client.get(Uri.parse(parameter.targetUrl));
+      if (response.statusCode >= HttpStatus.badRequest) {
+        return Result.failure(
+            error: AppError.fromStatusCode(response.statusCode));
+      }
+
+      // prepares to parse nova list from response.body.
+      String retStr = '';
+      final document = html_parser.parse(response.body);
+      final titleElement = document.getElementsByTagName("title").first;
+      if (titleElement.innerHtml.isNotEmpty) {
+        retStr = titleElement.innerHtml.split(" -").first;
+      }
       return Result.success(data: retStr);
     } on AppError catch (error) {
       return Result.failure(error: error);
@@ -365,6 +391,18 @@ class LocalNovaWebApi {
         if (!urlString.contains(parentUrl)) {
           return retNovaItem;
         }
+      }
+
+      if (title.isEmpty) {
+        Result<String> titleResult = await _fetchNovaItemTitle(
+            parameter: LocalNovaItemParameter(
+                targetUrl: urlString, docType: NovaDocType.none));
+
+        titleResult.when(
+            success: (value) {
+              title = value;
+            },
+            failure: (value) {});
       }
       // thumbUrlString
       if (urlString.isNotEmpty && index < _kThumbLimit) {
