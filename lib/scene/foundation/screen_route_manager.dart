@@ -4,6 +4,7 @@ import 'package:ses_novajoj/scene/splash/splash_page_builder.dart';
 import 'package:ses_novajoj/scene/tabs/tabs_page_builder.dart';
 import 'package:ses_novajoj/scene/top_detail/top_detail_page_builder.dart';
 import 'package:ses_novajoj/scene/local_list/local_list_page_builder.dart';
+import 'package:ses_novajoj/scene/thread_list/thread_list_page_builder.dart';
 
 class ScreenRouteManager {
   static Route<dynamic> generateRoute(RouteSettings? settings) {
@@ -22,6 +23,9 @@ class ScreenRouteManager {
       case ScreenRouteName.localList:
         return MaterialPageRoute(
             builder: (_) => LocalListPageBuilder().page, settings: settings);
+      case ScreenRouteName.threadList:
+        return MaterialPageRoute(
+            builder: (_) => ThreadListPageBuilder().page, settings: settings);
       default:
         return MaterialPageRoute(
             builder: (_) => Scaffold(
