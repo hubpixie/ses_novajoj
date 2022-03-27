@@ -5,7 +5,7 @@ import 'package:ses_novajoj/foundation/firebase_util.dart';
 import 'package:ses_novajoj/domain/foundation/bloc/bloc_provider.dart';
 import 'package:ses_novajoj/scene/top_list/top_list_presenter.dart';
 import 'package:ses_novajoj/scene/top_list/top_list_presenter_output.dart';
-import 'package:ses_novajoj/scene/widgets/top_list_cell.dart';
+import 'package:ses_novajoj/scene/widgets/nova_list_cell.dart';
 import 'package:ses_novajoj/scene/widgets/square_text_icon_button.dart';
 import 'package:ses_novajoj/scene/widgets/error_view.dart';
 
@@ -72,7 +72,7 @@ class _TopListPageState extends State<TopListPage> {
                   if (data.error == null) {
                     return ListView.builder(
                         itemCount: data.viewModelList?.length,
-                        itemBuilder: (context, index) => TopListCell(
+                        itemBuilder: (context, index) => NovaListCell(
                             viewModel: data.viewModelList![index],
                             onCellSelecting: (selIndex) {
                               widget.presenter.eventSelectDetail(context,

@@ -46,5 +46,18 @@
     "localListMenuSg":"新加坡",
     "localListMenuIe":"爱尔兰",
     "localListMenuEu":"欧洲其他",
+    "hotThreadListAppBarTitle":"热帖",
+    "threadRecommend":"热门推荐",
+    "threadKidding":"笑口常开",
+    "threadLifeStyle":"生活百态",
+    "threadChatIdly":"杂论闲侃",
+    "threadMarriageLife":"婚姻家庭",
+    "threadTalkHistory":"史海钩沉",
+    "threadEntertainment":"娱乐八卦",
+    "threadTalkArmchair":"网际谈兵",
+    "threadEconomics":"经济观察",
+    "threadDissertation":"博论天下",
+    "threadGourmet":"各类美食",
+    "threadTravel":"驴友导航",
     "msgNetworkUnavailable":"当前网络无法连接，请稍后重试！"
   }

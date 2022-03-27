@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:ses_novajoj/scene/local_list/local_list_presenter_output.dart';
 
 typedef CellSelectingDelegate = void Function(int);
 typedef ThumbnameShowingDelegate = Future<String> Function(int);
 
-class LocalListCell extends StatelessWidget {
-  final LocalNovaListRowViewModel viewModel;
+class NovaListCell extends StatelessWidget {
+  final dynamic viewModel;
   final int index;
   final CellSelectingDelegate? onCellSelecting;
   final ThumbnameShowingDelegate? onThumbnailShowing;
 
-  const LocalListCell(
+  const NovaListCell(
       {Key? key,
       required this.viewModel,
       required this.index,

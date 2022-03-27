@@ -46,5 +46,18 @@
   "localListMenuSg":"Singapore",
   "localListMenuIe":"Irelandcd",
   "localListMenuEu":"European",
-"msgNetworkUnavailable": "Network is unavailable, please try again later"
+  "hotThreadListAppBarTitle":"Hot Threads",
+  "threadRecommend":"Recommendation",
+  "threadKidding":"Kidding",
+  "threadLifeStyle":"Lifestyle",
+  "threadChatIdly":"Chat Idly",
+  "threadMarriageLife":"Marriage Life",
+  "threadTalkHistory":"Talk History",
+  "threadEntertainment":"Entertainment",
+  "threadTalkArmchair":"Talk Armchair",
+  "threadEconomics":"Economics",
+  "threadDissertation":"Dissertation",
+  "threadGourmet":"Gourmet",
+  "threadTravel":"Travel Info",
+  "msgNetworkUnavailable": "Network is unavailable, please try again later"
 }

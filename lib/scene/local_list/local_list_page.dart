@@ -6,7 +6,7 @@ import 'package:ses_novajoj/foundation/firebase_util.dart';
 import 'package:ses_novajoj/scene/foundation/use_l10n.dart';
 import 'package:ses_novajoj/scene/local_list/local_list_presenter.dart';
 import 'package:ses_novajoj/scene/local_list/local_list_presenter_output.dart';
-import 'package:ses_novajoj/scene/widgets/local_list_cell.dart';
+import 'package:ses_novajoj/scene/widgets/nova_list_cell.dart';
 import 'package:ses_novajoj/scene/widgets/error_view.dart';
 
 class LocalListPage extends StatefulWidget {
@@ -59,7 +59,7 @@ class _LocalListPageState extends State<LocalListPage> {
                 if (data.error == null) {
                   return ListView.builder(
                       itemCount: data.viewModelList?.length,
-                      itemBuilder: (context, index) => LocalListCell(
+                      itemBuilder: (context, index) => NovaListCell(
                           viewModel: data.viewModelList![index],
                           onCellSelecting: (selIndex) {
                             widget.presenter.eventSelectDetail(context,
