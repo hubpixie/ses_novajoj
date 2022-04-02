@@ -11,6 +11,13 @@ class StringUtil {
       {required String start, required String end}) {
     int pos1 = string.indexOf(start);
     int pos2 = string.indexOf(end);
+    if (end.isEmpty) {
+      pos2 = string.length - 1;
+    } else {
+      if (pos2 < pos1) {
+        pos2 = string.indexOf(end, pos1 + start.length);
+      }
+    }
     if (pos1 < 0) {
       return string;
     }

@@ -22,9 +22,55 @@ abstract class ThreadNovaListUseCase
 class ThreadNovaListUseCaseImpl extends ThreadNovaListUseCase {
   final ThreadNovaListRepositoryImpl repository;
   ThreadNovaListUseCaseImpl() : repository = ThreadNovaListRepositoryImpl();
+
   static final List<FetchThreadNovaListRepoInput> _inputUrlData = [
     FetchThreadNovaListRepoInput(
-        targetUrl: "https://local.6parknews.com/index.php?type_id=11",
+        // Hots
+        targetUrl: "https://club.6parkbbs.com/index.php",
+        docType: NovaDocType.threadList),
+    FetchThreadNovaListRepoInput(
+        // Kidding
+        targetUrl: "https://club.6parkbbs.com/enter1/index.php",
+        docType: NovaDocType.list),
+    FetchThreadNovaListRepoInput(
+        // LifeStyle
+        targetUrl: "https://club.6parkbbs.com/life2/index.php",
+        docType: NovaDocType.list),
+    FetchThreadNovaListRepoInput(
+        // ChatIdly
+        targetUrl: "https://club.6parkbbs.com/pk/index.php",
+        docType: NovaDocType.list),
+    FetchThreadNovaListRepoInput(
+        // MarriageLife
+        targetUrl: "https://club.6parkbbs.com/life9/index.php",
+        docType: NovaDocType.list),
+    FetchThreadNovaListRepoInput(
+        // TalkHistory
+        targetUrl: "https://club.6parkbbs.com/chan1/index.php",
+        docType: NovaDocType.list),
+    FetchThreadNovaListRepoInput(
+        // Entertainment
+        targetUrl: "https://club.6parkbbs.com/enter8/index.php",
+        docType: NovaDocType.list),
+    FetchThreadNovaListRepoInput(
+        // TalkArmchair
+        targetUrl: "https://club.6parkbbs.com/military/index.php",
+        docType: NovaDocType.list),
+    FetchThreadNovaListRepoInput(
+        // Economics
+        targetUrl: "https://club.6parkbbs.com/finance/index.php",
+        docType: NovaDocType.list),
+    FetchThreadNovaListRepoInput(
+        // Dissertation
+        targetUrl: "https://club.6parkbbs.com/bolun/index.php",
+        docType: NovaDocType.list),
+    FetchThreadNovaListRepoInput(
+        // Gourmet
+        targetUrl: "https://club.6parkbbs.com/life6/index.php",
+        docType: NovaDocType.list),
+    FetchThreadNovaListRepoInput(
+        // Travel
+        targetUrl: "https://club.6parkbbs.com/life7/index.php",
         docType: NovaDocType.list),
   ];
 

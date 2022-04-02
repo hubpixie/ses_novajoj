@@ -10,17 +10,18 @@ import 'package:ses_novajoj/foundation/data/string_util.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/foundation/data/result.dart';
 import 'package:ses_novajoj/networking/api_client/base_api_client.dart';
-import 'package:ses_novajoj/networking/request/local_nova_item_parameter.dart';
+import 'package:ses_novajoj/networking/api/base_nova_web_api.dart';
+import 'package:ses_novajoj/networking/request/nova_item_parameter.dart';
 import 'package:ses_novajoj/networking/response/local_nova_list_response.dart';
 
-class LocalNovaWebApi {
+class LocalNovaWebApi extends BaseNovaWebApi {
   static const int _kThumbLimit = 5;
 
   ///
   /// api entry: fetchNovaList
   ///
   Future<Result<List<LocalNovaListItemRes>>> fetchNovaList(
-      {required LocalNovaItemParameter parameter}) async {
+      {required NovaItemParameter parameter}) async {
     try {
       // check network state
       final networkState = await BaseApiClient.connectivityState();
@@ -58,94 +59,6 @@ class LocalNovaWebApi {
     }
   }
 
-  ///
-  /// api entry: fetchNovaItemThumbUrl
-  ///
-  /// <div id='shownewsc' style="margin:15px;">
-  /// 			新闻新闻新闻新闻新闻。<br />
-  /// <br />
-  /// 新闻新闻新闻新闻新闻新闻新闻新闻新闻。<br />
-  /// <br />
-  /// <center><img onload='javascript:if(this.width>600) this.width=600'  src="https://web.popo8.com/202202/13/0/47c5918239type_jpeg_size_220_100_end.jpg"/><br />
-  /// </center><br />
-  /// 新闻新闻新闻新闻新闻新闻新闻新闻新闻新闻。<br />
-  /// <br />
-  /// 新闻新闻新闻新闻新闻新闻新闻新闻新闻新闻新闻新闻新闻。<br />
-  /// <br />
-  /// 新闻新闻新闻新闻新闻新闻新闻新闻新闻新闻新闻新闻新闻新闻<br />
-  /// <center><br />
-  /// <img onload='javascript:if(this.width>600) this.width=600'  src="https://web.popo8.com/202202/13/9/54795a8d62type_jpeg_size_1080_210_end.jpg"/><br />
-  /// <br />
-  /// 图源：Hello BC</center><br />
-  /// <br />
-  /// 新闻新闻新闻新闻新闻新闻新闻新闻新闻新闻新闻新闻。<br />
-  /// 			<div>
-  /// 				<div class="OUTBRAIN" data-src="DROP_PERMALINK_HERE" data-widget-id="AR_1"></div> <script type="text/javascript" async="async" src="//widgets.outbrain.com/outbrain.js"></script>
-  /// 			</div>
-  /// 			</div>
-  ///
-  Future<Result<String>> fetchNovaItemThumbUrl(
-      {required LocalNovaItemParameter parameter}) async {
-    try {
-      // send request for fetching nova item's thumb url.
-      final response =
-          await BaseApiClient.client.get(Uri.parse(parameter.targetUrl));
-      if (response.statusCode >= HttpStatus.badRequest) {
-        return Result.failure(
-            error: AppError.fromStatusCode(response.statusCode));
-      }
-
-      // prepares to parse nova list from response.body.
-      final document = html_parser.parse(response.body);
-      final imgElements = document.getElementsByTagName('img');
-      if (imgElements.isEmpty) {
-        log.warning('imgElements.isEmpty');
-        throw AppError(
-            type: AppErrorType.dataError, reason: FailureReason.missingImgNode);
-      }
-      final imgElement = imgElements.firstWhere((element) {
-        bool ret = false;
-        if (element.attributes.keys.contains("src")) {
-          String imgSrc = element.attributes["src"] ?? "";
-          return imgSrc.contains("www.popo8.com");
-        }
-        return ret;
-      }, orElse: () => imgElements.first);
-      String retStr = imgElement.attributes['src'] ?? '';
-      return Result.success(data: retStr);
-    } on AppError catch (error) {
-      return Result.failure(error: error);
-    } on Exception catch (error) {
-      return Result.failure(error: AppError.fromException(error));
-    }
-  }
-
-  Future<Result<String>> _fetchNovaItemTitle(
-      {required LocalNovaItemParameter parameter}) async {
-    try {
-      // send request for fetching nova item's thumb url.
-      final response =
-          await BaseApiClient.client.get(Uri.parse(parameter.targetUrl));
-      if (response.statusCode >= HttpStatus.badRequest) {
-        return Result.failure(
-            error: AppError.fromStatusCode(response.statusCode));
-      }
-
-      // prepares to parse nova list from response.body.
-      String retStr = '';
-      final document = html_parser.parse(response.body);
-      final titleElement = document.getElementsByTagName("title").first;
-      if (titleElement.innerHtml.isNotEmpty) {
-        retStr = titleElement.innerHtml.split(" -").first;
-      }
-      return Result.success(data: retStr);
-    } on AppError catch (error) {
-      return Result.failure(error: error);
-    } on Exception catch (error) {
-      return Result.failure(error: AppError.fromException(error));
-    }
-  }
-
   ///  <div id="d_list"  class="main_right_margin">
   /// 		<div style='height:30px;line-height:30px;background:#EDEDED;'>
   /// 			<center>
@@ -163,7 +76,7 @@ class LocalNovaWebApi {
   ///<li><a href="index.php?app=news&act=view&nid=1037038">担忧！加国多省取消口罩令！专家:第6波疫情恐五月到</a> - 51.CA  (3377 bytes)  - <i>03/20/22</i>  (15 reads)</li>
 
   Future<Result<List<LocalNovaListItemRes>>> _parseLiItems(
-      {required LocalNovaItemParameter parameter, Element? rootElement}) async {
+      {required NovaItemParameter parameter, Element? rootElement}) async {
     try {
       List<LocalNovaListItemRes> retArr = [];
 
@@ -202,7 +115,6 @@ class LocalNovaWebApi {
 
   Future<LocalNovaListItemRes?> _createNovaLiItem(String url,
       {required int index, required Element li}) async {
-    LocalNovaListItemRes? retNovaItem;
     int id = index;
     String thunnailUrlString = "";
     String title = "";
@@ -230,7 +142,7 @@ class LocalNovaWebApi {
       // thumbUrlString
       if (urlString.isNotEmpty && index < _kThumbLimit) {
         Result<String> thumbUrlResult = await fetchNovaItemThumbUrl(
-            parameter: LocalNovaItemParameter(
+            parameter: NovaItemParameter(
                 targetUrl: urlString, docType: NovaDocType.thumb));
         thumbUrlResult.when(
             success: (value) {
@@ -291,7 +203,7 @@ class LocalNovaWebApi {
   ///     </table>
   /// </div>
   Future<Result<List<LocalNovaListItemRes>>> _parseTrItems(
-      {required LocalNovaItemParameter parameter, Element? rootElement}) async {
+      {required NovaItemParameter parameter, Element? rootElement}) async {
     try {
       List<LocalNovaListItemRes> retArr = [];
 
@@ -394,8 +306,8 @@ class LocalNovaWebApi {
       }
 
       if (title.isEmpty) {
-        Result<String> titleResult = await _fetchNovaItemTitle(
-            parameter: LocalNovaItemParameter(
+        Result<String> titleResult = await fetchNovaItemTitle(
+            parameter: NovaItemParameter(
                 targetUrl: urlString, docType: NovaDocType.none));
 
         titleResult.when(
@@ -407,7 +319,7 @@ class LocalNovaWebApi {
       // thumbUrlString
       if (urlString.isNotEmpty && index < _kThumbLimit) {
         Result<String> thumbUrlResult = await fetchNovaItemThumbUrl(
-            parameter: LocalNovaItemParameter(
+            parameter: NovaItemParameter(
                 targetUrl: urlString, docType: NovaDocType.thumb));
         thumbUrlResult.when(
             success: (value) {
