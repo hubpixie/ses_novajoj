@@ -1,65 +1,59 @@
 import 'package:ses_novajoj/foundation/data/result.dart';
-//import 'package:ses_novajoj/networking/api/my_web_api.dart';
-// import 'package:ses_novajoj/networking/response/thread_nova_item_response.dart';
-// import 'package:ses_novajoj/networking/request/thread_nova_list_parameter.dart';
+import 'package:ses_novajoj/networking/api/thread_nova_web_api.dart';
+import 'package:ses_novajoj/networking/response/thread_nova_list_response.dart';
+import 'package:ses_novajoj/networking/request/nova_item_parameter.dart';
 import 'package:ses_novajoj/domain/entities/thread_nova_list_item.dart';
 import 'package:ses_novajoj/domain/repositories/thread_nova_list_repository.dart';
-import 'package:ses_novajoj/foundation/data/user_types.dart';
-
-/// TODO: This is dummy Web API class.
-/// You should  web api class is defined in its dart file, like `my_web_api.dart`
-class MyWebApi {}
 
 class ThreadNovaListRepositoryImpl extends ThreadNovaListRepository {
-  final MyWebApi _api;
+  final ThreadNovaWebApi _api;
 
   // sigleton
   static final ThreadNovaListRepositoryImpl _instance =
       ThreadNovaListRepositoryImpl._internal();
-  ThreadNovaListRepositoryImpl._internal() : _api = MyWebApi();
+  ThreadNovaListRepositoryImpl._internal() : _api = ThreadNovaWebApi();
   factory ThreadNovaListRepositoryImpl() => _instance;
 
   @override
   Future<Result<List<ThreadNovaListItem>>> fetchThreadNovaList(
       {required FetchThreadNovaListRepoInput input}) async {
-    int id = 9999;
-    String thunnailUrlString = "";
-    String title = "";
-    String urlString = "";
-    String source = "";
-    String commentUrlString = "";
-    int commentCount = 0;
-    DateTime? createAt;
-    int reads = 0;
-    bool isRead = false;
-    bool isNew = false;
+    Result<List<ThreadNovaListItemRes>> result = await _api.fetchNovaList(
+        parameter: NovaItemParameter(
+            targetUrl: input.targetUrl, docType: input.docType));
 
-    NovaItemInfo itemInfo = NovaItemInfo(
-        id: id,
-        thunnailUrlString: thunnailUrlString,
-        title: title,
-        urlString: urlString,
-        source: source,
-        author: '',
-        createAt: createAt ?? DateTime.now(),
-        loadCommentAt: '',
-        commentUrlString: commentUrlString,
-        commentCount: commentCount,
-        reads: reads,
-        isNew: isNew,
-        isRead: isRead);
+    late Result<List<ThreadNovaListItem>> ret;
+    List<ThreadNovaListItem> novaItems = <ThreadNovaListItem>[];
+    result.when(success: (response) {
+      for (var item in response) {
+        ThreadNovaListItem retItem = ThreadNovaListItem(
+          itemInfo: item.itemInfo,
+        );
+        novaItems.add(retItem);
+      }
+      ret = Result.success(data: novaItems);
+    }, failure: (error) {
+      ret = Result.failure(error: error);
+    });
 
-    Result<List<ThreadNovaListItem>> result = Result.success(
-        data: [ThreadNovaListItem(itemInfo: itemInfo)]); // TODO: call api
-
-    // TODO: change api result for `ThreadNovaList' repository
-    return result;
+    return ret;
   }
 
   @override
   Future<Result<String>> fetchThumbUrl(
       {required FetchThreadNovaListRepoInput input}) async {
+    Result<String> result = await _api.fetchNovaItemThumbUrl(
+        parameter: NovaItemParameter(
+            targetUrl: input.targetUrl, docType: input.docType));
+
+    late Result<String> ret;
     String retUrl = "";
-    return Result.success(data: retUrl);
+    result.when(success: (response) {
+      retUrl = response;
+      ret = Result.success(data: retUrl);
+    }, failure: (error) {
+      ret = Result.failure(error: error);
+    });
+
+    return ret;
   }
 }

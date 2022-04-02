@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/domain/foundation/bloc/bloc_provider.dart';
 import 'package:ses_novajoj/scene/foundation/use_l10n.dart';
-import 'package:ses_novajoj/scene/foundation/page/page_parameter.dart';
 import 'package:ses_novajoj/scene/thread_list/thread_list_presenter.dart';
 import 'package:ses_novajoj/scene/thread_list/thread_list_presenter_output.dart';
 import 'package:ses_novajoj/scene/widgets/nova_list_cell.dart';
@@ -31,6 +30,7 @@ class _ThreadSubPageState extends State<ThreadSubPage>
 
   @override
   void initState() {
+    _loadData();
     super.initState();
   }
 

@@ -1,28 +1,22 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:ses_novajoj/scene/thread_list/thread_sub_page.dart';
 import 'package:ses_novajoj/scene/foundation/use_l10n.dart';
 import 'package:ses_novajoj/scene/thread_list/thread_list_presenter.dart';
 
 class ThreadListPage extends StatefulWidget {
-  final ThreadListPresenter presenter;
-  const ThreadListPage({Key? key, required this.presenter}) : super(key: key);
+  final List<ThreadListPresenter> presenters;
+  const ThreadListPage({Key? key, required this.presenters}) : super(key: key);
 
   @override
   _ThreadListPageState createState() => _ThreadListPageState();
 }
 
 class _ThreadListPageState extends State<ThreadListPage> {
-  late String? _selectedTabItemText = UseL10n.of(context)?.threadRecommend;
-  int _selectedTabItemIndex = 0;
   List<String> _tabNames = [];
 
   @override
   void initState() {
     super.initState();
-    // TODO: Initialize your variables.
-    widget.presenter
-        .eventViewReady(input: ThreadListPresenterInput(itemIndex: 0));
   }
 
   @override
@@ -92,7 +86,7 @@ class _ThreadListPageState extends State<ThreadListPage> {
     List<Widget> pages = [];
     _tabNames.asMap().forEach((int index, String value) {
       pages.add(ThreadSubPage(
-        presenter: widget.presenter,
+        presenter: widget.presenters[index],
         tabIndex: index,
         dummyText: value,
       ));

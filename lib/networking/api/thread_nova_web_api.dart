@@ -12,19 +12,15 @@ import 'package:ses_novajoj/foundation/data/result.dart';
 import 'package:ses_novajoj/networking/api_client/base_api_client.dart';
 import 'package:ses_novajoj/networking/api/base_nova_web_api.dart';
 import 'package:ses_novajoj/networking/request/nova_item_parameter.dart';
-import 'package:ses_novajoj/networking/request/nova_detalo_parameter.dart';
-import 'package:ses_novajoj/networking/response/nova_list_response.dart';
-import 'package:ses_novajoj/networking/response/nova_detalo_item_response.dart';
+import 'package:ses_novajoj/networking/response/thread_nova_list_response.dart';
 
-part 'nova_web_api_detalo.dart';
-
-class NovaWebApi extends BaseNovaWebApi {
+class ThreadNovaWebApi extends BaseNovaWebApi {
   static const int _kThumbLimit = 5;
 
   ///
   /// api entry: fetchNovaList
   ///
-  Future<Result<List<NovaListItemRes>>> fetchNovaList(
+  Future<Result<List<ThreadNovaListItemRes>>> fetchNovaList(
       {required NovaItemParameter parameter}) async {
     try {
       // check network state
@@ -42,9 +38,10 @@ class NovaWebApi extends BaseNovaWebApi {
       }
       // prepares to parse nova list from response.body.
       final document = html_parser.parse(response.body);
-      List<NovaListItemRes> retArr = [];
+      List<ThreadNovaListItemRes> retArr = [];
 
-      if (parameter.docType == NovaDocType.list) {
+      if (parameter.docType == NovaDocType.list ||
+          parameter.docType == NovaDocType.threadList) {
         return _parseLiItems(
             parameter: parameter,
             rootElement: document.getElementById("d_list"));
@@ -74,10 +71,15 @@ class NovaWebApi extends BaseNovaWebApi {
   ///       <li><a href="https://www.6parknews.com/newspark/view.php?app=news&act=view&nid=532638">新闻新闻新闻新闻新闻新闻新闻新闻新闻新闻新闻新闻新闻(图)</a> - 加拿大留学生问吧  (5348 bytes)  - <i>02/13/22</i>  (2099 reads)  <a class='list_reimg' href='index.php?act=newsreply&nid=532638'>1</a></li>
   ///     </ul>
   /// </div>
-  Future<Result<List<NovaListItemRes>>> _parseLiItems(
+  /// 		<div id="d_list"  class="main_right_margin">
+  ///			<ul>
+  ///			<li><a href="index.php?app=news&act=view&nid=1037039">多伦多DT爆发大规模游行，多条道路关闭！画风竟是这</a> - 加国无忧  (4307 bytes)  - <i>03/20/22</i>  (12 reads)</li>
+  ///<li><a href="index.php?app=news&act=view&nid=1037038">担忧！加国多省取消口罩令！专家:第6波疫情恐五月到</a> - 51.CA  (3377 bytes)  - <i>03/20/22</i>  (15 reads)</li>
+
+  Future<Result<List<ThreadNovaListItemRes>>> _parseLiItems(
       {required NovaItemParameter parameter, Element? rootElement}) async {
     try {
-      List<NovaListItemRes> retArr = [];
+      List<ThreadNovaListItemRes> retArr = [];
 
       if (rootElement?.children == null) {
         log.severe('rootElement?.children');
@@ -96,9 +98,16 @@ class NovaWebApi extends BaseNovaWebApi {
       }
       int index = 0;
       for (Element li in ulElement?.children ?? []) {
-        NovaListItemRes? novaListItemRes =
-            await _createNovaLiItem(parameter.targetUrl, index: index, li: li);
-        if (novaListItemRes != null) {
+        ThreadNovaListItemRes? novaListItemRes;
+        if (parameter.docType == NovaDocType.list) {
+          novaListItemRes = await _createNovaLiItem(parameter.targetUrl,
+              index: index, li: li);
+        } else if (parameter.docType == NovaDocType.threadList) {
+          novaListItemRes = await _createThreadNovaLiItem(parameter.targetUrl,
+              index: index, li: li);
+        }
+        if (novaListItemRes != null &&
+            novaListItemRes.itemInfo.title.isNotEmpty) {
           retArr.add(novaListItemRes);
           index++;
         }
@@ -112,9 +121,8 @@ class NovaWebApi extends BaseNovaWebApi {
     }
   }
 
-  Future<NovaListItemRes?> _createNovaLiItem(String url,
+  Future<ThreadNovaListItemRes?> _createNovaLiItem(String url,
       {required int index, required Element li}) async {
-    NovaListItemRes? retNovaItem;
     int id = index;
     String thunnailUrlString = "";
     String title = "";
@@ -136,7 +144,8 @@ class NovaWebApi extends BaseNovaWebApi {
       title = liSubElements[0].innerHtml;
       urlString = liSubElements[0].attributes["href"] ?? "";
       if (!urlString.contains(parentUrl)) {
-        return retNovaItem;
+        urlString = parentUrl + "/" + urlString;
+        //return retNovaItem;
       }
       // thumbUrlString
       if (urlString.isNotEmpty && index < _kThumbLimit) {
@@ -152,26 +161,111 @@ class NovaWebApi extends BaseNovaWebApi {
     }
 
     // createAt
-    if (liCount > 1 && liSubElements[1].localName == 'i') {
-      createAt = DateUtil().fromString(liSubElements[1].innerHtml);
+    if (liCount > 2 && liSubElements[2].localName == 'i') {
+      createAt = DateUtil().fromString(liSubElements[2].innerHtml);
     }
 
+    /*
     // commentUrlString, commentCount
-    if (liCount > 2 && liSubElements[2].localName == 'a') {
+    if (liCount > 2 && liSubElements[].localName == 'a') {
       String tmpUrl = liSubElements[2].attributes["href"] ?? "";
       commentUrlString = parentUrl + tmpUrl;
 
       commentCount =
           NumberUtil().parseInt(string: liSubElements[2].innerHtml) ?? 0;
     }
+    */
+
+    // source:
+    if (liCount > 1 && liSubElements[1].localName == 'a') {
+      source = StringUtil()
+          .substring(liSubElements[1].innerHtml, start: ">", end: "<");
+    }
+
+    // reads:
+    if (li.innerHtml.isNotEmpty) {
+      String readsStr =
+          StringUtil().substring(li.innerHtml, start: "\">(", end: " reads)");
+      reads = NumberUtil().parseInt(string: readsStr) ?? 0;
+    }
+    NovaItemInfo itemInfo = NovaItemInfo(
+        id: id,
+        thunnailUrlString: thunnailUrlString,
+        title: title,
+        urlString: urlString,
+        source: source,
+        author: '',
+        createAt: createAt ?? DateTime.now(),
+        loadCommentAt: '',
+        commentUrlString: commentUrlString,
+        commentCount: commentCount,
+        reads: reads,
+        isNew: isNew,
+        isRead: isRead);
+    return ThreadNovaListItemRes(itemInfo: itemInfo);
+  }
+
+  Future<ThreadNovaListItemRes?> _createThreadNovaLiItem<T>(String url,
+      {required int index, required Element li}) async {
+    int id = index;
+    String thunnailUrlString = "";
+    String title = "";
+    String urlString = "";
+    String source = "";
+    String commentUrlString = "";
+    int commentCount = 0;
+    DateTime? createAt;
+    int reads = 0;
+    bool isRead = false;
+    bool isNew = false;
+
+    List<Element> liSubElements = li.children;
+    int liCount = liSubElements.length;
+
+    // title, urlString
+    if (liCount > 1 && liSubElements[1].localName == 'a') {
+      title = StringUtil()
+          .substring(liSubElements[1].innerHtml, start: "</span> ", end: "");
+      urlString = liSubElements[1].attributes["href"] ?? "";
+
+      // thumbUrlString
+      if (urlString.isNotEmpty && index < _kThumbLimit) {
+        Result<String> thumbUrlResult = await fetchNovaItemThumbUrl(
+            parameter: NovaItemParameter(
+                targetUrl: urlString, docType: NovaDocType.thumb));
+        thumbUrlResult.when(
+            success: (value) {
+              thunnailUrlString = value;
+            },
+            failure: (value) {});
+      }
+    }
+
+    // createAt
+    if (liCount > 2 && liSubElements[2].localName == 'i') {
+      createAt = DateUtil().fromString(liSubElements[2].innerHtml);
+    }
+
+    // commentUrlString, commentCount
+    /*
+    if (liCount > 3 && liSubElements[3].localName == 'a') {
+      String tmpUrl = liSubElements[2].attributes["href"] ?? "";
+      commentUrlString = parentUrl + tmpUrl;
+
+      commentCount =
+          NumberUtil().parseInt(string: liSubElements[2].innerHtml) ?? 0;
+    }
+    */
 
     // source, reads
     if (li.innerHtml.isNotEmpty) {
-      source =
-          StringUtil().substring(li.innerHtml, start: "</a> - ", end: "  (");
+      // source:
+      // liSubElements[0]: <a>...</a>
+      source = liSubElements[0].innerHtml;
 
-      String readsStr = StringUtil()
-          .substring(li.innerHtml, start: "</i>  (", end: " reads)");
+      // reads:
+      String readsStr =
+          StringUtil().substring(li.innerHtml, start: "</i>  (", end: " ");
       reads = NumberUtil().parseInt(string: readsStr) ?? 0;
     }
 
@@ -189,7 +283,7 @@ class NovaWebApi extends BaseNovaWebApi {
         reads: reads,
         isNew: isNew,
         isRead: isRead);
-    return NovaListItemRes(itemInfo: itemInfo);
+    return ThreadNovaListItemRes(itemInfo: itemInfo);
   }
 
   ///  <div id="d_list"  class="main_right_margin">
@@ -201,10 +295,10 @@ class NovaWebApi extends BaseNovaWebApi {
   /// 	    <tr ><td>第4位</td><td><a href="https://www.6parknews.com/newspark/view.php?app=news&act=view&nid=533246">新闻新闻新闻新闻新闻新闻新闻新闻新闻新闻(组图)</a> <i>02/16/22</i></td><td><center>161002 reads</center></td><td><center>89 次</center></td><td><center><a href="index.php?act=newsreply&nid=533246">查看评论</a></center></td></tr>
   ///     </table>
   /// </div>
-  Future<Result<List<NovaListItemRes>>> _parseTrItems(
+  Future<Result<List<ThreadNovaListItemRes>>> _parseTrItems(
       {required NovaItemParameter parameter, Element? rootElement}) async {
     try {
-      List<NovaListItemRes> retArr = [];
+      List<ThreadNovaListItemRes> retArr = [];
 
       if (rootElement?.children == null) {
         log.severe('rootElement?.children');
@@ -239,7 +333,7 @@ class NovaWebApi extends BaseNovaWebApi {
         if (aLinkFound < 2) {
           continue;
         }
-        NovaListItemRes? novaListItemRes =
+        ThreadNovaListItemRes? novaListItemRes =
             await _createNovaTrItem(parameter.targetUrl, index: index, tr: tr);
         if (novaListItemRes != null) {
           retArr.add(novaListItemRes);
@@ -271,9 +365,9 @@ class NovaWebApi extends BaseNovaWebApi {
   ///         </td>
   ///     </tr>
   /// </table>
-  Future<NovaListItemRes?> _createNovaTrItem(String url,
+  Future<ThreadNovaListItemRes?> _createNovaTrItem(String url,
       {required int index, required Element tr}) async {
-    NovaListItemRes? retNovaItem;
+    ThreadNovaListItemRes? retNovaItem;
     int id = index;
     String thunnailUrlString = "";
     String title = "";
@@ -303,6 +397,19 @@ class NovaWebApi extends BaseNovaWebApi {
           return retNovaItem;
         }
       }
+
+      if (title.isEmpty) {
+        Result<String> titleResult = await fetchNovaItemTitle(
+            parameter: NovaItemParameter(
+                targetUrl: urlString, docType: NovaDocType.none));
+
+        titleResult.when(
+            success: (value) {
+              title = value;
+            },
+            failure: (value) {});
+      }
+
       // thumbUrlString
       if (urlString.isNotEmpty && index < _kThumbLimit) {
         Result<String> thumbUrlResult = await fetchNovaItemThumbUrl(
@@ -356,7 +463,7 @@ class NovaWebApi extends BaseNovaWebApi {
         reads: reads,
         isNew: isNew,
         isRead: isRead);
-    return NovaListItemRes(itemInfo: itemInfo);
+    return ThreadNovaListItemRes(itemInfo: itemInfo);
   }
 
   String _parentUrl({required String url}) {

@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'package:ses_novajoj/foundation/data/user_types.dart';
-import 'package:ses_novajoj/foundation/log_util.dart';
 import 'package:ses_novajoj/domain/foundation/bloc/simple_bloc.dart';
 import 'package:ses_novajoj/domain/usecases/local_nova_list_usecase.dart';
 import 'package:ses_novajoj/domain/usecases/local_nova_list_usecase_output.dart';
@@ -66,7 +64,6 @@ class LocalListPresenterImpl extends LocalListPresenter {
   }
 
   StreamSubscription<LocalNovaListUseCaseOutput> _addStreamListener() {
-    log.info("_addStreamListener -- START");
     return useCase.stream.listen((event) {
       if (event is PresentModel) {
         streamAdd(ShowLocalListPageModel(
@@ -75,7 +72,6 @@ class LocalListPresenterImpl extends LocalListPresenter {
                 .toList(),
             error: event.error));
       }
-      log.info("_addStreamListener -- END");
     });
   }
 }

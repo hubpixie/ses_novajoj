@@ -1,7 +1,7 @@
 import 'package:ses_novajoj/foundation/data/result.dart';
 import 'package:ses_novajoj/networking/api/local_nova_web_api.dart';
 import 'package:ses_novajoj/networking/response/local_nova_list_response.dart';
-import 'package:ses_novajoj/networking/request/local_nova_item_parameter.dart';
+import 'package:ses_novajoj/networking/request/nova_item_parameter.dart';
 import 'package:ses_novajoj/domain/entities/local_nova_list_item.dart';
 import 'package:ses_novajoj/domain/repositories/local_nova_list_repository.dart';
 
@@ -18,7 +18,7 @@ class LocalNovaListRepositoryImpl extends LocalNovaListRepository {
   Future<Result<List<LocalNovaListItem>>> fetchLocalNovaList(
       {required FetchLocalNovaListRepoInput input}) async {
     Result<List<LocalNovaListItemRes>> result = await _api.fetchNovaList(
-        parameter: LocalNovaItemParameter(
+        parameter: NovaItemParameter(
             targetUrl: input.targetUrl, docType: input.docType));
 
     late Result<List<LocalNovaListItem>> ret;
@@ -42,7 +42,7 @@ class LocalNovaListRepositoryImpl extends LocalNovaListRepository {
   Future<Result<String>> fetchThumbUrl(
       {required FetchLocalNovaListRepoInput input}) async {
     Result<String> result = await _api.fetchNovaItemThumbUrl(
-        parameter: LocalNovaItemParameter(
+        parameter: NovaItemParameter(
             targetUrl: input.targetUrl, docType: input.docType));
 
     late Result<String> ret;
