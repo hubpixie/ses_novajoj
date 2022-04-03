@@ -17,6 +17,8 @@ class ThreadListPresenterInput {
 
 abstract class ThreadListPresenter with SimpleBloc<ThreadListPresenterOutput> {
   void eventViewReady({required ThreadListPresenterInput input});
+  void eventSelectDetail(Object context,
+      {required String appBarTitle, Object? itemInfo, Object? completeHandler});
   Future<String> eventFetchThumbnail({required ThreadListPresenterInput input});
 }
 
@@ -40,6 +42,17 @@ class ThreadListPresenterImpl extends ThreadListPresenter {
     }
     useCase.fetchThreadNovaList(
         input: ThreadNovaListUseCaseInput(itemIndex: input.itemIndex));
+  }
+
+  @override
+  void eventSelectDetail(Object context,
+      {required String appBarTitle,
+      Object? itemInfo,
+      Object? completeHandler}) {
+    router.gotoThreadDetail(context,
+        appBarTitle: appBarTitle,
+        itemInfo: itemInfo,
+        completeHandler: completeHandler);
   }
 
   @override
