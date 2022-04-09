@@ -88,7 +88,7 @@ class _ThreadListPageState extends State<ThreadListPage> {
       pages.add(ThreadSubPage(
         presenter: widget.presenters[index],
         tabIndex: index,
-        dummyText: value,
+        appBarTitle: value,
       ));
     });
 

@@ -10,13 +10,13 @@ import 'package:ses_novajoj/scene/widgets/error_view.dart';
 class ThreadSubPage extends StatefulWidget {
   final ThreadListPresenter presenter;
   final int tabIndex;
-  final String dummyText;
+  final String appBarTitle;
 
   const ThreadSubPage(
       {Key? key,
       required this.presenter,
       required this.tabIndex,
-      this.dummyText = ""})
+      this.appBarTitle = ""})
       : super(key: key);
 
   @override
@@ -55,12 +55,12 @@ class _ThreadSubPageState extends State<ThreadSubPage>
                     itemBuilder: (context, index) => NovaListCell(
                         viewModel: data.viewModelList![index],
                         onCellSelecting: (selIndex) {
-                          // widget.presenter.eventSelectDetail(context,
-                          //     appBarTitle: _selectedMenuItemText ?? "",
-                          //     itemInfo: data.viewModelList![selIndex].itemInfo,
-                          //     completeHandler: () {
-                          //   _loadData(isReloaded: true);
-                          // });
+                          widget.presenter.eventSelectDetail(context,
+                              appBarTitle: widget.appBarTitle,
+                              itemInfo: data.viewModelList![selIndex].itemInfo,
+                              completeHandler: () {
+                            _loadData(isReloaded: true);
+                          });
                         },
                         onThumbnailShowing: (thumbIndex) async {
                           if (data.viewModelList![thumbIndex].itemInfo
