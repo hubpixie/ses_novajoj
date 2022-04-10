@@ -59,5 +59,8 @@
   "threadDissertation":"Dissertation",
   "threadGourmet":"Gourmet",
   "threadTravel":"Travel Info",
+  "bbsMain":"BBS",
+  "bbsGuide":"BBS Guide",
+  "bbsMenuList":"BBS Menu",
   "msgNetworkUnavailable": "Network is unavailable, please try again later"
 }
