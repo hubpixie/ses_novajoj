@@ -28,16 +28,16 @@ class ThreadNovaDetailItem {
     <body>
 		<div style="margin:14px;"><p style="background-color:#ceebfd;">{{title}}</p></div>
 		<hr style="border-top: 1px solid #bbb;">  
-		<p style="text-align:center;">
+		<div style="text-align:center;">
 <!-- itemSource -->
-			{{itemSource}}  Latest Upated:{{createAt}} 
-		</p>      
+			{{itemSource}}&nbsp;&nbsp;Upated:{{createAt}}&nbsp;&nbsp;<font size='2px'>{{reads}}</font>
+		</div>      
 		<hr style="border-top: 1px solid #bbb;">  
         <div id='shownewsc' style="margin:15px;">
-<!-- Author -->
 <!-- Body Text -->
-{{author}}　{{body}}
-      <br/>		
+　      {{body}}
+<!-- Author -->
+        <div style="text-align:right;">(&nbsp;{{author}}&nbsp;)</div>
 			<div>
 				<div class="OUTBRAIN" data-src="DROP_PERMALINK_HERE" data-widget-id="AR_1"></div> <script type="text/javascript" async="async" src="//widgets.outbrain.com/outbrain.js"></script>
 			</div>
@@ -56,10 +56,15 @@ class ThreadNovaDetailItem {
   String toHtmlString() {
     String html = _kHtmlTemplateString.replaceAll(r'{{title}}', itemInfo.title);
     html = html.replaceAll(r'{{itemSource}}', itemInfo.source);
+    if (itemInfo.reads > 0) {
+      html = html.replaceAll('{{reads}}', "(${itemInfo.reads}&nbsp;reads)");
+    } else {
+      html = html.replaceAll('{{reads}}', "");
+    }
     html = html.replaceAll(
         r'{{createAt}}',
-        DateUtil().getDateString(
-            date: itemInfo.createAt, format: 'yyyy-MM-dd H:mm:ss'));
+        DateUtil()
+            .getDateString(date: itemInfo.createAt, format: 'yyyy-MM-dd H:mm'));
     html = html.replaceAll(r'{{author}}', itemInfo.author);
     html = html.replaceAll(r'{{body}}', bodyString);
     return html;

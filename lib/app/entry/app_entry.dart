@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ses_novajoj/foundation/firebase_util.dart';
+import 'package:ses_novajoj/foundation/log_util.dart';
 import 'package:ses_novajoj/scene/foundation/screen_route_manager.dart';
 import 'package:ses_novajoj/scene/splash/splash_page_builder.dart';
 import 'package:ses_novajoj/l10n/l10n.dart';
@@ -23,5 +24,16 @@ class MyApp extends StatelessWidget {
       navigatorObservers: <NavigatorObserver>[FirebaseUtil().observer],
       home: SplashPageBuilder().page,
     );
+  }
+
+  static void run() {
+    FlutterError.onError = (FlutterErrorDetails details) {
+      //this line prints the default flutter gesture caught exception in console
+      log.severe("Error Library:${details.library}...");
+      log.severe("Error :  ${details.exception}");
+      log.severe("StackTrace :  ${details.stack}");
+      log.severe("----------------------");
+    };
+    runApp(const MyApp());
   }
 }

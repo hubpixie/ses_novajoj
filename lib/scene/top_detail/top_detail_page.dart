@@ -4,6 +4,7 @@ import 'package:ses_novajoj/foundation/log_util.dart';
 import 'package:ses_novajoj/foundation/firebase_util.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/domain/foundation/bloc/bloc_provider.dart';
+import 'package:ses_novajoj/scene/foundation/page/screen_route_enums.dart';
 import 'package:ses_novajoj/scene/foundation/use_l10n.dart';
 import 'package:ses_novajoj/scene/foundation/page/page_parameter.dart';
 import 'package:ses_novajoj/scene/top_detail/top_detail_presenter.dart';
@@ -30,23 +31,11 @@ class _TopDetailPageState extends State<TopDetailPage> {
   @override
   void initState() {
     super.initState();
-    // send viewEvent
-    FirebaseUtil().sendViewEvent(route: AnalyticsRoute.topDetail);
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_pageLoadIsFirst) {
-      _pageLoadIsFirst = false;
-      // get page paratmers via ModalRoute
-      _parameters = ModalRoute.of(context)?.settings.arguments as Map?;
-      _appBarTitle =
-          _parameters?[TopDetailParamKeys.appBarTitle] as String? ?? '';
-      _itemInfo = _parameters?[TopDetailParamKeys.itemInfo] as NovaItemInfo?;
-
-      // fetch data
-      _loadData();
-    }
+    _parseRouteParameter();
 
     return Scaffold(
       appBar: AppBar(
@@ -121,6 +110,35 @@ class _TopDetailPageState extends State<TopDetailPage> {
         ],
       ),
     );
+  }
+
+  void _parseRouteParameter() {
+    if (_pageLoadIsFirst) {
+      _pageLoadIsFirst = false;
+      //
+      // get page paratmers via ModalRoute
+      //
+      _parameters = ModalRoute.of(context)?.settings.arguments as Map?;
+      _appBarTitle =
+          _parameters?[TopDetailParamKeys.appBarTitle] as String? ?? '';
+      _itemInfo = _parameters?[TopDetailParamKeys.itemInfo] as NovaItemInfo?;
+
+      //
+      // FA
+      //
+      if ((_parameters?[TopDetailParamKeys.source] as String? ?? '') ==
+          ScreenRouteName.tabs.name) {
+        // send viewEvent
+        FirebaseUtil().sendViewEvent(route: AnalyticsRoute.topDetail);
+      } else if ((_parameters?[TopDetailParamKeys.source] as String? ?? '') ==
+          ScreenRouteName.threadList.name) {
+        // send viewEvent
+        FirebaseUtil().sendViewEvent(route: AnalyticsRoute.threadDetail);
+      }
+
+      // fetch data
+      _loadData();
+    }
   }
 
   void _loadData() {

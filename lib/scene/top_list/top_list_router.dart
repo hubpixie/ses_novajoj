@@ -24,6 +24,7 @@ class TopListRouterImpl extends TopListRouter {
     DateTime startDate = DateTime.now();
     Navigator.pushNamed(context as BuildContext, ScreenRouteName.topDetail.name,
         arguments: {
+          TopDetailParamKeys.source: ScreenRouteName.tabs.name,
           TopDetailParamKeys.appBarTitle: appBarTitle,
           TopDetailParamKeys.itemInfo: itemInfo
         }).then((value) {

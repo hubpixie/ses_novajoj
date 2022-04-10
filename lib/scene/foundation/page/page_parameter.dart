@@ -1,4 +1,4 @@
-enum TopDetailParamKeys { appBarTitle, itemInfo }
+enum TopDetailParamKeys { source, appBarTitle, itemInfo }
 enum ThreadDetailParamKeys { appBarTitle, itemInfo }
 
 class PageParameter<T> {

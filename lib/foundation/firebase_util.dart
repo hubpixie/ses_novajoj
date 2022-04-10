@@ -12,6 +12,9 @@ enum AnalyticsRoute {
   topList,
   topDetail,
   localList,
+  localDetail,
+  threadList,
+  threadDetail,
 }
 
 extension AnalyticsRouteInfo on AnalyticsRoute {

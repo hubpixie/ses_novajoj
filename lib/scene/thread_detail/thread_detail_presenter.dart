@@ -7,10 +7,12 @@ import 'thread_detail_presenter_output.dart';
 import 'thread_detail_router.dart';
 
 class ThreadDetailPresenterInput {
-
+  NovaItemInfo itemInfo;
+  ThreadDetailPresenterInput({required this.itemInfo});
 }
 
-abstract class ThreadDetailPresenter with SimpleBloc<ThreadDetailPresenterOutput> {
+abstract class ThreadDetailPresenter
+    with SimpleBloc<ThreadDetailPresenterOutput> {
   void eventViewReady({required ThreadDetailPresenterInput input});
 }
 
@@ -34,6 +36,7 @@ class ThreadDetailPresenterImpl extends ThreadDetailPresenter {
 
   @override
   void eventViewReady({required ThreadDetailPresenterInput input}) {
-    useCase.fetchThreadNovaDetail(input: ThreadNovaDetailUseCaseInput());
+    useCase.fetchThreadNovaDetail(
+        input: ThreadNovaDetailUseCaseInput(itemInfo: input.itemInfo));
   }
 }
