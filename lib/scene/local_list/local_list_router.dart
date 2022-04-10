@@ -18,6 +18,7 @@ class LocalListRouterImpl extends LocalListRouter {
     DateTime startDate = DateTime.now();
     Navigator.pushNamed(context as BuildContext, ScreenRouteName.topDetail.name,
         arguments: {
+          TopDetailParamKeys.source: ScreenRouteName.localList.name,
           TopDetailParamKeys.appBarTitle: appBarTitle,
           TopDetailParamKeys.itemInfo: itemInfo
         }).then((value) {

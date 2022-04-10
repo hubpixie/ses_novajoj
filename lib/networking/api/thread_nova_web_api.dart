@@ -12,7 +12,11 @@ import 'package:ses_novajoj/foundation/data/result.dart';
 import 'package:ses_novajoj/networking/api_client/base_api_client.dart';
 import 'package:ses_novajoj/networking/api/base_nova_web_api.dart';
 import 'package:ses_novajoj/networking/request/nova_item_parameter.dart';
+import 'package:ses_novajoj/networking/request/nova_detalo_parameter.dart';
 import 'package:ses_novajoj/networking/response/thread_nova_list_response.dart';
+import 'package:ses_novajoj/networking/response/thread_detalo_item_response.dart';
+
+part 'thread_nova_web_api_detalo.dart';
 
 class ThreadNovaWebApi extends BaseNovaWebApi {
   static const int _kThumbLimit = 5;

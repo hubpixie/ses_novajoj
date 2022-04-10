@@ -102,7 +102,7 @@ extension NovaWebApiDetail on NovaWebApi {
               .substring(plElement.innerHtml, start: source, end: ' \n');
           createAtStr = StringUtil().subfix(createAtStr, width: 18);
           return DateUtil()
-                  .fromString(createAtStr, format: 'yyyy-MM-dd H:mm:ss') ??
+                  .fromString(createAtStr, format: 'yyyy-MM-dd H:mm') ??
               value;
         }
         return value;
