@@ -1,22 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:ses_novajoj/scene/thread_list/thread_sub_page.dart';
 import 'package:ses_novajoj/scene/foundation/use_l10n.dart';
-import 'package:ses_novajoj/scene/thread_list/thread_list_presenter.dart';
+import 'package:ses_novajoj/scene/bbs_main/bbs_main_presenter.dart';
 
-class ThreadListPage extends StatefulWidget {
-  final List<ThreadListPresenter> presenters;
-  const ThreadListPage({Key? key, required this.presenters}) : super(key: key);
+class BbsMainPage extends StatefulWidget {
+  final BbsMainPresenter presenter;
+  const BbsMainPage({Key? key, required this.presenter}) : super(key: key);
 
   @override
-  _ThreadListPageState createState() => _ThreadListPageState();
+  _BbsMainPageState createState() => _BbsMainPageState();
 }
 
-class _ThreadListPageState extends State<ThreadListPage> {
+class _BbsMainPageState extends State<BbsMainPage> {
   List<String> _tabNames = [];
 
   @override
   void initState() {
     super.initState();
+    // TODO: Initialize your variables.
+    widget.presenter.eventViewReady(input: BbsMainPresenterInput());
   }
 
   @override
@@ -83,14 +84,17 @@ class _ThreadListPageState extends State<ThreadListPage> {
   }
 
   Widget _buildTabPage(BuildContext context) {
-    List<Widget> pages = [];
-    _tabNames.asMap().forEach((int index, String value) {
-      pages.add(ThreadSubPage(
-        presenter: widget.presenters[index],
-        tabIndex: index,
-        appBarTitle: value,
-      ));
-    });
+    List<Widget> pages = [
+      Container(),
+      Container(),
+    ];
+    // _tabNames.asMap().forEach((int index, String value) {
+    //   pages.add(ThreadSubPage(
+    //     presenter: widget.presenters[index],
+    //     tabIndex: index,
+    //     appBarTitle: value,
+    //   ));
+    // });
 
     return TabBarView(
       children: pages,
@@ -121,18 +125,8 @@ class _ThreadListPageState extends State<ThreadListPage> {
   void _initTabNames(BuildContext context) {
     if (_tabNames.isEmpty) {
       _tabNames = <String>[
-        UseL10n.of(context)?.threadRecommend ?? "",
-        UseL10n.of(context)?.threadKidding ?? "",
-        UseL10n.of(context)?.threadLifeStyle ?? "",
-        UseL10n.of(context)?.threadChatIdly ?? "",
-        UseL10n.of(context)?.threadMarriageLife ?? "",
-        UseL10n.of(context)?.threadTalkHistory ?? "",
-        UseL10n.of(context)?.threadEntertainment ?? "",
-        UseL10n.of(context)?.threadTalkArmchair ?? "",
-        UseL10n.of(context)?.threadEconomics ?? "",
-        UseL10n.of(context)?.threadDissertation ?? "",
-        UseL10n.of(context)?.threadGourmet ?? "",
-        UseL10n.of(context)?.threadTravel ?? "",
+        UseL10n.of(context)?.bbsGuide ?? "",
+        UseL10n.of(context)?.bbsMenuList ?? "",
       ];
     }
   }
