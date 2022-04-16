@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ses_novajoj/scene/foundation/use_l10n.dart';
+import 'package:ses_novajoj/scene/bbs_guide/bbs_guide_page_builder.dart';
 import 'package:ses_novajoj/scene/bbs_main/bbs_main_presenter.dart';
 
 class BbsMainPage extends StatefulWidget {
@@ -85,7 +86,7 @@ class _BbsMainPageState extends State<BbsMainPage> {
 
   Widget _buildTabPage(BuildContext context) {
     List<Widget> pages = [
-      Container(),
+      BbsGuidePageBuilder().page,
       Container(),
     ];
     // _tabNames.asMap().forEach((int index, String value) {
