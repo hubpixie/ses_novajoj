@@ -60,7 +60,9 @@
     "threadGourmet":"各类美食",
     "threadTravel":"驴友导航",
     "bbsMain":"论坛",
-    "bbsGuide":"论坛引读",
-    "bbsMenuList":"论坛看点",
+    "bbsGuideA":"引读",
+    "bbsGuideB":"精华选读",
+    "bbsGuideC":"全读",
+    "bbsMenuList":"分类选读",
     "msgNetworkUnavailable":"当前网络无法连接，请稍后重试！"
   }

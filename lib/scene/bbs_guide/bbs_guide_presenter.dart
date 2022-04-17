@@ -1,5 +1,3 @@
-import 'package:flutter/cupertino.dart';
-import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/domain/foundation/bloc/simple_bloc.dart';
 import 'package:ses_novajoj/domain/usecases/bbs_nova_guide_usecase.dart';
 import 'package:ses_novajoj/domain/usecases/bbs_nova_guide_usecase_output.dart';

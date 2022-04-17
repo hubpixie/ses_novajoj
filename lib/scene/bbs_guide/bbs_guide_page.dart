@@ -1,17 +1,23 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/domain/foundation/bloc/bloc_provider.dart';
 import 'package:ses_novajoj/scene/foundation/use_l10n.dart';
-import 'package:ses_novajoj/scene/foundation/page/page_parameter.dart';
 import 'package:ses_novajoj/scene/bbs_guide/bbs_guide_presenter.dart';
 import 'package:ses_novajoj/scene/bbs_guide/bbs_guide_presenter_output.dart';
-import 'package:ses_novajoj/scene/widgets/nova_list_cell.dart';
+import 'package:ses_novajoj/scene/widgets/simple_nova_item_cell.dart';
 import 'package:ses_novajoj/scene/widgets/error_view.dart';
+
+class BbsGuidePageState {
+  int subPageIndex;
+  BbsGuidePageState({required this.subPageIndex});
+}
 
 class BbsGuidePage extends StatefulWidget {
   final BbsGuidePresenter presenter;
-  const BbsGuidePage({Key? key, required this.presenter}) : super(key: key);
+  final BbsGuidePageState pageState;
+  const BbsGuidePage(
+      {Key? key, required this.presenter, required this.pageState})
+      : super(key: key);
 
   @override
   _BbsGuidePageState createState() => _BbsGuidePageState();
@@ -25,19 +31,20 @@ class _BbsGuidePageState extends State<BbsGuidePage>
   @override
   void initState() {
     super.initState();
-    // TODO: Initialize your variables.
-    widget.presenter
-        .eventViewReady(input: BbsGuidePresenterInput(itemIndex: 0));
+    widget.presenter.eventViewReady(
+        input:
+            BbsGuidePresenterInput(itemIndex: widget.pageState.subPageIndex));
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
-/*    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: const [Spacer(), Text('This is building...'), Spacer()],
-    );
-*/
+
     return BlocProvider<BbsGuidePresenter>(
       bloc: widget.presenter,
       child: SafeArea(
@@ -55,7 +62,7 @@ class _BbsGuidePageState extends State<BbsGuidePage>
                 if (data.error == null) {
                   return ListView.builder(
                       itemCount: data.viewModelList?.length,
-                      itemBuilder: (context, index) => NovaListCell(
+                      itemBuilder: (context, index) => SimpleNovaListCell(
                           viewModel: data.viewModelList![index],
                           onCellSelecting: (selIndex) {
                             // widget.presenter.eventSelectDetail(context,
