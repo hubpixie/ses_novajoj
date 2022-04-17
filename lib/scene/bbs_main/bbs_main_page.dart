@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ses_novajoj/scene/foundation/use_l10n.dart';
 import 'package:ses_novajoj/scene/bbs_guide/bbs_guide_page_builder.dart';
+import 'package:ses_novajoj/scene/bbs_guide/bbs_guide_page.dart';
 import 'package:ses_novajoj/scene/bbs_main/bbs_main_presenter.dart';
 
 class BbsMainPage extends StatefulWidget {
@@ -13,19 +14,32 @@ class BbsMainPage extends StatefulWidget {
 
 class _BbsMainPageState extends State<BbsMainPage> {
   List<String> _tabNames = [];
+  late List<BbsGuidePage> _guidePages;
+
+  // ignore: unused_field
+  bool _pageIsFirst = true;
 
   @override
   void initState() {
     super.initState();
-    // TODO: Initialize your variables.
-    widget.presenter.eventViewReady(input: BbsMainPresenterInput());
+    _guidePages = () {
+      List<BbsGuidePage> pages = [
+        BbsGuidePageBuilder().page,
+        BbsGuidePageBuilder().page,
+        BbsGuidePageBuilder().page
+      ];
+      pages.asMap().forEach((idx, page) {
+        page.pageState.subPageIndex = idx;
+      });
+      return pages;
+    }();
   }
 
   @override
   Widget build(BuildContext context) {
     _initTabNames(context);
 
-    return DefaultTabController(
+    Widget widget = DefaultTabController(
       length: _tabNames.length,
       child: Scaffold(
           appBar: AppBar(
@@ -43,6 +57,8 @@ class _BbsMainPageState extends State<BbsMainPage> {
           ),
           body: _buildTabPage(context)),
     );
+    _pageIsFirst = false;
+    return widget;
   }
 
   // ignore: unused_element
@@ -76,26 +92,22 @@ class _BbsMainPageState extends State<BbsMainPage> {
         child: Text(name),
       ));
     }
-
     return TabBar(
-        isScrollable: true,
-        unselectedLabelColor: Colors.white.withOpacity(0.6),
-        indicatorColor: Colors.white,
-        tabs: tabs);
+      isScrollable: true,
+      unselectedLabelColor: Colors.white.withOpacity(0.6),
+      indicatorColor: Colors.white,
+      tabs: tabs,
+      onTap: (tabIndex) {},
+    );
   }
 
   Widget _buildTabPage(BuildContext context) {
     List<Widget> pages = [
-      BbsGuidePageBuilder().page,
-      Container(),
+      _guidePages[0],
+      _guidePages[1],
+      _guidePages[2],
+      Container()
     ];
-    // _tabNames.asMap().forEach((int index, String value) {
-    //   pages.add(ThreadSubPage(
-    //     presenter: widget.presenters[index],
-    //     tabIndex: index,
-    //     appBarTitle: value,
-    //   ));
-    // });
 
     return TabBarView(
       children: pages,
@@ -126,7 +138,9 @@ class _BbsMainPageState extends State<BbsMainPage> {
   void _initTabNames(BuildContext context) {
     if (_tabNames.isEmpty) {
       _tabNames = <String>[
-        UseL10n.of(context)?.bbsGuide ?? "",
+        UseL10n.of(context)?.bbsGuideA ?? "",
+        UseL10n.of(context)?.bbsGuideB ?? "",
+        UseL10n.of(context)?.bbsGuideC ?? "",
         UseL10n.of(context)?.bbsMenuList ?? "",
       ];
     }

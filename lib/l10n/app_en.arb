@@ -60,7 +60,9 @@
   "threadGourmet":"Gourmet",
   "threadTravel":"Travel Info",
   "bbsMain":"BBS",
-  "bbsGuide":"BBS Guide",
-  "bbsMenuList":"BBS Menu",
+  "bbsGuideA":"BBS Guide",
+  "bbsGuideB":"BBS Essence",
+  "bbsGuideC":"BBS Other",
+"bbsMenuList":"BBS Menu",
   "msgNetworkUnavailable": "Network is unavailable, please try again later"
 }

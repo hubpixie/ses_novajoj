@@ -1,6 +1,15 @@
 import 'dart:io';
 
-enum NovaDocType { none, list, table, thumb, detail, threadList }
+enum NovaDocType {
+  none,
+  list,
+  table,
+  thumb,
+  detail,
+  bbsList,
+  bbsEtcList,
+  threadList
+}
 
 class Comment {
   int id;

@@ -22,11 +22,25 @@ class BbsNovaGuideUseCaseImpl extends BbsNovaGuideUseCase {
   final BbsNovaGuideRepositoryImpl repository;
   BbsNovaGuideUseCaseImpl() : repository = BbsNovaGuideRepositoryImpl();
 
+  static final List<FetchBbsGuideRepoInput> _inputUrlData = [
+    FetchBbsGuideRepoInput(
+        // bbs guide 1
+        targetUrl: "https://www.6park.com/pub/aimain.php?act=parkyc",
+        docType: NovaDocType.bbsList),
+    FetchBbsGuideRepoInput(
+        // bbs guide 2
+        targetUrl: "https://www.6park.com/pub/aimain.php?act=jingfill",
+        docType: NovaDocType.bbsList),
+    FetchBbsGuideRepoInput(
+        // bbs guide 3
+        targetUrl: "https://www.6park.com/pub/aimain.php?act=bbshot",
+        docType: NovaDocType.bbsEtcList),
+  ];
+
   @override
   void fetchBbsGuideList({required BbsNovaGuideUseCaseInput input}) async {
     final result = await repository.fetchBbsNovaGuideList(
-        input:
-            FetchBbsGuideRepoInput(targetUrl: '', docType: NovaDocType.list));
+        input: _inputUrlData[input.itemIndex]);
 
     result.when(success: (value) {
       List<BbsGuideListItem> list = value;

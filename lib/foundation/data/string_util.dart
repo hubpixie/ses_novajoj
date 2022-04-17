@@ -9,7 +9,10 @@ class StringUtil {
 
   String substring(String string,
       {required String start, required String end}) {
-    int pos1 = string.indexOf(start);
+    int pos1 = 0;
+    if (start.isNotEmpty) {
+      pos1 = string.indexOf(start);
+    }
     int pos2 = string.indexOf(end);
     if (end.isEmpty) {
       pos2 = string.length - 1;

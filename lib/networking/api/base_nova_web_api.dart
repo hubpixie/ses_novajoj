@@ -92,6 +92,9 @@ class BaseNovaWebApi {
       if (titleElement.innerHtml.isNotEmpty) {
         retStr = titleElement.innerHtml.split(" -").first;
       }
+      retStr = retStr.replaceAll('&nbsp;', ' ').trim();
+      retStr = retStr.replaceAll('&amp;', '&');
+
       return Result.success(data: retStr);
     } on AppError catch (error) {
       return Result.failure(error: error);
