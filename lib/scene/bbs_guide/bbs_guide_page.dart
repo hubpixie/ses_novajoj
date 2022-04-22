@@ -9,7 +9,8 @@ import 'package:ses_novajoj/scene/widgets/error_view.dart';
 
 class BbsGuidePageState {
   int subPageIndex;
-  BbsGuidePageState({required this.subPageIndex});
+  String subPageTitle;
+  BbsGuidePageState({required this.subPageIndex, required this.subPageTitle});
 }
 
 class BbsGuidePage extends StatefulWidget {
@@ -31,9 +32,7 @@ class _BbsGuidePageState extends State<BbsGuidePage>
   @override
   void initState() {
     super.initState();
-    widget.presenter.eventViewReady(
-        input:
-            BbsGuidePresenterInput(itemIndex: widget.pageState.subPageIndex));
+    _loadData(isReloaded: false);
   }
 
   @override
@@ -65,12 +64,12 @@ class _BbsGuidePageState extends State<BbsGuidePage>
                       itemBuilder: (context, index) => SimpleNovaListCell(
                           viewModel: data.viewModelList![index],
                           onCellSelecting: (selIndex) {
-                            // widget.presenter.eventSelectDetail(context,
-                            //     appBarTitle: _selectedAppBarTitle,
-                            //     itemInfo: data.viewModelList![selIndex]
-                            //         .itemInfo, completeHandler: () {
-                            //   _loadData(isReloaded: true);
-                            // });
+                            widget.presenter.eventSelectDetail(context,
+                                appBarTitle: widget.pageState.subPageTitle,
+                                itemInfo: data.viewModelList![selIndex]
+                                    .itemInfo, completeHandler: () {
+                              _loadData(isReloaded: true);
+                            });
                           },
                           onThumbnailShowing: (thumbIndex) async {
                             if (data.viewModelList![thumbIndex].itemInfo
@@ -104,5 +103,11 @@ class _BbsGuidePageState extends State<BbsGuidePage>
             }),
       ),
     );
+  }
+
+  void _loadData({required bool isReloaded}) {
+    widget.presenter.eventViewReady(
+        input:
+            BbsGuidePresenterInput(itemIndex: widget.pageState.subPageIndex));
   }
 }
