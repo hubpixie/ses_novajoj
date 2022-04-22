@@ -15,6 +15,7 @@ enum AnalyticsRoute {
   localDetail,
   threadList,
   threadDetail,
+  bbsDetail,
 }
 
 extension AnalyticsRouteInfo on AnalyticsRoute {
@@ -28,6 +29,8 @@ extension AnalyticsRouteInfo on AnalyticsRoute {
         return '/topDetail';
       case AnalyticsRoute.localList:
         return '/localList';
+      case AnalyticsRoute.bbsDetail:
+        return '/bbsDetail';
       default:
         return '';
     }
@@ -39,6 +42,7 @@ extension AnalyticsRouteInfo on AnalyticsRoute {
       case AnalyticsRoute.topList:
       case AnalyticsRoute.topDetail:
       case AnalyticsRoute.localList:
+      case AnalyticsRoute.bbsDetail:
         return toString().split(".")[1];
       default:
         return '';

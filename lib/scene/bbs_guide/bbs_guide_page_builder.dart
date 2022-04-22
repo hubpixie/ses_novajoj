@@ -9,7 +9,8 @@ class BbsGuidePageBuilder {
 
   factory BbsGuidePageBuilder() {
     //final StreamController<int> pageState = StreamController<int>();
-    final BbsGuidePageState pageState = BbsGuidePageState(subPageIndex: 0);
+    final BbsGuidePageState pageState =
+        BbsGuidePageState(subPageIndex: 0, subPageTitle: '');
     final router = BbsGuideRouterImpl();
     final presenter = BbsGuidePresenterImpl(router: router);
     final page = BbsGuidePage(presenter: presenter, pageState: pageState);

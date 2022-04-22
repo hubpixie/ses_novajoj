@@ -14,7 +14,7 @@ class BbsMainPage extends StatefulWidget {
 
 class _BbsMainPageState extends State<BbsMainPage> {
   List<String> _tabNames = [];
-  late List<BbsGuidePage> _guidePages;
+  List<BbsGuidePage> _guidePages = [];
 
   // ignore: unused_field
   bool _pageIsFirst = true;
@@ -22,22 +22,11 @@ class _BbsMainPageState extends State<BbsMainPage> {
   @override
   void initState() {
     super.initState();
-    _guidePages = () {
-      List<BbsGuidePage> pages = [
-        BbsGuidePageBuilder().page,
-        BbsGuidePageBuilder().page,
-        BbsGuidePageBuilder().page
-      ];
-      pages.asMap().forEach((idx, page) {
-        page.pageState.subPageIndex = idx;
-      });
-      return pages;
-    }();
   }
 
   @override
   Widget build(BuildContext context) {
-    _initTabNames(context);
+    _initTabInfos(context);
 
     Widget widget = DefaultTabController(
       length: _tabNames.length,
@@ -102,6 +91,9 @@ class _BbsMainPageState extends State<BbsMainPage> {
   }
 
   Widget _buildTabPage(BuildContext context) {
+    _guidePages[0].pageState.subPageTitle = _tabNames[0];
+    _guidePages[1].pageState.subPageTitle = _tabNames[1];
+    _guidePages[2].pageState.subPageTitle = _tabNames[2];
     List<Widget> pages = [
       _guidePages[0],
       _guidePages[1],
@@ -135,7 +127,8 @@ class _BbsMainPageState extends State<BbsMainPage> {
     ];
   }
 
-  void _initTabNames(BuildContext context) {
+  void _initTabInfos(BuildContext context) {
+    // Tab Names
     if (_tabNames.isEmpty) {
       _tabNames = <String>[
         UseL10n.of(context)?.bbsGuideA ?? "",
@@ -143,6 +136,20 @@ class _BbsMainPageState extends State<BbsMainPage> {
         UseL10n.of(context)?.bbsGuideC ?? "",
         UseL10n.of(context)?.bbsMenuList ?? "",
       ];
+    }
+
+    // Tab Page
+    if (_guidePages.isEmpty) {
+      List<BbsGuidePage> pages = [
+        BbsGuidePageBuilder().page,
+        BbsGuidePageBuilder().page,
+        BbsGuidePageBuilder().page
+      ];
+      pages.asMap().forEach((idx, page) {
+        page.pageState.subPageIndex = idx;
+        page.pageState.subPageTitle = _tabNames[idx];
+      });
+      _guidePages.addAll(pages);
     }
   }
 }
