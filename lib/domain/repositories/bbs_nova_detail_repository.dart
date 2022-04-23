@@ -3,10 +3,10 @@ import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/foundation/data/result.dart';
 
 class FetchBbsNovaDetailRepoInput {
-  Object id;
-  String string;
+  NovaItemInfo itemInfo;
+  NovaDocType docType;
 
-  FetchBbsNovaDetailRepoInput({required this.id, required this.string});
+  FetchBbsNovaDetailRepoInput({required this.itemInfo, required this.docType});
 }
 
 abstract class BbsNovaDetailRepository {

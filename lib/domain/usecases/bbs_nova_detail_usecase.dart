@@ -6,10 +6,13 @@ import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'bbs_nova_detail_usecase_output.dart';
 
 class BbsNovaDetailUseCaseInput {
+  NovaItemInfo itemInfo;
 
+  BbsNovaDetailUseCaseInput({required this.itemInfo});
 }
 
-abstract class BbsNovaDetailUseCase with SimpleBloc<BbsNovaDetailUseCaseOutput> {
+abstract class BbsNovaDetailUseCase
+    with SimpleBloc<BbsNovaDetailUseCaseOutput> {
   void fetchBbsNovaDetail({required BbsNovaDetailUseCaseInput input});
 }
 
@@ -21,11 +24,12 @@ class BbsNovaDetailUseCaseImpl extends BbsNovaDetailUseCase {
   void fetchBbsNovaDetail({required BbsNovaDetailUseCaseInput input}) async {
     final result = await repository.fetchBbsNovaDetail(
         input: FetchBbsNovaDetailRepoInput(
-            id: 9999, string: "99999" /* // TODO: dummy code*/));
+            itemInfo: input.itemInfo, docType: NovaDocType.detail));
 
     result.when(success: (value) {
-      streamAdd(
-          PresentModel(model: BbsNovaDetailUseCaseModel(9999, value.toString() /* // TODO: dummy code*/)));
+      streamAdd(PresentModel(
+          model:
+              BbsNovaDetailUseCaseModel(value.itemInfo, value.toHtmlString())));
     }, failure: (error) {
       streamAdd(PresentModel(error: error));
     });

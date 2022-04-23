@@ -32,8 +32,6 @@ class _BbsDetailPageState extends State<BbsDetailPage> {
   @override
   void initState() {
     super.initState();
-    // TODO: Initialize your variables.
-    widget.presenter.eventViewReady(input: BbsDetailPresenterInput());
   }
 
   @override
@@ -99,8 +97,7 @@ class _BbsDetailPageState extends State<BbsDetailPage> {
                 onWebViewCreated: (WebViewController controller) {
                   //_controller = controller;
                   controller.loadUrl(Uri.dataFromString(
-                          // TODO: detailItem?.htmlText
-                          "detailItem?.htmlText ?? ''",
+                          detailItem?.htmlText ?? '',
                           mimeType: 'text/html',
                           encoding: Encoding.getByName('utf-8'))
                       .toString());
@@ -146,8 +143,8 @@ class _BbsDetailPageState extends State<BbsDetailPage> {
 
   void _loadData() {
     if (_itemInfo != null) {
-      // widget.presenter.eventViewReady(
-      //     input: BbsDetailPresenterInput(itemInfo: _itemInfo!));
+      widget.presenter
+          .eventViewReady(input: BbsDetailPresenterInput(itemInfo: _itemInfo!));
     } else {
       log.warning('thread_detail_page: parameter is error!');
     }

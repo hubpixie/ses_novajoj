@@ -13,7 +13,7 @@ import 'package:ses_novajoj/networking/api/base_nova_web_api.dart';
 import 'package:ses_novajoj/networking/request/nova_item_parameter.dart';
 import 'package:ses_novajoj/networking/request/nova_detalo_parameter.dart';
 import 'package:ses_novajoj/networking/response/bbs_nova_guide_response.dart';
-import 'package:ses_novajoj/networking/response/thread_detalo_item_response.dart';
+import 'package:ses_novajoj/networking/response/bbs_detalo_item_response.dart';
 
 part 'bbs_nova_web_api_detalo.dart';
 
@@ -139,7 +139,11 @@ class BbsNovaWebApi extends BaseNovaWebApi {
         return retStr;
       }(aLink.parent?.innerHtml ?? '');
 
-      urlString = aLink.attributes['href'] ?? '';
+      urlString = () {
+        String str = aLink.attributes['href'] ?? '';
+        str = str.replaceAll('\\"', '');
+        return str;
+      }();
 
       // thumbUrlString
       if (title.isNotEmpty) {
