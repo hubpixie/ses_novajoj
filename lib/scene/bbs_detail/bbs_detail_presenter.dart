@@ -7,7 +7,8 @@ import 'bbs_detail_presenter_output.dart';
 import 'bbs_detail_router.dart';
 
 class BbsDetailPresenterInput {
-
+  NovaItemInfo itemInfo;
+  BbsDetailPresenterInput({required this.itemInfo});
 }
 
 abstract class BbsDetailPresenter with SimpleBloc<BbsDetailPresenterOutput> {
@@ -34,6 +35,7 @@ class BbsDetailPresenterImpl extends BbsDetailPresenter {
 
   @override
   void eventViewReady({required BbsDetailPresenterInput input}) {
-    useCase.fetchBbsNovaDetail(input: BbsNovaDetailUseCaseInput());
+    useCase.fetchBbsNovaDetail(
+        input: BbsNovaDetailUseCaseInput(itemInfo: input.itemInfo));
   }
 }

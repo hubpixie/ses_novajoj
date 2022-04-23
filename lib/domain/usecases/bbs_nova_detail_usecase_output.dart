@@ -1,6 +1,6 @@
 import 'package:ses_novajoj/foundation/data/user_types.dart';
 
-abstract class  BbsNovaDetailUseCaseOutput {}
+abstract class BbsNovaDetailUseCaseOutput {}
 
 class PresentModel extends BbsNovaDetailUseCaseOutput {
   final BbsNovaDetailUseCaseModel? model;
@@ -9,8 +9,8 @@ class PresentModel extends BbsNovaDetailUseCaseOutput {
 }
 
 class BbsNovaDetailUseCaseModel {
-  int id;
-  String string;
+  NovaItemInfo itemInfo;
+  String htmlText;
 
-  BbsNovaDetailUseCaseModel(this.id, this.string);
+  BbsNovaDetailUseCaseModel(this.itemInfo, this.htmlText);
 }

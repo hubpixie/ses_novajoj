@@ -1,10 +1,10 @@
 part of 'bbs_nova_web_api.dart';
 
-extension ThreadNovaWebApiDetail on BbsNovaWebApi {
+extension BbsNovaWebApiDetail on BbsNovaWebApi {
   ///
-  /// api entry: fetchNovaDetail
+  /// api entry: fetchBbsDetail
   ///
-  Future<Result<ThreadDetaloItemRes>> fetchThreadDetail(
+  Future<Result<BbsDetaloItemRes>> fetchBbsDetail(
       {required NovaDetaloParameter parameter}) async {
     try {
       // check network state
@@ -23,7 +23,7 @@ extension ThreadNovaWebApiDetail on BbsNovaWebApi {
       }
       // prepares to parse nova list from response.body.
       final document = html_parser.parse(response.body);
-      ThreadDetaloItemRes? retVal;
+      BbsDetaloItemRes? retVal;
 
       final rootElement = document.getElementsByClassName('show_content').first;
       if (parameter.docType == NovaDocType.detail) {
@@ -79,12 +79,12 @@ extension ThreadNovaWebApiDetail on BbsNovaWebApi {
   ///    ...
   ///</table>
   ///
-  Future<Result<ThreadDetaloItemRes>> _parseDetailItems(
+  Future<Result<BbsDetaloItemRes>> _parseDetailItems(
       {required NovaDetaloParameter parameter,
       Element? rootElement,
       Element? infoElement}) async {
     try {
-      ThreadDetaloItemRes retVal = ThreadDetaloItemRes(
+      BbsDetaloItemRes retVal = BbsDetaloItemRes(
           itemInfo: parameter.itemInfo,
           bodyString:
               rootElement?.getElementsByTagName('pre').first.innerHtml ?? '');
