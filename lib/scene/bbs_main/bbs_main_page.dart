@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:ses_novajoj/scene/foundation/use_l10n.dart';
 import 'package:ses_novajoj/scene/bbs_guide/bbs_guide_page_builder.dart';
 import 'package:ses_novajoj/scene/bbs_guide/bbs_guide_page.dart';
+import 'package:ses_novajoj/scene/bbs_menu/bbs_menu_page_builder.dart';
+import 'package:ses_novajoj/scene/bbs_menu/bbs_menu_page.dart';
 import 'package:ses_novajoj/scene/bbs_main/bbs_main_presenter.dart';
 
 class BbsMainPage extends StatefulWidget {
@@ -14,7 +16,7 @@ class BbsMainPage extends StatefulWidget {
 
 class _BbsMainPageState extends State<BbsMainPage> {
   List<String> _tabNames = [];
-  List<BbsGuidePage> _guidePages = [];
+  late List<Widget> _guidePages;
 
   // ignore: unused_field
   bool _pageIsFirst = true;
@@ -22,11 +24,29 @@ class _BbsMainPageState extends State<BbsMainPage> {
   @override
   void initState() {
     super.initState();
+    _guidePages = () {
+      List<Widget> pages = [
+        BbsGuidePageBuilder().page,
+        BbsGuidePageBuilder().page,
+        BbsGuidePageBuilder().page,
+        BbsMenuPageBuilder().page
+      ];
+      pages.asMap().forEach((idx, item) {
+        if (item is BbsGuidePage) {
+          BbsGuidePage page = item;
+          page.pageState.subPageIndex = idx;
+        } else if (item is BbsMenuPage) {
+          BbsMenuPage page = item;
+          page.pageState.subPageIndex = idx;
+        }
+      });
+      return pages;
+    }();
   }
 
   @override
   Widget build(BuildContext context) {
-    _initTabInfos(context);
+    _initTabNames(context);
 
     Widget widget = DefaultTabController(
       length: _tabNames.length,
@@ -91,15 +111,7 @@ class _BbsMainPageState extends State<BbsMainPage> {
   }
 
   Widget _buildTabPage(BuildContext context) {
-    _guidePages[0].pageState.subPageTitle = _tabNames[0];
-    _guidePages[1].pageState.subPageTitle = _tabNames[1];
-    _guidePages[2].pageState.subPageTitle = _tabNames[2];
-    List<Widget> pages = [
-      _guidePages[0],
-      _guidePages[1],
-      _guidePages[2],
-      Container()
-    ];
+    List<Widget> pages = _guidePages;
 
     return TabBarView(
       children: pages,
@@ -127,8 +139,7 @@ class _BbsMainPageState extends State<BbsMainPage> {
     ];
   }
 
-  void _initTabInfos(BuildContext context) {
-    // Tab Names
+  void _initTabNames(BuildContext context) {
     if (_tabNames.isEmpty) {
       _tabNames = <String>[
         UseL10n.of(context)?.bbsGuideA ?? "",
@@ -136,20 +147,6 @@ class _BbsMainPageState extends State<BbsMainPage> {
         UseL10n.of(context)?.bbsGuideC ?? "",
         UseL10n.of(context)?.bbsMenuList ?? "",
       ];
-    }
-
-    // Tab Page
-    if (_guidePages.isEmpty) {
-      List<BbsGuidePage> pages = [
-        BbsGuidePageBuilder().page,
-        BbsGuidePageBuilder().page,
-        BbsGuidePageBuilder().page
-      ];
-      pages.asMap().forEach((idx, page) {
-        page.pageState.subPageIndex = idx;
-        page.pageState.subPageTitle = _tabNames[idx];
-      });
-      _guidePages.addAll(pages);
     }
   }
 }
