@@ -82,6 +82,8 @@ enum FailureReason {
   missingImgNode,
   missingListNode,
   missingTableNode,
+  missingBbsMenuNode,
+  missingBbsLangNode,
   exception,
 }
 

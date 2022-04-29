@@ -49,7 +49,7 @@
     "hotThreadListAppBarTitle":"热帖",
     "threadRecommend":"热门推荐",
     "threadKidding":"笑口常开",
-    "threadLifeStyle":"生活百态",
+    "threadLifeStyle":"环球百态",
     "threadChatIdly":"杂论闲侃",
     "threadMarriageLife":"婚姻家庭",
     "threadTalkHistory":"史海钩沉",
@@ -63,6 +63,6 @@
     "bbsGuideA":"引读",
     "bbsGuideB":"精华选读",
     "bbsGuideC":"全读",
-    "bbsMenuList":"分类选读",
+    "bbsMenuList":"分类选读",           
     "msgNetworkUnavailable":"当前网络无法连接，请稍后重试！"
   }

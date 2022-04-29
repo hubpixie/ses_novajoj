@@ -49,7 +49,7 @@
   "hotThreadListAppBarTitle":"Hot Threads",
   "threadRecommend":"Recommendation",
   "threadKidding":"Kidding",
-  "threadLifeStyle":"Lifestyle",
+  "threadLifeStyle":"World Life",
   "threadChatIdly":"Chat Idly",
   "threadMarriageLife":"Marriage Life",
   "threadTalkHistory":"Talk History",
@@ -63,6 +63,6 @@
   "bbsGuideA":"BBS Guide",
   "bbsGuideB":"BBS Essence",
   "bbsGuideC":"BBS Other",
-"bbsMenuList":"BBS Menu",
-  "msgNetworkUnavailable": "Network is unavailable, please try again later"
+  "bbsMenuList":"BBS Menu",
+ "msgNetworkUnavailable": "Network is unavailable, please try again later"
 }

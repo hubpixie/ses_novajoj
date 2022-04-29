@@ -5,10 +5,6 @@ import 'package:ses_novajoj/networking/request/nova_detalo_parameter.dart';
 import 'package:ses_novajoj/domain/entities/bbs_nova_detail_item.dart';
 import 'package:ses_novajoj/domain/repositories/bbs_nova_detail_repository.dart';
 
-/// TODO: This is dummy Web API class.
-/// You should  web api class is defined in its dart file, like `my_web_api.dart`
-class MyWebApi {}
-
 class BbsNovaDetailRepositoryImpl extends BbsNovaDetailRepository {
   final BbsNovaWebApi _api;
 

@@ -8,7 +8,6 @@ class BbsGuidePageBuilder {
   BbsGuidePageBuilder._(this.page);
 
   factory BbsGuidePageBuilder() {
-    //final StreamController<int> pageState = StreamController<int>();
     final BbsGuidePageState pageState =
         BbsGuidePageState(subPageIndex: 0, subPageTitle: '');
     final router = BbsGuideRouterImpl();

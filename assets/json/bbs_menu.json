@@ -1,0 +1,752 @@
+{
+  "bbs_menu": [
+    {
+      "id": 1,
+      "section_title": "Entertainments",
+      "title": "Kidding",
+      "url_string": "https://club.6parkbbs.com/enter1/index.php",
+      "access_flag": 1
+    },
+    {
+      "id": 2,
+      "section_title": "Entertainments",
+      "title": "Entertainments",
+      "url_string": "https://club.6parkbbs.com/enter8/index.php",
+      "access_flag": 1
+    },
+    {
+      "id": 3,
+      "section_title": "Entertainments",
+      "title": "Enjoyment",
+      "url_string": "https://club.6parkbbs.com/netstar/index.php",
+      "access_flag": 1
+    },
+    {
+      "id": 4,
+      "section_title": "Entertainments",
+      "title": "Music",
+      "url_string": "https://club.6parkbbs.com/enter4/index.php",
+      "access_flag": 1
+    },
+    {
+      "id": 5,
+      "section_title": "Entertainments",
+      "title": "Songs",
+      "url_string": "https://club.6parkbbs.com/chan7/index.php",
+      "access_flag": 1
+    },
+    {
+      "id": 6,
+      "section_title": "Life",
+      "title": "Digital Appliances",
+      "url_string": "https://club.6parkbbs.com/chan6/index.php",
+      "access_flag": 1
+    },
+    {
+      "id": 7,
+      "section_title": "Life",
+      "title": "Photography",
+      "url_string": "https://club.6parkbbs.com/chan8/index.php",
+      "access_flag": 1
+    },
+    {
+      "id": 8,
+      "section_title": "Life",
+      "title": "Gourmet",
+      "url_string": "https://club.6parkbbs.com/life6/index.php",
+      "access_flag": 1
+    },
+    {
+      "id": 9,
+      "section_title": "Life",
+      "title": "Pets",
+      "url_string": "https://club.6parkbbs.com/life8/index.php",
+      "access_flag": 1
+    },
+    {
+      "id": 10,
+      "section_title": "Life",
+      "title": "Travel Info",
+      "url_string": "https://club.6parkbbs.com/life7/index.php",
+      "access_flag": 1
+    },
+    {
+      "id": 11,
+      "section_title": "Leisure",
+      "title": "Sports",
+      "url_string": "https://club.6parkbbs.com/enter5/index.php",
+      "access_flag": 1
+    },
+    {
+      "id": 12,
+      "section_title": "Leisure",
+      "title": "Work Out",
+      "url_string": "https://club.6parkbbs.com/sport/index.php",
+      "access_flag": 1
+    },
+    {
+      "id": 13,
+      "section_title": "Leisure",
+      "title": "Games",
+      "url_string": "https://club.6parkbbs.com/enter3/index.php",
+      "access_flag": 1
+    },
+    {
+      "id": 14,
+      "section_title": "Leisure",
+      "title": "Cartoons",
+      "url_string": "https://club.6parkbbs.com/enter6/index.php",
+      "access_flag": 1
+    },
+    {
+      "id": 15,
+      "section_title": "Leisure",
+      "title": "Destiny",
+      "url_string": "https://club.6parkbbs.com/gz3/index.php",
+      "access_flag": 1
+    },
+    {
+      "id": 16,
+      "section_title": "Information",
+      "title": "Economics",
+      "url_string": "https://club.6parkbbs.com/finance/index.php",
+      "access_flag": 1
+    },
+    {
+      "id": 17,
+      "section_title": "Information",
+      "title": "Stocks",
+      "url_string": "https://club.6parkbbs.com/chan4/index.php",
+      "access_flag": 1
+    },
+    {
+      "id": 18,
+      "section_title": "Information",
+      "title": "Car Fans",
+      "url_string": "https://club.6parkbbs.com/enter7/index.php",
+      "access_flag": 1
+    },
+    {
+      "id": 19,
+      "section_title": "Information",
+      "title": "PC Channel",
+      "url_string": "https://club.6parkbbs.com/know1/index.php",
+      "access_flag": 1
+    },
+    {
+      "id": 20,
+      "section_title": "Information",
+      "title": "Science",
+      "url_string": "https://club.6parkbbs.com/chan2/index.php",
+      "access_flag": 1
+    },
+    {
+      "id": 21,
+      "section_title": "Feelings",
+      "title": "Marriage & Family",
+      "url_string": "https://club.6parkbbs.com/life9/index.php",
+      "access_flag": 1
+    },
+    {
+      "id": 22,
+      "section_title": "Feelings",
+      "title": "Feelings",
+      "url_string": "https://club.6parkbbs.com/life3/index.php",
+      "access_flag": 1
+    },
+    {
+      "id": 23,
+      "section_title": "Feelings",
+      "title": "Glamour Fashion",
+      "url_string": "https://club.6parkbbs.com/life1/index.php",
+      "access_flag": 1
+    },
+    {
+      "id": 24,
+      "section_title": "Feelings",
+      "title": "Women's Channel",
+      "url_string": "https://club.6parkbbs.com/chan10/index.php",
+      "access_flag": 1
+    },
+    {
+      "id": 25,
+      "section_title": "Feelings",
+      "title": "Kids",
+      "url_string": "https://club.6parkbbs.com/chan5/index.php",
+      "access_flag": 1
+    },
+    {
+      "id": 26,
+      "section_title": "Forums",
+      "title": "Talk Armchair",
+      "url_string": "https://club.6parkbbs.com/military/index.php",
+      "access_flag": 1
+    },
+    {
+      "id": 27,
+      "section_title": "Forums",
+      "title": "Military",
+      "url_string": "https://club.6parkbbs.com/nz/index.php",
+      "access_flag": 1
+    },
+    {
+      "id": 28,
+      "section_title": "Forums",
+      "title": "Chat Idly",
+      "url_string": "https://club.6parkbbs.com/pk/index.php",
+      "access_flag": 1
+    },
+    {
+      "id": 29,
+      "section_title": "Forums",
+      "title": "Hundreds of Forums",
+      "url_string": "https://club.6parkbbs.com/other/index.php",
+      "access_flag": 1
+    },
+    {
+      "id": 30,
+      "section_title": "Forums",
+      "title": "Discuss the World",
+      "url_string": "https://club.6parkbbs.com/bolun/index.php",
+      "access_flag": 1
+    },
+    {
+      "id": 31,
+      "section_title": "Culture",
+      "title": "Talk History",
+      "url_string": "https://club.6parkbbs.com/chan1/index.php",
+      "access_flag": 1
+    },
+    {
+      "id": 32,
+      "section_title": "Culture",
+      "title": "Cultural Corridor",
+      "url_string": "https://club.6parkbbs.com/life10/index.php",
+      "access_flag": 1
+    },
+    {
+      "id": 33,
+      "section_title": "Culture",
+      "title": "Park Aesthetics",
+      "url_string": "https://club.6parkbbs.com/gz1/index.php",
+      "access_flag": 1
+    },
+    {
+      "id": 34,
+      "section_title": "Culture",
+      "title": "Treasure",
+      "url_string": "https://club.6parkbbs.com/page/index.php",
+      "access_flag": 1
+    },
+    {
+      "id": 35,
+      "section_title": "Culture",
+      "title": "literary World",
+      "url_string": "https://club.6parkbbs.com/novel/index.php",
+      "access_flag": 1
+    },
+    {
+      "id": 36,
+      "section_title": "Culture",
+      "title": "learning Field",
+      "url_string": "https://club.6parkbbs.com/gz2/index.php",
+      "access_flag": 1
+    },
+    {
+      "id": 37,
+      "section_title": "World",
+      "title": "World Geography",
+      "url_string": "https://web.6parkbbs.com/index.php?act=bbs&bbsid=2033",
+      "access_flag": 1
+    },
+    {
+      "id": 38,
+      "section_title": "World",
+      "title": "World Around",
+      "url_string": "https://web.6parkbbs.com/index.php?act=bbs&bbsid=2128",
+      "access_flag": 1
+    },
+    {
+      "id": 39,
+      "section_title": "World",
+      "title": "World Life",
+      "url_string": "https://club.6parkbbs.com/life2/index.php",
+      "access_flag": 1
+    },
+    {
+      "id": 40,
+      "section_title": "World",
+      "title": "Meet in US",
+      "url_string": "https://club.6parkbbs.com/us/index.php",
+      "access_flag": 1
+    },
+    {
+      "id": 41,
+      "section_title": "World",
+      "title": "Meet in Canada",
+      "url_string": "https://club.6parkbbs.com/ca/index.php",
+      "access_flag": 1
+    },
+    {
+      "id": 42,
+      "section_title": "World",
+      "title": "Meet in Australia",
+      "url_string": "https://club.6parkbbs.com/au/index.php",
+      "access_flag": 1
+    },
+    {
+      "id": 43,
+      "section_title": "World",
+      "title": "Study Abroad",
+      "url_string": "https://club.6parkbbs.com/life4/index.php",
+      "access_flag": 1
+    },
+    {
+      "id": 44,
+      "section_title": "Wemedia",
+      "title": "Anti-Covid Information",
+      "url_string": "https://web.6parkbbs.com/index.php?act=bbs&bbsid=2060",
+      "access_flag": 1
+    },
+    {
+      "id": 45,
+      "section_title": "Wemedia",
+      "title": "Smartphone",
+      "url_string": "https://web.6parkbbs.com/index.php?act=bbs&bbsid=2024",
+      "access_flag": 1
+    },
+    {
+      "id": 46,
+      "section_title": "Wemedia",
+      "title": "Super Vacal",
+      "url_string": "https://club.6parkbbs.com/aup/index.php",
+      "access_flag": 1
+    },
+    {
+      "id": 47,
+      "section_title": "Wemedia",
+      "title": "Online Videos",
+      "url_string": "https://mv.6park.com/index.php",
+      "access_flag": 1
+    },
+    {
+      "id": 48,
+      "section_title": "Wemedia",
+      "title": "Special Voices",
+      "url_string": "https://club.6parkbbs.com/fr/index.php",
+      "access_flag": 1
+    },
+    {
+      "id": 49,
+      "section_title": "Wemedia",
+      "title": "Almighty Films",
+      "url_string": "https://web.6parkbbs.com/index.php?act=bbs&bbsid=2046",
+      "access_flag": 1
+    },
+    {
+      "id": 50,
+      "section_title": "Wemedia",
+      "title": "Warm Home",
+      "url_string": "https://club.6parkbbs.com/chan3/index.php",
+      "access_flag": 1
+    },
+    {
+      "id": 51,
+      "section_title": "Other",
+      "title": "Women's Channel",
+      "url_string": "https://club.6parkbbs.com/chan10/index.php",
+      "access_flag": 1
+    },
+    {
+      "id": 52,
+      "section_title": "Other",
+      "title": "Beauties",
+      "url_string": "https://web.6parkbbs.com/index.php?act=bbs&bbsid=2011",
+      "access_flag": 1
+    },
+    {
+      "id": 53,
+      "section_title": "Other",
+      "title": "Maddened",
+      "url_string": "https://web.6parkbbs.com/index.php?act=bbs&bbsid=2015",
+      "access_flag": 1
+    },
+    {
+      "id": 54,
+      "section_title": "Other",
+      "title": "Sexy Zone",
+      "url_string": "https://www.cool18.com/bj/index.php",
+      "access_flag": 0
+    },
+    {
+      "id": 55,
+      "section_title": "Other",
+      "title": "Beautiful Images",
+      "url_string": "https://www.cool18.com/bbs2/index.php",
+      "access_flag": 0
+    },
+    {
+      "id": 56,
+      "section_title": "Other",
+      "title": "Sexy Stickers",
+      "url_string": "https://www.cool18.com/bbs/index.php",
+      "access_flag": 0
+    },
+    {
+      "id": 57,
+      "section_title": "Other",
+      "title": "Sexy Novels",
+      "url_string": "https://www.cool18.com/bbs4/index.php",
+      "access_flag": 0
+    },
+    {
+      "id": 58,
+      "section_title": "Other",
+      "title": "Selfie",
+      "url_string": "https://www.cool18.com/bbs6/index.php",
+      "access_flag": 0
+    },
+    {
+      "id": 59,
+      "section_title": "Other",
+      "title": "Sexy Free",
+      "url_string": "https://www.cool18.com/bbs5/index.php",
+      "access_flag": 0
+    },
+    {
+      "id": 60,
+      "section_title": "Other",
+      "title": "Sexy Animations",
+      "url_string": "https://www.cool18.com/bbs7/index.php",
+      "access_flag": 0
+    },
+    {
+      "id": 61,
+      "section_title": "Other",
+      "title": "New Animations",
+      "url_string": "https://web.6parkbbs.com/index.php?act=bbs&bbsid=2032",
+      "access_flag": 0
+    },
+    {
+      "id": 999,
+      "section_title": "Other",
+      "title": "More...",
+      "url_string": "-",
+      "access_flag": 1
+    }
+   ],
+  "menu_lang": {
+    "cn": [
+      {
+        "id": 1,
+        "section_title": "娱乐",
+        "title": "笑口常开"
+      },
+      {
+        "id": 2,
+        "section_title": "娱乐",
+        "title": "娱乐八卦"
+      },
+      {
+        "id": 3,
+        "section_title": "娱乐",
+        "title": "吃喝玩乐"
+      },
+      {
+        "id": 4,
+        "section_title": "娱乐",
+        "title": "音乐殿堂"
+      },
+      {
+        "id": 5,
+        "section_title": "娱乐",
+        "title": "网络歌坛"
+      },
+      {
+        "id": 6,
+        "section_title": "生活",
+        "title": "数码家电"
+      },
+      {
+        "id": 7,
+        "section_title": "生活",
+        "title": "摄影部落"
+      },
+      {
+        "id": 8,
+        "section_title": "生活",
+        "title": "各类美食"
+      },
+      {
+        "id": 9,
+        "section_title": "生活",
+        "title": "宠物情缘"
+      },
+      {
+        "id": 10,
+        "section_title": "生活",
+        "title": "驴友导航"
+      },
+      {
+        "id": 11,
+        "section_title": "休闲",
+        "title": "体坛纵横"
+      },
+      {
+        "id": 12,
+        "section_title": "休闲",
+        "title": "运动健身"
+      },
+      {
+        "id": 13,
+        "section_title": "休闲",
+        "title": "游戏天地"
+      },
+      {
+        "id": 14,
+        "section_title": "休闲",
+        "title": "卡通漫画"
+      },
+      {
+        "id": 15,
+        "section_title": "休闲",
+        "title": "命理玄机"
+      },
+      {
+        "id": 16,
+        "section_title": "信息",
+        "title": "经济观察"
+      },
+      {
+        "id": 17,
+        "section_title": "信息",
+        "title": "谈股论金"
+      },
+      {
+        "id": 18,
+        "section_title": "信息",
+        "title": "车迷沙龙"
+      },
+      {
+        "id": 19,
+        "section_title": "信息",
+        "title": "电脑前线"
+      },
+      {
+        "id": 20,
+        "section_title": "信息",
+        "title": "科技频道"
+      },
+      {
+        "id": 21,
+        "section_title": "情感",
+        "title": "婚姻家庭"
+      },
+      {
+        "id": 22,
+        "section_title": "情感",
+        "title": "情感世界"
+      },
+      {
+        "id": 23,
+        "section_title": "情感",
+        "title": "魅力时尚"
+      },
+      {
+        "id": 24,
+        "section_title": "情感",
+        "title": "女性频道"
+      },
+      {
+        "id": 25,
+        "section_title": "情感",
+        "title": "爱子情怀"
+      },
+      {
+        "id": 26,
+        "section_title": "评论",
+        "title": "网际谈兵"
+      },
+      {
+        "id": 27,
+        "section_title": "评论",
+        "title": "军事纵横"
+      },
+      {
+        "id": 28,
+        "section_title": "评论",
+        "title": "杂论闲侃"
+      },
+      {
+        "id": 29,
+        "section_title": "评论",
+        "title": "百家论坛"
+      },
+      {
+        "id": 30,
+        "section_title": "评论",
+        "title": "博论天下 "
+      },
+      {
+        "id": 31,
+        "section_title": "文化",
+        "title": "史海钩沉"
+      },
+      {
+        "id": 32,
+        "section_title": "文化",
+        "title": "文化长廊"
+      },
+      {
+        "id": 33,
+        "section_title": "文化",
+        "title": "唯美乐园"
+      },
+      {
+        "id": 34,
+        "section_title": "文化",
+        "title": "奇异珍宝"
+      },
+      {
+        "id": 35,
+        "section_title": "文化",
+        "title": "网络文坛"
+      },
+      {
+        "id": 36,
+        "section_title": "文化",
+        "title": "学习园地 "
+      },
+      {
+        "id": 37,
+        "section_title": "环球",
+        "title": "环球地理"
+      },
+      {
+        "id": 38,
+        "section_title": "环球",
+        "title": "环球经纬"
+      },
+      {
+        "id": 39,
+        "section_title": "环球",
+        "title": "环球百态"
+      },
+      {
+        "id": 40,
+        "section_title": "环球",
+        "title": "缘聚美国"
+      },
+      {
+        "id": 41,
+        "section_title": "环球",
+        "title": "缘聚加国"
+      },
+      {
+        "id": 42,
+        "section_title": "环球",
+        "title": "缘聚澳洲"
+      },
+      {
+        "id": 43,
+        "section_title": "环球",
+        "title": "留学移民"
+      },
+      {
+        "id": 44,
+        "section_title": "自媒",
+        "title": "抗疫信息"
+      },
+      {
+        "id": 45,
+        "section_title": "自媒",
+        "title": "手机数码"
+      },
+      {
+        "id": 46,
+        "section_title": "自媒",
+        "title": "声入人心"
+      },
+      {
+        "id": 47,
+        "section_title": "自媒",
+        "title": "在线视频"
+      },
+      {
+        "id": 48,
+        "section_title": "自媒",
+        "title": "非常影音"
+      },
+      {
+        "id": 49,
+        "section_title": "自媒",
+        "title": "全能影视"
+      },
+      {
+        "id": 50,
+        "section_title": "自媒",
+        "title": "温馨居家"
+      },
+      {
+        "id": 51,
+        "section_title": "其他",
+        "title": "女性频道"
+      },
+      {
+        "id": 52,
+        "section_title": "其他",
+        "title": "美女欣赏"
+      },
+      {
+        "id": 53,
+        "section_title": "其他",
+        "title": "意乱情迷"
+      },
+      {
+        "id": 54,
+        "section_title": "其他",
+        "title": "性趣论坛"
+      },
+      {
+        "id": 55,
+        "section_title": "其他",
+        "title": "青涩倩影"
+      },
+      {
+        "id": 56,
+        "section_title": "其他",
+        "title": "情趣贴图"
+      },
+      {
+        "id": 57,
+        "section_title": "其他",
+        "title": "禁忌书屋"
+      },
+      {
+        "id": 58,
+        "section_title": "其他",
+        "title": "网友自拍"
+      },
+      {
+        "id": 59,
+        "section_title": "其他",
+        "title": "青涩无忌"
+      },
+      {
+        "id": 60,
+        "section_title": "其他",
+        "title": "涩涩动漫"
+      },
+      {
+        "id": 61,
+        "section_title": "其他",
+        "title": "新❀华漫"
+      },
+      {
+        "id": 999,
+        "section_title": "其他",
+        "title": "更多..."
+      }
+    ]
+  }
+}
