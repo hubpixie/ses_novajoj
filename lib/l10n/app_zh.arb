@@ -64,5 +64,7 @@
     "bbsGuideB":"精华选读",
     "bbsGuideC":"全读",
     "bbsMenuList":"分类选读",           
+    "bbsSelectListForYou":"为您推选",
+    "bbsSelectListLatest":"最新",
     "msgNetworkUnavailable":"当前网络无法连接，请稍后重试！"
   }

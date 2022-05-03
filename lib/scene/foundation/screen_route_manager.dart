@@ -7,6 +7,7 @@ import 'package:ses_novajoj/scene/local_list/local_list_page_builder.dart';
 import 'package:ses_novajoj/scene/thread_list/thread_list_page_builder.dart';
 import 'package:ses_novajoj/scene/thread_detail/thread_detail_page_builder.dart';
 import 'package:ses_novajoj/scene/bbs_detail/bbs_detail_page_builder.dart';
+import 'package:ses_novajoj/scene/bbs_select_list/bbs_select_list_page_builder.dart';
 
 class ScreenRouteManager {
   static Route<dynamic> generateRoute(RouteSettings? settings) {
@@ -34,6 +35,10 @@ class ScreenRouteManager {
       case ScreenRouteName.bbsDetail:
         return MaterialPageRoute(
             builder: (_) => BbsDetailPageBuilder().page, settings: settings);
+      case ScreenRouteName.bbsSelectList:
+        return MaterialPageRoute(
+            builder: (_) => BbsSelectListPageBuilder().page,
+            settings: settings);
       default:
         return MaterialPageRoute(
             builder: (_) => Scaffold(

@@ -64,5 +64,7 @@
   "bbsGuideB":"BBS Essence",
   "bbsGuideC":"BBS Other",
   "bbsMenuList":"BBS Menu",
- "msgNetworkUnavailable": "Network is unavailable, please try again later"
+  "bbsSelectListForYou":"For You",
+  "bbsSelectListLatest":"Latest",
+  "msgNetworkUnavailable": "Network is unavailable, please try again later"
 }

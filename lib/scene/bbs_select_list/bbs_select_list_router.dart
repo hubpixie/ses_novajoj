@@ -1,31 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:ses_novajoj/scene/foundation/page/page_parameter.dart';
 import 'package:ses_novajoj/scene/foundation/page/screen_route_enums.dart';
-import 'package:ses_novajoj/foundation/log_util.dart';
 
-abstract class BbsMenuRouter {
-  void gotoBbsSelectList(Object context,
-      {required String appBarTitle,
-      Object? targetUrl,
-      Object? completeHandler});
+abstract class BbsSelectListRouter {
+  void gotoBbsDetail(Object context,
+      {required String appBarTitle, Object? itemInfo, Object? completeHandler});
 }
 
-class BbsMenuRouterImpl extends BbsMenuRouter {
-  BbsMenuRouterImpl();
+class BbsSelectListRouterImpl extends BbsSelectListRouter {
+  BbsSelectListRouterImpl();
 
   @override
-  void gotoBbsSelectList(Object context,
+  void gotoBbsDetail(Object context,
       {required String appBarTitle,
-      Object? targetUrl,
+      Object? itemInfo,
       Object? completeHandler}) {
-    log.info(
-        'gotoBbsSelectList: appBarTitle=$appBarTitle, targetUrl=$targetUrl');
     DateTime startDate = DateTime.now();
-    Navigator.pushNamed(
-        context as BuildContext, ScreenRouteName.bbsSelectList.name,
+    Navigator.pushNamed(context as BuildContext, ScreenRouteName.bbsDetail.name,
         arguments: {
-          BbsSelectListParamKeys.appBarTitle: appBarTitle,
-          BbsSelectListParamKeys.targetUrl: targetUrl
+          BbsDetailParamKeys.appBarTitle: appBarTitle,
+          BbsDetailParamKeys.itemInfo: itemInfo
         }).then((value) {
       if (completeHandler != null && completeHandler is Function) {
         DateTime endDate = DateTime.now();

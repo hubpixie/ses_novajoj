@@ -69,10 +69,6 @@ class _BbsMenuPageState extends State<BbsMenuPage>
         itemBuilder: (_, index) {
           bool isSameSection = true;
           String sectionName = menuDataList[index].sectionTitle;
-          String nextSectionName = sectionName;
-          if (index + 1 < menuDataList.length) {
-            nextSectionName = menuDataList[index + 1].sectionTitle;
-          }
 
           if (index == 0) {
             isSameSection = false;
@@ -96,16 +92,10 @@ class _BbsMenuPageState extends State<BbsMenuPage>
                 ),
               ),
               _buildRowTile(context, menuDataList: menuDataList, row: index),
-              const Divider(thickness: 1.0)
             ]);
           } else {
-            List<Widget> widgets = [
-              _buildRowTile(context, menuDataList: menuDataList, row: index),
-            ];
-            if (nextSectionName == sectionName) {
-              widgets.add(const Divider(thickness: 1.0));
-            }
-            return Column(children: widgets);
+            return _buildRowTile(context,
+                menuDataList: menuDataList, row: index);
           }
         });
   }
@@ -113,12 +103,16 @@ class _BbsMenuPageState extends State<BbsMenuPage>
   Widget _buildRowTile(BuildContext context,
       {required List<BbsMenuListRowViewModel> menuDataList, required int row}) {
     return ListTile(
+        shape: const ContinuousRectangleBorder(
+            side: BorderSide(width: 0.0, color: Colors.grey),
+            borderRadius: BorderRadius.zero),
         leading: const SizedBox(width: 10),
         title: Text(menuDataList[row].title),
         trailing: const Icon(Icons.keyboard_arrow_right),
         onTap: () {
           widget.presenter.eventSelectNextList(context,
-              appBarTitle: widget.pageState.subPageTitle,
+              appBarTitle:
+                  "${widget.pageState.subPageTitle}[${menuDataList[row].title}]",
               targetUrl: menuDataList[row].urlString,
               completeHandler: () {});
         });
