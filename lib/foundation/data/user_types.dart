@@ -39,6 +39,7 @@ class NovaItemInfo {
   int reads;
   bool isRead;
   bool isNew;
+  List<NovaItemInfo>? children;
 
   NovaItemInfo(
       {required this.id,
@@ -53,7 +54,8 @@ class NovaItemInfo {
       required this.commentCount,
       required this.reads,
       this.isRead = false,
-      this.isNew = false});
+      this.isNew = false,
+      this.children});
 }
 
 class NetworkType {}

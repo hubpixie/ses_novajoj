@@ -10,6 +10,7 @@ enum ScreenRouteName {
   threadDetail,
   bbsGuide,
   bbsDetail,
+  bbsSelectList,
 }
 
 extension ScreenRouteNameSummary on ScreenRouteName {
@@ -35,6 +36,8 @@ extension ScreenRouteNameSummary on ScreenRouteName {
         return 'bbsGuide';
       case ScreenRouteName.bbsDetail:
         return 'bbsDetail';
+      case ScreenRouteName.bbsSelectList:
+        return 'bbsSelectList';
       default:
         return '';
     }
@@ -56,6 +59,7 @@ extension ScreenRouteNameSummary on ScreenRouteName {
       case ScreenRouteName.threadDetail:
       case ScreenRouteName.bbsGuide:
       case ScreenRouteName.bbsDetail:
+      case ScreenRouteName.bbsSelectList:
         return toString().split(".").last;
       default:
         return null;

@@ -7,10 +7,17 @@ import 'package:ses_novajoj/scene/bbs_guide/bbs_guide_presenter_output.dart';
 import 'package:ses_novajoj/scene/widgets/simple_nova_item_cell.dart';
 import 'package:ses_novajoj/scene/widgets/error_view.dart';
 
+enum BbsGuideDestination { detail, selectList }
+
 class BbsGuidePageState {
   int subPageIndex;
   String subPageTitle;
-  BbsGuidePageState({required this.subPageIndex, required this.subPageTitle});
+  BbsGuideDestination nextPageDestination;
+
+  BbsGuidePageState(
+      {required this.subPageIndex,
+      required this.subPageTitle,
+      this.nextPageDestination = BbsGuideDestination.detail});
 }
 
 class BbsGuidePage extends StatefulWidget {
@@ -64,12 +71,25 @@ class _BbsGuidePageState extends State<BbsGuidePage>
                       itemBuilder: (context, index) => SimpleNovaListCell(
                           viewModel: data.viewModelList![index],
                           onCellSelecting: (selIndex) {
-                            widget.presenter.eventSelectDetail(context,
-                                appBarTitle: widget.pageState.subPageTitle,
-                                itemInfo: data.viewModelList![selIndex]
-                                    .itemInfo, completeHandler: () {
-                              _loadData(isReloaded: true);
-                            });
+                            if (widget.pageState.nextPageDestination ==
+                                BbsGuideDestination.detail) {
+                              widget.presenter.eventSelectDetail(context,
+                                  appBarTitle:
+                                      "${widget.pageState.subPageTitle}[${data.viewModelList![selIndex].itemInfo.source}]",
+                                  itemInfo: data.viewModelList![selIndex]
+                                      .itemInfo, completeHandler: () {
+                                _loadData(isReloaded: true);
+                              });
+                            } else if (widget.pageState.nextPageDestination ==
+                                BbsGuideDestination.selectList) {
+                              widget.presenter.eventSelectList(context,
+                                  appBarTitle:
+                                      "${widget.pageState.subPageTitle}[${data.viewModelList![selIndex].itemInfo.source}]",
+                                  targetUrl: data.viewModelList![selIndex]
+                                      .itemInfo.urlString, completeHandler: () {
+                                _loadData(isReloaded: true);
+                              });
+                            }
                           },
                           onThumbnailShowing: (thumbIndex) async {
                             if (data.viewModelList![thumbIndex].itemInfo

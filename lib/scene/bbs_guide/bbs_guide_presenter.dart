@@ -18,6 +18,10 @@ abstract class BbsGuidePresenter with SimpleBloc<BbsGuidePresenterOutput> {
   void eventViewReady({required BbsGuidePresenterInput input});
   void eventSelectDetail(Object context,
       {required String appBarTitle, Object? itemInfo, Object? completeHandler});
+  void eventSelectList(Object context,
+      {required String appBarTitle,
+      Object? targetUrl,
+      Object? completeHandler});
   Future<String> eventFetchThumbnail({required BbsGuidePresenterInput input});
 }
 
@@ -47,9 +51,20 @@ class BbsGuidePresenterImpl extends BbsGuidePresenter {
       {required String appBarTitle,
       Object? itemInfo,
       Object? completeHandler}) {
-    router.gotobsGuideDetail(context,
+    router.gotoBbsDetail(context,
         appBarTitle: appBarTitle,
         itemInfo: itemInfo,
+        completeHandler: completeHandler);
+  }
+
+  @override
+  void eventSelectList(Object context,
+      {required String appBarTitle,
+      Object? targetUrl,
+      Object? completeHandler}) {
+    router.gotoBbsSelectList(context,
+        appBarTitle: appBarTitle,
+        targetUrl: targetUrl,
         completeHandler: completeHandler);
   }
 

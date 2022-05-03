@@ -24,29 +24,11 @@ class _BbsMainPageState extends State<BbsMainPage> {
   @override
   void initState() {
     super.initState();
-    _guidePages = () {
-      List<Widget> pages = [
-        BbsGuidePageBuilder().page,
-        BbsGuidePageBuilder().page,
-        BbsGuidePageBuilder().page,
-        BbsMenuPageBuilder().page
-      ];
-      pages.asMap().forEach((idx, item) {
-        if (item is BbsGuidePage) {
-          BbsGuidePage page = item;
-          page.pageState.subPageIndex = idx;
-        } else if (item is BbsMenuPage) {
-          BbsMenuPage page = item;
-          page.pageState.subPageIndex = idx;
-        }
-      });
-      return pages;
-    }();
   }
 
   @override
   Widget build(BuildContext context) {
-    _initTabNames(context);
+    _initTabInfo(context);
 
     Widget widget = DefaultTabController(
       length: _tabNames.length,
@@ -139,14 +121,43 @@ class _BbsMainPageState extends State<BbsMainPage> {
     ];
   }
 
-  void _initTabNames(BuildContext context) {
-    if (_tabNames.isEmpty) {
-      _tabNames = <String>[
-        UseL10n.of(context)?.bbsGuideA ?? "",
-        UseL10n.of(context)?.bbsGuideB ?? "",
-        UseL10n.of(context)?.bbsGuideC ?? "",
-        UseL10n.of(context)?.bbsMenuList ?? "",
-      ];
+  void _initTabInfo(BuildContext context) {
+    if (_tabNames.isNotEmpty) {
+      return;
     }
+    _tabNames = <String>[
+      UseL10n.of(context)?.bbsGuideA ?? "",
+      UseL10n.of(context)?.bbsGuideB ?? "",
+      UseL10n.of(context)?.bbsGuideC ?? "",
+      UseL10n.of(context)?.bbsMenuList ?? "",
+    ];
+
+    _guidePages = () {
+      List<Widget> pages = [
+        BbsGuidePageBuilder().page,
+        BbsGuidePageBuilder().page,
+        BbsGuidePageBuilder().page,
+        BbsMenuPageBuilder().page
+      ];
+      pages.asMap().forEach((idx, item) {
+        if (item is BbsGuidePage) {
+          BbsGuidePage page = item;
+          page.pageState.subPageIndex = idx;
+          page.pageState.subPageTitle = _tabNames[idx];
+          if (idx == 0) {
+            page.pageState.nextPageDestination = BbsGuideDestination.detail;
+          } else if (idx == 1) {
+            page.pageState.nextPageDestination = BbsGuideDestination.selectList;
+          } else if (idx == 2) {
+            page.pageState.nextPageDestination = BbsGuideDestination.selectList;
+          }
+        } else if (item is BbsMenuPage) {
+          BbsMenuPage page = item;
+          page.pageState.subPageIndex = idx;
+          page.pageState.subPageTitle = _tabNames[idx];
+        }
+      });
+      return pages;
+    }();
   }
 }
