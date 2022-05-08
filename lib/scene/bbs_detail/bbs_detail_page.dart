@@ -1,7 +1,4 @@
-import 'dart:convert';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/gestures.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/foundation/log_util.dart';
 import 'package:ses_novajoj/foundation/firebase_util.dart';
@@ -12,7 +9,7 @@ import 'package:ses_novajoj/scene/foundation/page/page_parameter.dart';
 import 'package:ses_novajoj/scene/bbs_detail/bbs_detail_presenter.dart';
 import 'package:ses_novajoj/scene/bbs_detail/bbs_detail_presenter_output.dart';
 
-import 'package:webview_flutter/webview_flutter.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:ses_novajoj/scene/widgets/error_view.dart';
 
 class BbsDetailPage extends StatefulWidget {
@@ -28,6 +25,25 @@ class _BbsDetailPageState extends State<BbsDetailPage> {
   late Map? _parameters;
   late String _appBarTitle;
   late NovaItemInfo? _itemInfo;
+
+//-----------------------
+  final GlobalKey webViewKey = GlobalKey();
+
+  InAppWebViewController? webViewController;
+  InAppWebViewGroupOptions options = InAppWebViewGroupOptions(
+      crossPlatform: InAppWebViewOptions(
+        useShouldOverrideUrlLoading: true,
+        mediaPlaybackRequiresUserGesture: false,
+      ),
+      android: AndroidInAppWebViewOptions(
+        useHybridComposition: true,
+      ),
+      ios: IOSInAppWebViewOptions(
+        allowsInlineMediaPlayback: true,
+      ));
+  final urlController = TextEditingController();
+  double progress = 0;
+//--------------
 
   @override
   void initState() {
@@ -84,33 +100,80 @@ class _BbsDetailPageState extends State<BbsDetailPage> {
 
   Widget _buildContentArea(BuildContext context,
       {BbsDetailViewModel? detailItem}) {
-    return Flexible(
-      child: Wrap(
-        children: <Widget>[
-          Container(
-              alignment: Alignment.topLeft,
-              height: MediaQuery.of(context).size.height - 100,
-              width: MediaQuery.of(context).size.width,
-              child: WebView(
-                initialUrl: 'about:blank',
-                javascriptMode: JavascriptMode.unrestricted,
-                onWebViewCreated: (WebViewController controller) {
-                  //_controller = controller;
-                  controller.loadUrl(Uri.dataFromString(
-                          detailItem?.htmlText ?? '',
-                          mimeType: 'text/html',
-                          encoding: Encoding.getByName('utf-8'))
-                      .toString());
-                },
-                gestureNavigationEnabled: true,
-                gestureRecognizers: {
-                  Factory<OneSequenceGestureRecognizer>(
-                    () => LongPressGestureRecognizer(),
-                  ),
-                },
-              )),
-          const SizedBox(height: 5),
-          const Divider(height: 1.0, thickness: 1.0),
+    return Expanded(
+      child: Stack(
+        children: [
+          InAppWebView(
+            key: webViewKey,
+            initialUrlRequest: URLRequest(url: Uri.parse("about:blank")),
+            initialOptions: options,
+            onWebViewCreated: (controller) {
+              if ((detailItem?.htmlText ?? '').contains('home_login.php')) {
+                controller.loadUrl(
+                    urlRequest: URLRequest(
+                        url: Uri.parse(detailItem?.itemInfo.urlString ?? '')));
+              } else {
+                controller.loadData(
+                    data: detailItem?.htmlText ?? '',
+                    mimeType: 'text/html',
+                    encoding: 'utf8');
+              }
+              webViewController = controller;
+            },
+            onLoadStart: (controller, url) {
+              // setState(() {
+              //   this.url = url.toString();
+              //   urlController.text = this.url;
+              // });
+            },
+            androidOnPermissionRequest: (controller, origin, resources) async {
+              return PermissionRequestResponse(
+                  resources: resources,
+                  action: PermissionRequestResponseAction.GRANT);
+            },
+            shouldOverrideUrlLoading: (controller, navigationAction) async {
+              var uri = navigationAction.request.url!;
+
+              if (![
+                "http",
+                "https",
+                "file",
+                "chrome",
+                "data",
+                "javascript",
+                "about"
+              ].contains(uri.scheme)) {
+                return NavigationActionPolicy.CANCEL;
+              }
+
+              return NavigationActionPolicy.ALLOW;
+            },
+            onLoadStop: (controller, url) async {},
+            onLoadError: (controller, url, code, message) {
+              //pullToRefreshController.endRefreshing();
+            },
+            onProgressChanged: (controller, progress) {
+              if (progress == 100) {
+                //pullToRefreshController.endRefreshing();
+              }
+              setState(() {
+                this.progress = progress / 100;
+                // urlController.text = this.url;
+              });
+            },
+            onUpdateVisitedHistory: (controller, url, androidIsReload) {
+              setState(() {
+                // this.url = url.toString();
+                // urlController.text = this.url;
+              });
+            },
+            onConsoleMessage: (controller, consoleMessage) {
+              log.info(consoleMessage);
+            },
+          ),
+          progress < 1.0
+              ? LinearProgressIndicator(value: progress)
+              : Container(),
         ],
       ),
     );

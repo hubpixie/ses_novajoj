@@ -5,7 +5,7 @@ import 'package:html/parser.dart' as html_parser;
 import 'package:html/dom.dart';
 import 'package:ses_novajoj/foundation//log_util.dart';
 import 'package:ses_novajoj/foundation/data/date_util.dart';
-import 'package:ses_novajoj/foundation/data/number_ntil.dart';
+import 'package:ses_novajoj/foundation/data/number_util.dart';
 import 'package:ses_novajoj/foundation/data/string_util.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/foundation/data/result.dart';
@@ -145,12 +145,21 @@ class ThreadNovaWebApi extends BaseNovaWebApi {
 
     // title, urlString
     if (liCount > 0 && liSubElements[0].localName == 'a') {
-      title = liSubElements[0].innerHtml;
-      urlString = liSubElements[0].attributes["href"] ?? "";
-      if (!urlString.contains(parentUrl)) {
-        urlString = parentUrl + "/" + urlString;
-        //return retNovaItem;
-      }
+      title = () {
+        String retStr = liSubElements[0].innerHtml;
+        retStr = retStr.replaceAll('&nbsp;', ' ').trim();
+        retStr = retStr.replaceAll('&amp;', '&');
+        return retStr;
+      }();
+
+      urlString = () {
+        String retStr = liSubElements[0].attributes["href"] ?? "";
+        if (!retStr.contains(parentUrl)) {
+          retStr = parentUrl + "/" + retStr;
+        }
+        return retStr;
+      }();
+
       // thumbUrlString
       if (urlString.isNotEmpty && index < _kThumbLimit) {
         Result<String> thumbUrlResult = await fetchNovaItemThumbUrl(
@@ -228,8 +237,13 @@ class ThreadNovaWebApi extends BaseNovaWebApi {
 
     // title, urlString
     if (liCount > 1 && liSubElements[1].localName == 'a') {
-      title = StringUtil()
-          .substring(liSubElements[1].innerHtml, start: "</span> ", end: "");
+      title = () {
+        String retStr = StringUtil()
+            .substring(liSubElements[1].innerHtml, start: "</span> ", end: "");
+        retStr = retStr.replaceAll('&nbsp;', ' ').trim();
+        retStr = retStr.replaceAll('&amp;', '&');
+        return retStr;
+      }();
       urlString = liSubElements[1].attributes["href"] ?? "";
 
       // thumbUrlString
@@ -371,7 +385,6 @@ class ThreadNovaWebApi extends BaseNovaWebApi {
   /// </table>
   Future<ThreadNovaListItemRes?> _createNovaTrItem(String url,
       {required int index, required Element tr}) async {
-    ThreadNovaListItemRes? retNovaItem;
     int id = index;
     String thunnailUrlString = "";
     String title = "";
@@ -401,10 +414,14 @@ class ThreadNovaWebApi extends BaseNovaWebApi {
           retStr = retStr.replaceAll('&amp;', '&');
           return retStr;
         }();
-        urlString = tdSubElements[0].attributes["href"] ?? "";
-        if (!urlString.contains(parentUrl)) {
-          return retNovaItem;
-        }
+
+        urlString = () {
+          String retStr = tdSubElements[0].attributes["href"] ?? "";
+          if (!retStr.contains(parentUrl)) {
+            retStr = parentUrl + "/" + retStr;
+          }
+          return retStr;
+        }();
       }
 
       if (title.isEmpty) {

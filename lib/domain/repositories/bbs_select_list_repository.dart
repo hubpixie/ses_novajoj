@@ -3,10 +3,11 @@ import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/foundation/data/result.dart';
 
 class FetchBbsNovaSelectListRepoInput {
-  Object id;
-  String string;
+  String targetUrl;
+  NovaDocType docType;
 
-  FetchBbsNovaSelectListRepoInput({required this.id, required this.string});
+  FetchBbsNovaSelectListRepoInput(
+      {required this.targetUrl, required this.docType});
 }
 
 abstract class BbsNovaSelectListRepository {

@@ -5,7 +5,7 @@ import 'package:html/parser.dart' as html_parser;
 import 'package:html/dom.dart';
 import 'package:ses_novajoj/foundation//log_util.dart';
 import 'package:ses_novajoj/foundation/data/date_util.dart';
-import 'package:ses_novajoj/foundation/data/number_ntil.dart';
+import 'package:ses_novajoj/foundation/data/number_util.dart';
 import 'package:ses_novajoj/foundation/data/string_util.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/foundation/data/result.dart';

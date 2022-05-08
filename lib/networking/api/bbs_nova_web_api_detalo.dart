@@ -21,16 +21,32 @@ extension BbsNovaWebApiDetail on BbsNovaWebApi {
         return Result.failure(
             error: AppError.fromStatusCode(response.statusCode));
       }
+
       // prepares to parse nova list from response.body.
       final document = html_parser.parse(response.body);
       BbsDetaloItemRes? retVal;
 
-      final rootElement = document.getElementsByClassName('show_content').first;
+      final rootElement = () {
+        final elements = document.getElementsByClassName('show_content');
+        if (elements.isEmpty) {
+          return document.getElementsByClassName('c-box').first;
+        }
+        return elements.first;
+      }();
+
       if (parameter.docType == NovaDocType.detail) {
-        return _parseDetailItems(
-            parameter: parameter,
-            rootElement: document.getElementsByClassName('show_content').first,
-            infoElement: rootElement.getElementsByClassName('tab5').first);
+        final infoElements = rootElement.getElementsByClassName('c-box-a');
+        if (infoElements.isEmpty) {
+          return _parseDetailItems(
+              parameter: parameter,
+              rootElement: rootElement,
+              infoElement: rootElement.getElementsByClassName('tab5').first);
+        } else {
+          return _parseDetailDivItems(
+              parameter: parameter,
+              rootElement: rootElement,
+              infoElement: infoElements.first);
+        }
       }
 
       return Result.success(data: retVal!);
@@ -67,7 +83,7 @@ extension BbsNovaWebApiDetail on BbsNovaWebApi {
   ///            </table>
   ///            <!--bodybegin-->
   ///            <pre>
-  ///<p>【1】90 年代的服装新时尚<br /><p><center><img myDataSrc="https://www.popo8.com/host/data/202204/07/21/p1649376704_376type_jpeg_size_1080_80_end.jpg"  src="https://tva4.sinaimg.cn/mw2000/bc922383gy1h113d6z8zyj20u011i1kx.jpg"></center><br />
+  ///<p>【1】XXXXXX<br /><p><center><img myDataSrc="https://www.popo8.com/host/data/202204/07/21/p1649376704_376type_jpeg_size_1080_80_end.jpg"  src="https://tva4.sinaimg.cn/mw2000/bc922383gy1h113d6z8zyj20u011i1kx.jpg"></center><br />
   ///...</pre>
   ///            <!--bodyend-->
   ///        </td>
@@ -132,6 +148,70 @@ extension BbsNovaWebApiDetail on BbsNovaWebApi {
       // author
       retVal.itemInfo.author = () {
         final aLink = tdAuthor?.children
+            .firstWhere((element) => element.localName == 'a');
+        return aLink?.innerHtml ?? '';
+      }();
+
+      return Result.success(data: retVal);
+    } on AppError catch (error) {
+      return Result.failure(error: error);
+    } on Exception catch (error) {
+      return Result.failure(error: AppError.fromException(error));
+    }
+  }
+
+  Future<Result<BbsDetaloItemRes>> _parseDetailDivItems(
+      {required NovaDetaloParameter parameter,
+      Element? rootElement,
+      Element? infoElement}) async {
+    try {
+      String bodyString =
+          rootElement?.getElementsByTagName('pre').first.innerHtml ?? '';
+      BbsDetaloItemRes retVal = BbsDetaloItemRes(
+          itemInfo: parameter.itemInfo, bodyString: bodyString);
+      if (rootElement?.children == null) {
+        log.severe('rootElement?.children == null');
+        throw AppError(
+            type: AppErrorType.dataError,
+            reason: FailureReason.missingRootNode);
+      }
+
+      // <div class="c-box-a"><div>
+      //  <a>author</a>
+      //  <a>xxx-xx-xx xx:xx </a>
+      // </div></div>
+      Element? divAuthor = (Element? inElement) {
+        final element = inElement?.children.first;
+        if (element != null && element.children.isNotEmpty) {
+          return element;
+        }
+        return null;
+      }(infoElement);
+
+      // createAt (detail)
+      retVal.itemInfo.createAt = (DateTime value) {
+        String infoStr = divAuthor?.innerHtml ?? '';
+        if (infoStr.isEmpty) {
+          return value;
+        }
+        // XXXX-XX-XX XX:XX *** XXXX
+        String dateStr = '';
+        final dateLoc = infoStr.indexOf(
+            RegExp(r' [0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}.*[0-9]+ '),
+            0);
+        if (dateLoc >= 0) {
+          dateStr = infoStr.substring(dateLoc + 1, dateLoc + 17);
+        }
+        return DateUtil().fromString(dateStr, format: 'yyyy-MM-dd H:mm') ??
+            value;
+      }(retVal.itemInfo.createAt);
+
+      // author
+      retVal.itemInfo.author = () {
+        if (divAuthor?.children.isEmpty ?? true) {
+          return '';
+        }
+        final aLink = divAuthor?.children
             .firstWhere((element) => element.localName == 'a');
         return aLink?.innerHtml ?? '';
       }();

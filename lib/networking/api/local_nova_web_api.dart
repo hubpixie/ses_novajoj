@@ -5,7 +5,7 @@ import 'package:html/parser.dart' as html_parser;
 import 'package:html/dom.dart';
 import 'package:ses_novajoj/foundation//log_util.dart';
 import 'package:ses_novajoj/foundation/data/date_util.dart';
-import 'package:ses_novajoj/foundation/data/number_ntil.dart';
+import 'package:ses_novajoj/foundation/data/number_util.dart';
 import 'package:ses_novajoj/foundation/data/string_util.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/foundation/data/result.dart';
@@ -139,11 +139,16 @@ class LocalNovaWebApi extends BaseNovaWebApi {
         retStr = retStr.replaceAll('&amp;', '&');
         return retStr;
       }();
-      urlString = liSubElements[0].attributes["href"] ?? "";
-      if (!urlString.contains(parentUrl)) {
-        urlString = parentUrl + "/" + urlString;
-        //return retNovaItem;
-      }
+
+      urlString = () {
+        String retStr = liSubElements[0].attributes["href"] ?? "";
+        if (!retStr.contains(parentUrl)) {
+          retStr = parentUrl + "/" + retStr;
+        }
+        retStr = retStr.replaceAll('\\"', '');
+        return retStr;
+      }();
+
       // thumbUrlString
       if (urlString.isNotEmpty && index < _kThumbLimit) {
         Result<String> thumbUrlResult = await fetchNovaItemThumbUrl(
