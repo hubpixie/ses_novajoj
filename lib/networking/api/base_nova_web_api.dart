@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:async';
 import 'dart:io';
 import 'package:html/parser.dart' as html_parser;
@@ -8,6 +9,12 @@ import 'package:ses_novajoj/networking/api_client/base_api_client.dart';
 import 'package:ses_novajoj/networking/request/nova_item_parameter.dart';
 
 class BaseNovaWebApi {
+  static const String kSampleUrlStr =
+      'aHR0cHM6Ly9ob21lLjZwYXJrLmNvbS9pbmRleC5waHA/YXBwPWxvZ2luJmFjdD1kb2xvZ2lu';
+  //'aHR0cHM6Ly93ZWIuNnBhcmtiYnMuY29tL3B1Yl9wYWdlL2hvbWVfbG9naW4ucGhw';
+  static const String kSampleUrlParams = 'cGljaG82cGFya0A6d2FoYWhhQF8=';
+  static bool _logined = false;
+
   ///
   /// api entry: fetchNovaItemThumbUrl
   ///
@@ -98,6 +105,43 @@ class BaseNovaWebApi {
       return Result.success(data: retStr);
     } on AppError catch (error) {
       return Result.failure(error: error);
+    } on Exception catch (error) {
+      return Result.failure(error: AppError.fromException(error));
+    }
+  }
+
+  Future<Result<bool>> performSampleLogin(
+      String username, String password) async {
+    try {
+      if (_logined) {
+        return Result.success(data: _logined);
+      }
+      Codec<String, String> codec = utf8.fuse(base64);
+      //Map<String, String> headers = {"Content-type": "application/json"};
+
+      Map<String, String> dataBody = {
+        'username': codec.decode(kSampleUrlParams).split('@:').first,
+        'password': (String str) {
+          return str.substring(0, str.length - 2);
+        }(codec.decode(kSampleUrlParams).split('@:').last),
+        'dologin': '%20%E7%99%BB%E5%BD%95%20'
+      };
+
+      // make POST request
+      final response = await BaseApiClient.client
+          .post(Uri.parse(codec.decode(kSampleUrlStr)),
+              /*headers: headers,*/
+              body: dataBody);
+      // check the status code for the result
+      int statusCode = response.statusCode;
+
+      if (statusCode < HttpStatus.badRequest) {
+        _logined = true;
+        return const Result.success(data: true);
+      } else {
+        return Result.failure(
+            error: AppError.fromStatusCode(response.statusCode));
+      }
     } on Exception catch (error) {
       return Result.failure(error: AppError.fromException(error));
     }

@@ -1,4 +1,3 @@
-import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/domain/foundation/bloc/simple_bloc.dart';
 import 'package:ses_novajoj/domain/usecases/bbs_select_list_usecase.dart';
 import 'package:ses_novajoj/domain/usecases/bbs_select_list_usecase_output.dart';
@@ -7,10 +6,11 @@ import 'bbs_select_list_presenter_output.dart';
 import 'bbs_select_list_router.dart';
 
 class BbsSelectListPresenterInput {
-  String itemUrl;
+  String targetUrl;
   bool isReloaded;
 
-  BbsSelectListPresenterInput({required this.itemUrl, this.isReloaded = false});
+  BbsSelectListPresenterInput(
+      {required this.targetUrl, this.isReloaded = false});
 }
 
 abstract class BbsSelectListPresenter
@@ -42,7 +42,8 @@ class BbsSelectListPresenterImpl extends BbsSelectListPresenter {
 
   @override
   void eventViewReady({required BbsSelectListPresenterInput input}) {
-    useCase.fetchBbsSelectList(input: BbsSelectListUseCaseInput());
+    useCase.fetchBbsSelectList(
+        input: BbsSelectListUseCaseInput(targetUrl: input.targetUrl));
   }
 
   @override

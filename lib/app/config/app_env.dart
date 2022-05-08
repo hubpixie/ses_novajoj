@@ -13,7 +13,9 @@ class AppEnv {
 
   static void configure(Flavor flavor) async {
     WidgetsFlutterBinding.ensureInitialized();
-    await Firebase.initializeApp();
+    if (flavor != Flavor.web) {
+      await Firebase.initializeApp();
+    }
 
     _flavor = flavor;
   }

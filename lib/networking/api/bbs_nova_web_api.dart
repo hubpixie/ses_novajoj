@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:async/async.dart' as future_ext;
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:html/parser.dart' as html_parser;
 import 'package:html/dom.dart';
 import 'package:ses_novajoj/foundation//log_util.dart';
 import 'package:ses_novajoj/foundation/data/date_util.dart';
 import 'package:ses_novajoj/foundation/data/string_util.dart';
+import 'package:ses_novajoj/foundation/data/number_util.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/foundation/data/result.dart';
 import 'package:ses_novajoj/networking/api_client/base_api_client.dart';
@@ -13,9 +15,11 @@ import 'package:ses_novajoj/networking/api/base_nova_web_api.dart';
 import 'package:ses_novajoj/networking/request/nova_item_parameter.dart';
 import 'package:ses_novajoj/networking/request/nova_detalo_parameter.dart';
 import 'package:ses_novajoj/networking/response/bbs_nova_guide_response.dart';
+import 'package:ses_novajoj/networking/response/bbs_select_list_response.dart';
 import 'package:ses_novajoj/networking/response/bbs_detalo_item_response.dart';
 
 part 'bbs_nova_web_api_detalo.dart';
+part 'bbs_nova_web_api_select.dart';
 
 class BbsNovaWebApi extends BaseNovaWebApi {
   static const int _kThumbLimit = 5;
@@ -114,49 +118,39 @@ class BbsNovaWebApi extends BaseNovaWebApi {
 
     // title, urlString
     if (aLink.innerHtml.isNotEmpty) {
-      title = (String parentInnerHtml) {
-        String retStr = "${index + 1} ";
-        int prefixLen = 0;
-        if (parentInnerHtml.contains(RegExp(r'☉\[.{2}\]'), 0)) {
-          prefixLen = 2;
-        } else if (parentInnerHtml.contains(RegExp(r'☉\[.{4}\]'), 0)) {
-          prefixLen = 4;
-        }
-
-        int prefixPos = parentInnerHtml.indexOf(aLink.outerHtml);
-        if (prefixPos - prefixLen - 1 >= 0) {
-          retStr += '[' +
-              parentInnerHtml.substring(
-                  prefixPos - prefixLen - 1, prefixPos - 1) +
-              ']';
-        }
+      title = () {
+        String retStr = '${index + 1} ';
         retStr += aLink.innerHtml;
-        if (retStr.contains('<a ')) {
-          return '';
-        }
         retStr = retStr.replaceAll('&nbsp;', ' ').trim();
         retStr = retStr.replaceAll('&amp;', '&');
         return retStr;
-      }(aLink.parent?.innerHtml ?? '');
+      }();
 
       urlString = () {
         String str = aLink.attributes['href'] ?? '';
         str = str.replaceAll('\\"', '');
         return str;
       }();
+    }
 
-      // thumbUrlString
-      if (title.isNotEmpty) {
-        if (urlString.isNotEmpty && index < _kThumbLimit) {
-          Result<String> thumbUrlResult = await fetchNovaItemThumbUrl(
-              parameter: NovaItemParameter(
-                  targetUrl: urlString, docType: NovaDocType.thumb));
-          thumbUrlResult.when(
-              success: (value) {
-                thunnailUrlString = value;
-              },
-              failure: (value) {});
-        }
+    // source
+    if (aLink.innerHtml.isNotEmpty) {
+      source = () {
+        return StringUtil().substring(aLink.innerHtml, start: '☉[', end: ']');
+      }();
+    }
+
+    // thumbUrlString
+    if (title.isNotEmpty) {
+      if (urlString.isNotEmpty && index < _kThumbLimit) {
+        Result<String> thumbUrlResult = await fetchNovaItemThumbUrl(
+            parameter: NovaItemParameter(
+                targetUrl: urlString, docType: NovaDocType.thumb));
+        thumbUrlResult.when(
+            success: (value) {
+              thunnailUrlString = value;
+            },
+            failure: (value) {});
       }
     }
 
@@ -194,30 +188,44 @@ class BbsNovaWebApi extends BaseNovaWebApi {
     // title, urlString
     if (aLink.innerHtml.isNotEmpty) {
       title = () {
-        String retStr = "${index + 1} ";
-        retStr += '[' +
+        String retStr = '${index + 1} ';
+        retStr += '☉[' +
             StringUtil().substring(aLink.innerHtml, start: '>[', end: ']<') +
-            ']';
-        retStr +=
-            StringUtil().substring(aLink.innerHtml, start: '', end: ' <span');
+            ']'; //item_source type
+        retStr += StringUtil()
+            .substring(aLink.innerHtml, start: '', end: ' <span')
+            .replaceAll(RegExp(r'^[0-9]*[0-9]{1} +'), '');
         retStr = retStr.replaceAll('&nbsp;', ' ').trim();
         retStr = retStr.replaceAll('&amp;', '&');
         return retStr;
       }();
 
-      urlString = aLink.attributes['href'] ?? '';
+      urlString = () {
+        String str = aLink.attributes['href'] ?? '';
+        str = str.replaceAll('\\"', '');
+        return str;
+      }();
+    }
 
-      // thumbUrlString
-      if (urlString.isNotEmpty && index < _kThumbLimit) {
-        Result<String> thumbUrlResult = await fetchNovaItemThumbUrl(
-            parameter: NovaItemParameter(
-                targetUrl: urlString, docType: NovaDocType.thumb));
-        thumbUrlResult.when(
-            success: (value) {
-              thunnailUrlString = value;
-            },
-            failure: (value) {});
-      }
+    // source
+    if (aLink.innerHtml.isNotEmpty) {
+      source = () {
+        String retStr =
+            StringUtil().substring(aLink.innerHtml, start: '>[', end: ']<');
+        return retStr;
+      }();
+    }
+
+    // thumbUrlString
+    if (urlString.isNotEmpty && index < _kThumbLimit) {
+      Result<String> thumbUrlResult = await fetchNovaItemThumbUrl(
+          parameter: NovaItemParameter(
+              targetUrl: urlString, docType: NovaDocType.thumb));
+      thumbUrlResult.when(
+          success: (value) {
+            thunnailUrlString = value;
+          },
+          failure: (value) {});
     }
 
     NovaItemInfo itemInfo = NovaItemInfo(

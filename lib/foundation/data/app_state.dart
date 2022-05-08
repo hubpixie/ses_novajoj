@@ -1,3 +1,3 @@
 class AppState {
-  static bool isLogined = false;
+  static bool isLogined = true;
 }

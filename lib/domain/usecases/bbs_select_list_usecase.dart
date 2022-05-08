@@ -6,7 +6,10 @@ import 'package:ses_novajoj/foundation/data/user_types.dart';
 
 import 'bbs_select_list_usecase_output.dart';
 
-class BbsSelectListUseCaseInput {}
+class BbsSelectListUseCaseInput {
+  String targetUrl;
+  BbsSelectListUseCaseInput({required this.targetUrl});
+}
 
 abstract class BbsSelectListUseCase
     with SimpleBloc<BbsSelectListUseCaseOutput> {
@@ -21,7 +24,7 @@ class BbsSelectListUseCaseImpl extends BbsSelectListUseCase {
   void fetchBbsSelectList({required BbsSelectListUseCaseInput input}) async {
     final result = await repository.fetchBbsNovaSelectList(
         input: FetchBbsNovaSelectListRepoInput(
-            id: 9999, string: "99999" /* // TODO: dummy code*/));
+            targetUrl: input.targetUrl, docType: NovaDocType.bbsSelect));
 
     result.when(success: (value) {
       List<BbsNovaSelectListItem> list = value;

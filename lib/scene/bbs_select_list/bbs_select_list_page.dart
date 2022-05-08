@@ -1,11 +1,8 @@
-import 'dart:async';
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/foundation/log_util.dart';
 import 'package:ses_novajoj/foundation/firebase_util.dart';
 import 'package:ses_novajoj/domain/foundation/bloc/bloc_provider.dart';
-import 'package:ses_novajoj/scene/foundation/page/screen_route_enums.dart';
 import 'package:ses_novajoj/scene/foundation/use_l10n.dart';
 import 'package:ses_novajoj/scene/foundation/page/page_parameter.dart';
 import 'package:ses_novajoj/scene/bbs_select_list/bbs_select_list_presenter.dart';
@@ -56,10 +53,10 @@ class _BbsSelectListPageState extends State<BbsSelectListPage> {
               if (data is ShowBbsSelectListPageModel) {
                 if (data.error == null) {
                   return CustomScrollView(
-                    slivers: [
-                      _buildForYouList(context, dataList: data.viewModelList!),
-                      _buildLatestList(context, dataList: data.viewModelList!)
-                    ],
+                    slivers: _buildForYouList(context,
+                            dataList: data.viewModelList!) +
+                        _buildLatestList(context,
+                            dataList: data.viewModelList!),
                   );
                 } else {
                   return Text("${data.error}");
@@ -73,62 +70,72 @@ class _BbsSelectListPageState extends State<BbsSelectListPage> {
     );
   }
 
-  Widget _buildForYouList(BuildContext context,
+  List<Widget> _buildForYouList(BuildContext context,
       {required List<BbsSelectListRowViewModel> dataList}) {
     List<BbsSelectListRowViewModel> foryouList =
         dataList.where((element) => element.itemInfo.id < 100).toList();
-    return SliverList(
-        delegate: SliverChildBuilderDelegate((context, index) {
-      if (index == 0) {
-        return Column(children: [
-          Container(
-            height: 40,
-            color: Colors.grey[300],
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 20, top: 10),
-                  child: Text(UseL10n.of(context)?.bbsSelectListForYou ?? ''),
-                )
-              ],
+    if (foryouList.isEmpty) {
+      return [];
+    }
+    return [
+      SliverList(
+          delegate: SliverChildBuilderDelegate((context, index) {
+        if (index == 0) {
+          return Column(children: [
+            Container(
+              height: 40,
+              color: Colors.grey[300],
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 20, top: 10),
+                    child: Text(UseL10n.of(context)?.bbsSelectListForYou ?? ''),
+                  )
+                ],
+              ),
             ),
-          ),
-          _buildForYouRowTile(context, dataList: foryouList, row: index),
-        ]);
-      } else {
-        return _buildForYouRowTile(context, dataList: foryouList, row: index);
-      }
-    }, childCount: foryouList.length));
+            _buildForYouRowTile(context, dataList: foryouList, row: index),
+          ]);
+        } else {
+          return _buildForYouRowTile(context, dataList: foryouList, row: index);
+        }
+      }, childCount: foryouList.length))
+    ];
   }
 
-  Widget _buildLatestList(BuildContext context,
+  List<Widget> _buildLatestList(BuildContext context,
       {required List<BbsSelectListRowViewModel> dataList}) {
     List<BbsSelectListRowViewModel> latestList =
         dataList.where((element) => element.itemInfo.id >= 100).toList();
-    return SliverList(
-        delegate: SliverChildBuilderDelegate((context, index) {
-      if (index == 0) {
-        return Column(children: [
-          Container(
-            height: 40,
-            color: Colors.grey[300],
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 20, top: 10),
-                  child: Text(UseL10n.of(context)?.bbsSelectListLatest ?? ''),
-                )
-              ],
+    if (latestList.isEmpty) {
+      return [];
+    }
+    return [
+      SliverList(
+          delegate: SliverChildBuilderDelegate((context, index) {
+        if (index == 0) {
+          return Column(children: [
+            Container(
+              height: 40,
+              color: Colors.grey[300],
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 20, top: 10),
+                    child: Text(UseL10n.of(context)?.bbsSelectListLatest ?? ''),
+                  )
+                ],
+              ),
             ),
-          ),
-          _buildLatestRowTile(context, dataList: latestList, row: index),
-        ]);
-      } else {
-        return _buildLatestRowTile(context, dataList: latestList, row: index);
-      }
-    }, childCount: latestList.length));
+            _buildLatestCard(context, dataList: latestList, row: index),
+          ]);
+        } else {
+          return _buildLatestCard(context, dataList: latestList, row: index);
+        }
+      }, childCount: latestList.length))
+    ];
   }
 
   Widget _buildForYouRowTile(BuildContext context,
@@ -138,7 +145,9 @@ class _BbsSelectListPageState extends State<BbsSelectListPage> {
         shape: const ContinuousRectangleBorder(
             side: BorderSide(width: 0.0, color: Colors.grey),
             borderRadius: BorderRadius.zero),
-        title: Text(dataList[row].itemInfo.title),
+        title: Padding(
+            padding: const EdgeInsets.only(left: 12.0),
+            child: Text(dataList[row].itemInfo.title)),
         trailing: const Icon(Icons.keyboard_arrow_right),
         onTap: () {
           widget.presenter.eventSelectDetail(context,
@@ -149,48 +158,93 @@ class _BbsSelectListPageState extends State<BbsSelectListPage> {
         });
   }
 
-  Widget _buildLatestRowTile(BuildContext context,
+  Widget _buildLatestCard(BuildContext context,
       {required List<BbsSelectListRowViewModel> dataList, required int row}) {
     return Card(
       color: Colors.grey[100],
-      child: ExpansionTile(
-        title: TextButton(
-            style: TextButton.styleFrom(
-              primary: Colors.black,
+      child: (dataList[row].itemInfo.children?.isEmpty ?? true)
+          ? _buildLatestRowTile(context, itemInfo: dataList[row].itemInfo)
+          : ExpansionTile(
+              title: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TextButton(
+                      style: TextButton.styleFrom(
+                          alignment: Alignment.centerRight,
+                          primary: Colors.black54),
+                      child: Text(
+                        dataList[row].itemInfo.title,
+                        style: const TextStyle(fontSize: 16.0),
+                      ),
+                      onPressed: () {
+                        widget.presenter.eventSelectDetail(context,
+                            appBarTitle: _appBarTitle,
+                            itemInfo: dataList[row].itemInfo,
+                            completeHandler: () {
+                          _loadData();
+                        });
+                      },
+                    ),
+                    Row(children: [
+                      const SizedBox(width: 10),
+                      Text(
+                        dataList[row].itemInfo.source,
+                        style: const TextStyle(
+                            fontSize: 14.0, color: Colors.black45),
+                      ),
+                      const Spacer(),
+                      Text(
+                        BbsSelectListRowViewModel.asCreateAtText(
+                            dataList[row].itemInfo.createAt),
+                        style: const TextStyle(
+                            fontSize: 14.0, color: Colors.black45),
+                      ),
+                    ])
+                  ]),
+              children: <Widget>[
+                _buildLatestRowTile(context,
+                    itemInfo: dataList[row].itemInfo.children!.first,
+                    isSub: true),
+              ],
+              iconColor: Colors.black54,
+              textColor: Colors.black45,
             ),
-            onPressed: () {
-              widget.presenter.eventSelectDetail(context,
-                  appBarTitle: _appBarTitle,
-                  itemInfo: dataList[row].itemInfo, completeHandler: () {
-                _loadData();
-              });
-            },
-            child: Text(
-              dataList[row].itemInfo.title,
-              style: const TextStyle(fontSize: 16.0),
-            )),
-        children: <Widget>[
-          ListTile(
-              title: Row(children: [
-                const SizedBox(width: 10),
-                Text(
-                  dataList[row].itemInfo.children?.first.title ?? '',
-                  style: const TextStyle(fontSize: 15.0),
-                ),
-              ]),
-              trailing: const Icon(Icons.keyboard_arrow_right),
-              onTap: () {
-                widget.presenter.eventSelectDetail(context,
-                    appBarTitle: _appBarTitle,
-                    itemInfo: dataList[row].itemInfo.children?.first,
-                    completeHandler: () {
-                  _loadData();
-                });
-              })
-        ],
-        iconColor: Colors.black54,
-      ),
     );
+  }
+
+  Widget _buildLatestRowTile(BuildContext context,
+      {required NovaItemInfo itemInfo, bool isSub = false}) {
+    return ListTile(
+        title: Padding(
+          padding: isSub
+              ? const EdgeInsets.only(left: 14)
+              : const EdgeInsets.only(left: 8),
+          child: Text(
+            itemInfo.title,
+            style: const TextStyle(fontSize: 16.0),
+          ),
+        ),
+        subtitle: Row(children: [
+          Padding(
+              padding: const EdgeInsets.only(left: 8.0),
+              child: Text(
+                itemInfo.source,
+                style: const TextStyle(fontSize: 14.0),
+              )),
+          const Spacer(),
+          Text(
+            BbsSelectListRowViewModel.asCreateAtText(itemInfo.createAt),
+            style: const TextStyle(fontSize: 14.0),
+          ),
+        ]),
+        trailing: const Icon(Icons.keyboard_arrow_right),
+        onTap: () {
+          widget.presenter.eventSelectDetail(context,
+              appBarTitle: _appBarTitle,
+              itemInfo: itemInfo, completeHandler: () {
+            _loadData();
+          });
+        });
   }
 
   void _parseRouteParameter() {
@@ -218,7 +272,7 @@ class _BbsSelectListPageState extends State<BbsSelectListPage> {
   void _loadData() {
     if (_targetUrl != null) {
       widget.presenter.eventViewReady(
-          input: BbsSelectListPresenterInput(itemUrl: _targetUrl ?? ''));
+          input: BbsSelectListPresenterInput(targetUrl: _targetUrl ?? ''));
     } else {
       log.warning('thread_detail_page: parameter is error!');
     }

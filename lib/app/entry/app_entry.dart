@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:ses_novajoj/foundation/firebase_util.dart';
 import 'package:ses_novajoj/foundation/log_util.dart';
@@ -21,7 +22,8 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       onGenerateRoute: ScreenRouteManager.generateRoute,
-      navigatorObservers: <NavigatorObserver>[FirebaseUtil().observer],
+      navigatorObservers:
+          kIsWeb ? [] : <NavigatorObserver>[FirebaseUtil().observer],
       home: SplashPageBuilder().page,
     );
   }

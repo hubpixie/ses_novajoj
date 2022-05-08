@@ -8,6 +8,7 @@ enum NovaDocType {
   detail,
   bbsList,
   bbsEtcList,
+  bbsSelect,
   threadList
 }
 
