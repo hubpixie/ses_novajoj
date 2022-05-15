@@ -147,9 +147,9 @@ class _BbsMainPageState extends State<BbsMainPage> {
           if (idx == 0) {
             page.pageState.nextPageDestination = BbsGuideDestination.detail;
           } else if (idx == 1) {
-            page.pageState.nextPageDestination = BbsGuideDestination.selectList;
-          } else if (idx == 2) {
             page.pageState.nextPageDestination = BbsGuideDestination.detail;
+          } else if (idx == 2) {
+            page.pageState.nextPageDestination = BbsGuideDestination.selectList;
           }
         } else if (item is BbsMenuPage) {
           BbsMenuPage page = item;

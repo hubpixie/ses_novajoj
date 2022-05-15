@@ -240,7 +240,7 @@ extension BbsNovaWebApiSelect on BbsNovaWebApi {
       }();
       urlString = () {
         String retStr = liSubElements[0].attributes["href"] ?? "";
-        if (!retStr.contains(parentUrl)) {
+        if (!retStr.contains(RegExp(r'http(s)*:\/\/'))) {
           retStr = parentUrl + "/" + retStr;
         }
         return retStr;
@@ -396,7 +396,7 @@ extension BbsNovaWebApiSelect on BbsNovaWebApi {
       // urlString
       urlString = () {
         String retStr = alink.attributes["href"] ?? "";
-        if (!retStr.contains(parentUrl)) {
+        if (!retStr.contains(RegExp(r'http(s)*:\/\/'))) {
           retStr = parentUrl + "/" + retStr;
         }
         return retStr;

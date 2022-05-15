@@ -84,7 +84,7 @@ extension NovaWebApiDetail on NovaWebApi {
     try {
       NovaDetaloItemRes retVal = NovaDetaloItemRes(
           itemInfo: parameter.itemInfo,
-          bodyString: detailElement?.innerHtml ?? '');
+          bodyString: reshapeDetailBodyTags(detailElement));
       String source = parameter.itemInfo.source;
       if (rootElement?.children == null) {
         log.severe('rootElement?.children == null');

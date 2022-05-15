@@ -154,7 +154,7 @@ class ThreadNovaWebApi extends BaseNovaWebApi {
 
       urlString = () {
         String retStr = liSubElements[0].attributes["href"] ?? "";
-        if (!retStr.contains(parentUrl)) {
+        if (!retStr.contains(RegExp(r'http(s)*:\/\/'))) {
           retStr = parentUrl + "/" + retStr;
         }
         return retStr;
@@ -417,7 +417,7 @@ class ThreadNovaWebApi extends BaseNovaWebApi {
 
         urlString = () {
           String retStr = tdSubElements[0].attributes["href"] ?? "";
-          if (!retStr.contains(parentUrl)) {
+          if (!retStr.contains(RegExp(r'http(s)*:\/\/'))) {
             retStr = parentUrl + "/" + retStr;
           }
           return retStr;

@@ -13,13 +13,15 @@ class BaseNovaWebApi {
       'aHR0cHM6Ly9ob21lLjZwYXJrLmNvbS9pbmRleC5waHA/YXBwPWxvZ2luJmFjdD1kb2xvZ2lu';
   //'aHR0cHM6Ly93ZWIuNnBhcmtiYnMuY29tL3B1Yl9wYWdlL2hvbWVfbG9naW4ucGhw';
   static const String kSampleUrlParams = 'cGljaG82cGFya0A6d2FoYWhhQF8=';
+  static const String kSampleReplacedPkCode =
+      'Pihjb29sMTh8NnBhcmspXC5jb208Ly8+IDw=@@';
   static bool _logined = false;
 
   ///
   /// api entry: fetchNovaItemThumbUrl
   ///
   /// <div id='shownewsc' style="margin:15px;">
-  /// 			新闻新闻新闻新闻新闻。<br />
+  ///       新闻新闻新闻新闻新闻。<br />
   /// <br />
   /// 新闻新闻新闻新闻新闻新闻新闻新闻新闻。<br />
   /// <br />
@@ -36,10 +38,10 @@ class BaseNovaWebApi {
   /// 图源：Hello BC</center><br />
   /// <br />
   /// 新闻新闻新闻新闻新闻新闻新闻新闻新闻新闻新闻新闻。<br />
-  /// 			<div>
-  /// 				<div class="OUTBRAIN" data-src="DROP_PERMALINK_HERE" data-widget-id="AR_1"></div> <script type="text/javascript" async="async" src="//widgets.outbrain.com/outbrain.js"></script>
-  /// 			</div>
-  /// 			</div>
+  ///       <div>
+  ///         <div class="OUTBRAIN" data-src="DROP_PERMALINK_HERE" data-widget-id="AR_1"></div> <script type="text/javascript" async="async" src="//widgets.outbrain.com/outbrain.js"></script>
+  ///       </div>
+  ///       </div>
   ///
   Future<Result<String>> fetchNovaItemThumbUrl(
       {required NovaItemParameter parameter}) async {
@@ -64,7 +66,8 @@ class BaseNovaWebApi {
         bool ret = false;
         if (element.attributes.keys.contains("src")) {
           String imgSrc = element.attributes["src"] ?? "";
-          ret = imgSrc.contains("https://www.popo8.com/");
+          ret = imgSrc.contains("https://www.popo8.com/") ||
+              element.attributes['mydatasrc'] != null;
           if (ret) {
             return ret;
           }
@@ -72,7 +75,15 @@ class BaseNovaWebApi {
         }
         return ret;
       }, orElse: () => imgElements.first);
-      String retStr = imgElement.attributes['src'] ?? '';
+
+      String retStr = (dynamic inElement) {
+        String ret = imgElement.attributes['src'] ?? '';
+        if (inElement.attributes['mydatasrc'] != null) {
+          ret = inElement.attributes['mydatasrc'] ?? '';
+        }
+        return ret;
+      }(imgElement);
+
       return Result.success(data: retStr);
     } on AppError catch (error) {
       return Result.failure(error: error);
@@ -110,33 +121,57 @@ class BaseNovaWebApi {
     }
   }
 
+  String reshapeDetailBodyTags(dynamic inElement) {
+    // reshape img tags
+    var subElements = inElement?.getElementsByTagName('img');
+
+    for (dynamic item in subElements ?? []) {
+      if (item.attributes['mydatasrc'] != null) {
+        item.attributes['src'] = item.attributes['mydatasrc'] ?? '';
+      }
+    }
+
+    // reshape other tags
+    Codec<String, String> codec = utf8.fuse(base64);
+    final codes = codec
+        .decode(kSampleReplacedPkCode.substring(
+            0, kSampleReplacedPkCode.length - 2))
+        .split('//');
+    String retStr = inElement?.innerHtml ?? '';
+    retStr = retStr.replaceAll(RegExp(r'' + codes.first), codes.last);
+    return retStr;
+  }
+}
+
+extension BaseNovaWebApiForAuth on BaseNovaWebApi {
   Future<Result<bool>> performSampleLogin(
       String username, String password) async {
     try {
-      if (_logined) {
-        return Result.success(data: _logined);
+      if (BaseNovaWebApi._logined) {
+        return Result.success(data: BaseNovaWebApi._logined);
       }
       Codec<String, String> codec = utf8.fuse(base64);
       //Map<String, String> headers = {"Content-type": "application/json"};
 
       Map<String, String> dataBody = {
-        'username': codec.decode(kSampleUrlParams).split('@:').first,
+        'username':
+            codec.decode(BaseNovaWebApi.kSampleUrlParams).split('@:').first,
         'password': (String str) {
           return str.substring(0, str.length - 2);
-        }(codec.decode(kSampleUrlParams).split('@:').last),
+        }(codec.decode(BaseNovaWebApi.kSampleUrlParams).split('@:').last),
         'dologin': '%20%E7%99%BB%E5%BD%95%20'
       };
 
       // make POST request
       final response = await BaseApiClient.client
-          .post(Uri.parse(codec.decode(kSampleUrlStr)),
+          .post(Uri.parse(codec.decode(BaseNovaWebApi.kSampleUrlStr)),
               /*headers: headers,*/
               body: dataBody);
       // check the status code for the result
       int statusCode = response.statusCode;
 
       if (statusCode < HttpStatus.badRequest) {
-        _logined = true;
+        BaseNovaWebApi._logined = true;
         return const Result.success(data: true);
       } else {
         return Result.failure(

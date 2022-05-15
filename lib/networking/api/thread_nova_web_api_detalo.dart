@@ -86,8 +86,8 @@ extension ThreadNovaWebApiDetail on ThreadNovaWebApi {
     try {
       ThreadDetaloItemRes retVal = ThreadDetaloItemRes(
           itemInfo: parameter.itemInfo,
-          bodyString:
-              rootElement?.getElementsByTagName('pre').first.innerHtml ?? '');
+          bodyString: reshapeDetailBodyTags(
+              rootElement?.getElementsByTagName('pre').first));
       if (rootElement?.children == null) {
         log.severe('rootElement?.children == null');
         throw AppError(

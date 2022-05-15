@@ -1,6 +1,3 @@
-import 'dart:convert';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/foundation/log_util.dart';
@@ -12,7 +9,7 @@ import 'package:ses_novajoj/scene/foundation/page/page_parameter.dart';
 import 'package:ses_novajoj/scene/thread_detail/thread_detail_presenter.dart';
 import 'package:ses_novajoj/scene/thread_detail/thread_detail_presenter_output.dart';
 
-import 'package:webview_flutter/webview_flutter.dart';
+import 'package:ses_novajoj/scene/widgets/ext_web_view.dart';
 import 'package:ses_novajoj/scene/widgets/error_view.dart';
 
 class ThreadDetailPage extends StatefulWidget {
@@ -85,36 +82,7 @@ class _ThreadDetailPageState extends State<ThreadDetailPage> {
 
   Widget _buildContentArea(BuildContext context,
       {ThreadDetailViewModel? detailItem}) {
-    return Flexible(
-      child: Wrap(
-        children: <Widget>[
-          Container(
-              alignment: Alignment.topLeft,
-              height: MediaQuery.of(context).size.height - 100,
-              width: MediaQuery.of(context).size.width,
-              child: WebView(
-                initialUrl: 'about:blank',
-                javascriptMode: JavascriptMode.unrestricted,
-                onWebViewCreated: (WebViewController controller) {
-                  //_controller = controller;
-                  controller.loadUrl(Uri.dataFromString(
-                          detailItem?.htmlText ?? '',
-                          mimeType: 'text/html',
-                          encoding: Encoding.getByName('utf-8'))
-                      .toString());
-                },
-                gestureNavigationEnabled: true,
-                gestureRecognizers: {
-                  Factory<OneSequenceGestureRecognizer>(
-                    () => LongPressGestureRecognizer(),
-                  ),
-                },
-              )),
-          const SizedBox(height: 5),
-          const Divider(height: 1.0, thickness: 1.0),
-        ],
-      ),
-    );
+    return ExtWebView(detailItem: detailItem);
   }
 
   void _parseRouteParameter() {

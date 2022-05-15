@@ -140,6 +140,10 @@ class BbsNovaWebApi extends BaseNovaWebApi {
       }();
     }
 
+    if (source.isEmpty || source.contains(RegExp(r'http(s)*:\/\/'))) {
+      return null;
+    }
+
     // thumbUrlString
     if (title.isNotEmpty) {
       if (urlString.isNotEmpty && index < _kThumbLimit) {

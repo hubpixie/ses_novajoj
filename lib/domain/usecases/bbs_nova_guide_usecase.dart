@@ -29,12 +29,12 @@ class BbsNovaGuideUseCaseImpl extends BbsNovaGuideUseCase {
         docType: NovaDocType.bbsList),
     FetchBbsGuideRepoInput(
         // bbs guide 2
-        targetUrl: "https://www.6park.com/pub/aimain.php?act=jingfill",
-        docType: NovaDocType.bbsList),
-    FetchBbsGuideRepoInput(
-        // bbs guide 3
         targetUrl: "https://www.6park.com/pub/aimain.php?act=bbshot",
         docType: NovaDocType.bbsEtcList),
+    FetchBbsGuideRepoInput(
+        // bbs guide 3
+        targetUrl: "https://www.6park.com/pub/aimain.php?act=jingfill",
+        docType: NovaDocType.bbsList),
   ];
 
   @override
