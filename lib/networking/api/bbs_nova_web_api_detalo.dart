@@ -102,8 +102,8 @@ extension BbsNovaWebApiDetail on BbsNovaWebApi {
     try {
       BbsDetaloItemRes retVal = BbsDetaloItemRes(
           itemInfo: parameter.itemInfo,
-          bodyString:
-              rootElement?.getElementsByTagName('pre').first.innerHtml ?? '');
+          bodyString: reshapeDetailBodyTags(
+              rootElement?.getElementsByTagName('pre').first));
       if (rootElement?.children == null) {
         log.severe('rootElement?.children == null');
         throw AppError(
@@ -166,7 +166,8 @@ extension BbsNovaWebApiDetail on BbsNovaWebApi {
       Element? infoElement}) async {
     try {
       String bodyString =
-          rootElement?.getElementsByTagName('pre').first.innerHtml ?? '';
+          reshapeDetailBodyTags(rootElement?.getElementsByTagName('pre').first);
+
       BbsDetaloItemRes retVal = BbsDetaloItemRes(
           itemInfo: parameter.itemInfo, bodyString: bodyString);
       if (rootElement?.children == null) {
