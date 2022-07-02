@@ -66,5 +66,7 @@
   "bbsMenuList":"BBS Menu",
   "bbsSelectListForYou":"For You",
   "bbsSelectListLatest":"Latest",
+  "detailPageMenuOpenOriginalPage":"Open Original Page",
+  "detailPageMenuReadComments":"Read Comments",
   "msgNetworkUnavailable": "Network is unavailable, please try again later"
 }
