@@ -124,10 +124,19 @@ class BaseNovaWebApi {
   String reshapeDetailBodyTags(dynamic inElement) {
     // reshape img tags
     var subElements = inElement?.getElementsByTagName('img');
+    final osVer = Platform.operatingSystemVersion
+        .toLowerCase()
+        .replaceAll('version ', '');
+    bool imgSrcChangable =
+        Platform.isIOS && osVer.startsWith('9.') ? false : true;
 
     for (dynamic item in subElements ?? []) {
       if (item.attributes['mydatasrc'] != null) {
         item.attributes['src'] = item.attributes['mydatasrc'] ?? '';
+      }
+      item.attributes['data-src'] = item.attributes['src'] ?? '';
+      if (imgSrcChangable) {
+        item.attributes['src'] = '';
       }
     }
 

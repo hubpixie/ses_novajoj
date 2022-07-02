@@ -6,10 +6,10 @@ import 'package:ses_novajoj/domain/foundation/bloc/bloc_provider.dart';
 import 'package:ses_novajoj/scene/foundation/page/screen_route_enums.dart';
 import 'package:ses_novajoj/scene/foundation/use_l10n.dart';
 import 'package:ses_novajoj/scene/foundation/page/page_parameter.dart';
+import 'package:ses_novajoj/scene/root/detail_page.dart';
 import 'package:ses_novajoj/scene/bbs_detail/bbs_detail_presenter.dart';
 import 'package:ses_novajoj/scene/bbs_detail/bbs_detail_presenter_output.dart';
 
-import 'package:ses_novajoj/scene/widgets/ext_web_view.dart';
 import 'package:ses_novajoj/scene/widgets/error_view.dart';
 
 class BbsDetailPage extends StatefulWidget {
@@ -22,13 +22,16 @@ class BbsDetailPage extends StatefulWidget {
 
 class _BbsDetailPageState extends State<BbsDetailPage> {
   bool _pageLoadIsFirst = true;
-  late Map? _parameters;
+
   late String _appBarTitle;
-  late NovaItemInfo? _itemInfo;
+  late DetailPage _detailPage;
+  Map? _parameters;
+  NovaItemInfo? _itemInfo;
 
   @override
   void initState() {
     super.initState();
+    _detailPage = DetailPage();
   }
 
   @override
@@ -40,6 +43,8 @@ class _BbsDetailPageState extends State<BbsDetailPage> {
         title: Text(_appBarTitle),
         backgroundColor: const Color(0xFF1B80F3),
         centerTitle: true,
+        actions:
+            _detailPage.buildAppBarActionArea(context, itemInfo: _itemInfo),
       ),
       body: BlocProvider<BbsDetailPresenter>(
         bloc: widget.presenter,
@@ -56,7 +61,8 @@ class _BbsDetailPageState extends State<BbsDetailPage> {
               if (data is ShowBbsDetailPageModel) {
                 if (data.error == null) {
                   return Column(children: [
-                    _buildContentArea(context, detailItem: data.viewModel)
+                    _detailPage.buildContentArea(context,
+                        detailItem: data.viewModel)
                   ]);
                 } else {
                   return ErrorView(
@@ -77,11 +83,6 @@ class _BbsDetailPageState extends State<BbsDetailPage> {
             }),
       ),
     );
-  }
-
-  Widget _buildContentArea(BuildContext context,
-      {BbsDetailViewModel? detailItem}) {
-    return ExtWebView(detailItem: detailItem);
   }
 
   void _parseRouteParameter() {

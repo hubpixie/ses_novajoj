@@ -66,5 +66,7 @@
     "bbsMenuList":"分类选读",           
     "bbsSelectListForYou":"为您推选",
     "bbsSelectListLatest":"最新",
+    "detailPageMenuOpenOriginalPage":"打开原页面",
+    "detailPageMenuReadComments":"查看评论",
     "msgNetworkUnavailable":"当前网络无法连接，请稍后重试！"
   }
