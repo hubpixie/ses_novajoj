@@ -11,6 +11,7 @@ enum ScreenRouteName {
   bbsGuide,
   bbsDetail,
   bbsSelectList,
+  webPage,
 }
 
 extension ScreenRouteNameSummary on ScreenRouteName {
@@ -38,6 +39,8 @@ extension ScreenRouteNameSummary on ScreenRouteName {
         return 'bbsDetail';
       case ScreenRouteName.bbsSelectList:
         return 'bbsSelectList';
+      case ScreenRouteName.webPage:
+        return 'webPage';
       default:
         return '';
     }

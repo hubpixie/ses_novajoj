@@ -5,7 +5,8 @@ import 'package:ses_novajoj/scene/widgets/ext_web_view.dart';
 enum _MenuItems { openOriginal, readComments }
 
 class DetailPage {
-  Widget buildContentArea(BuildContext context, {dynamic detailItem}) {
+  Widget buildContentArea(BuildContext context,
+      {dynamic detailItem, bool imageZommingEnabled = true}) {
     return ExtWebView(detailItem: detailItem);
   }
 

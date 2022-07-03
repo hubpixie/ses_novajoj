@@ -12,6 +12,13 @@ enum NovaDocType {
   threadList
 }
 
+enum ServiceType {
+  none,
+  time,
+  audio,
+  favorite,
+}
+
 class Comment {
   int id;
   String author;
@@ -27,12 +34,14 @@ class Comment {
 
 class NovaItemInfo {
   int id;
+  ServiceType serviceType;
   String thunnailUrlString;
   String title;
   String urlString;
   String source;
   String author;
   DateTime createAt;
+  int orderIndex;
   String loadCommentAt;
   List<Comment>? comments;
   String commentUrlString;
@@ -44,16 +53,18 @@ class NovaItemInfo {
 
   NovaItemInfo(
       {required this.id,
-      required this.thunnailUrlString,
+      this.serviceType = ServiceType.none,
+      this.thunnailUrlString = '',
       required this.title,
       required this.urlString,
-      required this.source,
-      required this.author,
+      this.source = '',
+      this.author = '',
       required this.createAt,
-      required this.loadCommentAt,
-      required this.commentUrlString,
-      required this.commentCount,
-      required this.reads,
+      this.orderIndex = 0,
+      this.loadCommentAt = '',
+      this.commentUrlString = '',
+      this.commentCount = 0,
+      this.reads = 0,
       this.isRead = false,
       this.isNew = false,
       this.children});

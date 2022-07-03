@@ -17,6 +17,7 @@ enum AnalyticsRoute {
   threadDetail,
   bbsDetail,
   bbsSelectList,
+  webPage,
 }
 
 extension AnalyticsRouteInfo on AnalyticsRoute {
