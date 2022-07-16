@@ -44,8 +44,8 @@ class _WebPageState extends State<WebPage> {
           title: Text(_appBarTitle),
           backgroundColor: const Color(0xFF1B80F3),
           centerTitle: true,
-          actions:
-              _detailPage.buildAppBarActionArea(context, itemInfo: _itemInfo),
+          actions: _detailPage.buildAppBarActionArea(context,
+              itemInfo: _itemInfo, menuItems: [DetailMenuItem.openOriginal]),
         ),
         body: _detailPage.buildContentArea(context,
             detailItem: _detailItem, imageZommingEnabled: false));

@@ -22,7 +22,7 @@ class _TabsPageState extends State<TabsPage> with WidgetsBindingObserver {
     L10n.of(context)?.tabBarNameHome ?? '',
     L10n.of(context)?.tabBarNameBBS ?? '',
     L10n.of(context)?.tabBarNameLocal ?? '',
-    L10n.of(context)?.tabBarNameInfoService ?? '',
+    L10n.of(context)?.tabBarNameInfoServiceForMe ?? '',
     L10n.of(context)?.tabBarNameThreads ?? ''
   ];
 
@@ -85,7 +85,7 @@ class _TabsPageState extends State<TabsPage> with WidgetsBindingObserver {
                 label: _tabTitles[2],
               ),
               BottomNavigationBarItem(
-                icon: const Icon(Icons.miscellaneous_services_rounded),
+                icon: const Icon(Icons.person_outline_rounded),
                 label: _tabTitles[3],
               ),
               BottomNavigationBarItem(

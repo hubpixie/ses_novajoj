@@ -25,7 +25,7 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(UseL10n.of(context)?.tabBarNameInfoService ?? ''),
+        title: Text(UseL10n.of(context)?.infoServiceTop ?? ''),
         backgroundColor: const Color(0xFF1B80F3),
         automaticallyImplyLeading: false,
         centerTitle: true,
@@ -47,7 +47,9 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
                   return Column(
                     children: [
                       _buildMyTimeArea(context,
-                          viewModelList: data.viewModelList)
+                          viewModelList: data.viewModelList),
+                      _buildOnlineLiveArea(context,
+                          viewModelList: data.viewModelList),
                     ],
                   );
                 } else {
@@ -72,11 +74,34 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
         UseL10n.of(context)?.infoServiceMyTimeHoliday ?? '',
         UseL10n.of(context)?.infoServiceMyTimeCalendar ?? ''
       ],
-      otherTitle: UseL10n.of(context)?.infoServiceItemOther,
       onRowSelecting: (index) {
         final itemInfo = viewModelList
             ?.firstWhere((element) =>
                 element.itemInfo.serviceType == ServiceType.time &&
+                element.itemInfo.orderIndex == index)
+            .itemInfo;
+        widget.presenter.eventViewWebPage(context,
+            appBarTitle: itemInfo?.title ?? '',
+            itemInfo: itemInfo,
+            completeHandler: () {});
+      },
+      onOtherRowSelecting: (index) {},
+    );
+  }
+
+  Widget _buildOnlineLiveArea(BuildContext context,
+      {List<MiscInfoListViewModel>? viewModelList}) {
+    return InfoServiceCell(
+      sectionTitle: UseL10n.of(context)?.infoServiceOnline ?? '',
+      rowTitleList: [
+        UseL10n.of(context)?.infoServiceOnlineHotRadio ?? '',
+        UseL10n.of(context)?.infoServiceOnlineAfn ?? '',
+      ],
+      otherTitle: UseL10n.of(context)?.infoServiceItemOther,
+      onRowSelecting: (index) {
+        final itemInfo = viewModelList
+            ?.firstWhere((element) =>
+                element.itemInfo.serviceType == ServiceType.audio &&
                 element.itemInfo.orderIndex == index)
             .itemInfo;
         widget.presenter.eventViewWebPage(context,

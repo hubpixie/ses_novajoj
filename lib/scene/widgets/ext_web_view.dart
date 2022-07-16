@@ -79,7 +79,12 @@ class _ExtWebViewState extends State<ExtWebView> {
             children: [
               InAppWebView(
                 key: _webViewKey,
-                initialUrlRequest: URLRequest(url: Uri.parse('about:blank')),
+                //initialUrlRequest: URLRequest(url: Uri.parse('about:blank')),
+                initialData: htmlText.isNotEmpty
+                    ? InAppWebViewInitialData(
+                        data: htmlText,
+                      )
+                    : null,
                 initialOptions: _webViewGroupOptions,
                 onWebViewCreated: (controller) {
                   if (htmlText.isEmpty) {
@@ -87,11 +92,6 @@ class _ExtWebViewState extends State<ExtWebView> {
                         urlRequest: URLRequest(
                             url: Uri.parse(
                                 widget.detailItem?.itemInfo?.urlString ?? '')));
-                  } else {
-                    controller.loadData(
-                        data: htmlText,
-                        mimeType: 'text/html',
-                        encoding: 'utf8');
                   }
                 },
                 onLoadStart: (controller, url) {

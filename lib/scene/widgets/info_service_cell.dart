@@ -21,6 +21,7 @@ class InfoServiceCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
     return Padding(
         padding:
             const EdgeInsets.only(left: 30, right: 30, top: 20, bottom: 20),
@@ -38,7 +39,7 @@ class InfoServiceCell extends StatelessWidget {
                     width: 200,
                     height: 40,
                     decoration: BoxDecoration(
-                        color: Colors.cyan[100],
+                        color: const Color(0xFFF2FFFF),
                         border: Border.all(
                           color: Colors.black12,
                         ),
@@ -54,54 +55,61 @@ class InfoServiceCell extends StatelessWidget {
               ));
               widgets.add(const Divider(
                 height: 1,
-                thickness: 3,
+                thickness: 2,
                 color: Colors.black12,
               ));
 
               // Row title
+              final int cnt = rowTitleList.length;
               rowTitleList.asMap().forEach((idx, str) {
                 widgets.add(Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    const SizedBox(
-                      height: 10,
-                    ),
                     SizedBox(
-                        width: 180,
+                        width: screenWidth - 80,
                         height: 40,
                         child: TextButton(
                           onPressed: () => onRowSelecting?.call(idx),
-                          child: Text(str),
+                          child: Text(
+                            str,
+                            style: const TextStyle(color: Color(0xFF8D918D)),
+                          ),
                         )),
-                    const SizedBox(
-                      height: 10,
-                      width: 100,
-                    ),
                   ],
                 ));
+                if (idx < cnt - 1) {
+                  widgets.add(const Divider(
+                    height: 1.0,
+                    thickness: 0.5,
+                  ));
+                }
               });
 
               // Other Row
               if (otherTitle != null) {
+                widgets.add(const Divider(
+                  height: 1.0,
+                  thickness: 0.5,
+                ));
                 widgets.add(Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      const SizedBox(
-                        height: 10,
-                      ),
                       SizedBox(
-                          width: 180,
+                          width: screenWidth - 80,
                           height: 40,
                           child: TextButton(
                             onPressed: () => onOtherRowSelecting?.call(100),
-                            child: Text(otherTitle ?? ''),
+                            child: Text(
+                              otherTitle ?? '',
+                              style: const TextStyle(color: Color(0xFF8D918D)),
+                            ),
                           )),
-                      const SizedBox(
-                        height: 10,
-                        width: 100,
-                      ),
                     ]));
               }
+              widgets.add(const Divider(
+                height: 1.0,
+                thickness: 2.0,
+              ));
               return widgets;
             }()));
   }

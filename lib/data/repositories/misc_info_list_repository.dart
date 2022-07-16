@@ -31,34 +31,25 @@ class MiscInfoListRepositoryImpl extends MiscInfoListRepository {
               createAt: DateTime.now(),
               serviceType: ServiceType.time,
               orderIndex: 0)),
+      MiscInfoListItem(
+          itemInfo: NovaItemInfo(
+              id: 1,
+              urlString: 'https://www.spreaker.com/user/cock-radio',
+              title: 'Hot Radio',
+              createAt: DateTime.now(),
+              serviceType: ServiceType.audio,
+              orderIndex: 0)),
+      MiscInfoListItem(
+          itemInfo: NovaItemInfo(
+              id: 2,
+              urlString:
+                  'https://www.afnpacific.net/Portals/101/360/AudioPlayer2.html#AFNP_OSN',
+              title: 'Freely Listen',
+              createAt: DateTime.now(),
+              serviceType: ServiceType.audio,
+              orderIndex: 1)),
     ]);
-
+    DateTime.now().timeZoneName;
     return result;
   }
 }
-
-/*
-  @override
-  Future<Result<List<LocalNovaListItem>>> fetchLocalNovaList(
-      {required FetchLocalNovaListRepoInput input}) async {
-    Result<List<LocalNovaListItemRes>> result = await _api.fetchNovaList(
-        parameter: NovaItemParameter(
-            targetUrl: input.targetUrl, docType: input.docType));
-
-    late Result<List<LocalNovaListItem>> ret;
-    List<LocalNovaListItem> novaItems = <LocalNovaListItem>[];
-    result.when(success: (response) {
-      for (var item in response) {
-        LocalNovaListItem retItem = LocalNovaListItem(
-          itemInfo: item.itemInfo,
-        );
-        novaItems.add(retItem);
-      }
-      ret = Result.success(data: novaItems);
-    }, failure: (error) {
-      ret = Result.failure(error: error);
-    });
-
-    return ret;
-  }
-*/
