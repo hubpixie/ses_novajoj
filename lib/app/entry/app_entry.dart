@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:ses_novajoj/foundation/firebase_util.dart';
 import 'package:ses_novajoj/foundation/log_util.dart';
 import 'package:ses_novajoj/scene/foundation/screen_route_manager.dart';
@@ -8,12 +9,14 @@ import 'package:ses_novajoj/l10n/l10n.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
+  static const Locale _kLocale = Locale('zh', 'CN');
 
   @override
   Widget build(BuildContext context) {
+    Intl.defaultLocale = '${_kLocale.languageCode}-${_kLocale.countryCode}';
     return MaterialApp(
       title: 'First News',
-      locale: const Locale('zh', 'CN'),
+      locale: _kLocale,
       localizationsDelegates: L10n.localizationsDelegates,
       supportedLocales: L10n.supportedLocales,
       debugShowCheckedModeBanner: false,

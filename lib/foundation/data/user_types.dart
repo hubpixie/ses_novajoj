@@ -12,6 +12,15 @@ enum NovaDocType {
   threadList
 }
 
+enum ServiceType {
+  none,
+  time,
+  audio,
+  weather,
+  favorite,
+  history,
+}
+
 class Comment {
   int id;
   String author;
@@ -27,12 +36,14 @@ class Comment {
 
 class NovaItemInfo {
   int id;
+  ServiceType serviceType;
   String thunnailUrlString;
   String title;
   String urlString;
   String source;
   String author;
   DateTime createAt;
+  int orderIndex;
   String loadCommentAt;
   List<Comment>? comments;
   String commentUrlString;
@@ -41,22 +52,154 @@ class NovaItemInfo {
   bool isRead;
   bool isNew;
   List<NovaItemInfo>? children;
+  WeatherInfo? weatherInfo;
 
   NovaItemInfo(
       {required this.id,
-      required this.thunnailUrlString,
+      this.serviceType = ServiceType.none,
+      this.thunnailUrlString = '',
       required this.title,
       required this.urlString,
-      required this.source,
-      required this.author,
+      this.source = '',
+      this.author = '',
       required this.createAt,
-      required this.loadCommentAt,
-      required this.commentUrlString,
-      required this.commentCount,
-      required this.reads,
+      this.orderIndex = 0,
+      this.loadCommentAt = '',
+      this.commentUrlString = '',
+      this.commentCount = 0,
+      this.reads = 0,
       this.isRead = false,
       this.isNew = false,
-      this.children});
+      this.children,
+      this.weatherInfo});
+}
+
+class CityInfo {
+  int id;
+  String zip;
+  String langCode;
+  String name; //English name
+  String nameDesc; // Name description with current locale.
+  String countryCode;
+  int timezone;
+  bool isFavorite;
+
+  CityInfo(
+      {this.id = 0,
+      this.zip = '',
+      this.langCode = 'ja',
+      this.name = 'Tokyo',
+      this.nameDesc = '',
+      this.countryCode = 'JP',
+      this.timezone = 0,
+      this.isFavorite = false});
+}
+
+enum TemperatureUnit { kelvin, celsius, fahrenheit }
+
+extension TemperatureUnitDescripts on TemperatureUnit {
+  String get name {
+    switch (this) {
+      case TemperatureUnit.kelvin:
+        return '°K';
+      case TemperatureUnit.celsius:
+        return '°C'; //
+      case TemperatureUnit.fahrenheit:
+        return '°F';
+      default:
+        return '';
+    }
+  }
+
+  static TemperatureUnit fromString(String string) {
+    return TemperatureUnit.values
+        .firstWhere((element) => element.name == string);
+  }
+
+  String get stringClass {
+    switch (this) {
+      case TemperatureUnit.kelvin:
+      case TemperatureUnit.celsius:
+      case TemperatureUnit.fahrenheit:
+        return toString().split(".").last;
+      default:
+        return '';
+    }
+  }
+}
+
+class Temperature {
+  static const double kKelvin = 273.15;
+  final double _kelvin;
+
+  // ignore: unnecessary_null_comparison
+  Temperature(this._kelvin) : assert(_kelvin != null);
+
+  double get kelvin => _kelvin;
+
+  double get celsius => _kelvin - kKelvin;
+
+  double get fahrenheit => _kelvin * (9 / 5) - 459.67;
+
+  double as(TemperatureUnit unit) {
+    switch (unit) {
+      case TemperatureUnit.kelvin:
+        return kelvin;
+      case TemperatureUnit.celsius:
+        return celsius;
+      case TemperatureUnit.fahrenheit:
+        return fahrenheit;
+    }
+  }
+}
+
+class WeatherInfo {
+  int? id;
+  int? time;
+  int? sunrise;
+  int? sunset;
+  int? humidity;
+  double? rain; //mm
+  double? snow; //cm
+
+  String? description;
+  String? iconCode;
+  String? main;
+  CityInfo? city;
+
+  double? windSpeed;
+  double? windDeg;
+
+  Temperature? feelsLike;
+  Temperature? temperature;
+  Temperature? maxTemperature;
+  Temperature? minTemperature;
+  Temperature? maxTemperatureOfForecast;
+  Temperature? minTemperatureOfForecast;
+
+  List<WeatherInfo>? forecast;
+
+  WeatherInfo(
+      {this.id,
+      this.time,
+      this.sunrise,
+      this.sunset,
+      this.humidity,
+      this.rain,
+      this.snow,
+      this.description,
+      this.iconCode,
+      this.main,
+      this.city,
+      this.windSpeed,
+      this.windDeg,
+      this.feelsLike,
+      this.temperature,
+      this.maxTemperature,
+      this.minTemperature,
+      this.maxTemperatureOfForecast,
+      this.minTemperatureOfForecast,
+      this.forecast});
 }
 
 class NetworkType {}
