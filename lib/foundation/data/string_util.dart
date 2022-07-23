@@ -42,4 +42,10 @@ class StringUtil {
   String thousandFormat(int value) {
     return NumberFormat('###,##0').format(value);
   }
+
+  String getDefaultLangCode() {
+    String locale = Intl.defaultLocale ?? Intl.systemLocale;
+    final arr = locale.split('-');
+    return arr.isNotEmpty ? arr.first : 'en';
+  }
 }

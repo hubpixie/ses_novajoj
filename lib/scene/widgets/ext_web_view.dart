@@ -11,8 +11,11 @@ import 'package:ses_novajoj/foundation/log_util.dart';
 
 class ExtWebView extends StatefulWidget {
   final dynamic detailItem;
+  final bool imageZoomingEnabled;
 
-  const ExtWebView({Key? key, required this.detailItem}) : super(key: key);
+  const ExtWebView(
+      {Key? key, required this.detailItem, this.imageZoomingEnabled = true})
+      : super(key: key);
 
   static openBrowser(BuildContext context, {String? url}) {
     ChromeSafariBrowser browser = _ChromeSafariBrowser(context);
@@ -64,8 +67,10 @@ class _ExtWebViewState extends State<ExtWebView> {
 
   @override
   Widget build(BuildContext context) {
-    return Flexible(
-        child: Wrap(children: <Widget>[
+    String htmlText = widget.detailItem?.htmlText ?? '';
+    return /*Flexible(
+        child:*/
+        Wrap(children: <Widget>[
       Container(
           alignment: Alignment.topLeft,
           height: MediaQuery.of(context).size.height - 100,
@@ -74,16 +79,20 @@ class _ExtWebViewState extends State<ExtWebView> {
             children: [
               InAppWebView(
                 key: _webViewKey,
-                //initialUrlRequest: URLRequest(url: Uri.parse("about:blank")),
-                initialData: InAppWebViewInitialData(
-                  data: widget.detailItem?.htmlText ?? '',
-                ),
+                //initialUrlRequest: URLRequest(url: Uri.parse('about:blank')),
+                initialData: htmlText.isNotEmpty
+                    ? InAppWebViewInitialData(
+                        data: htmlText,
+                      )
+                    : null,
                 initialOptions: _webViewGroupOptions,
                 onWebViewCreated: (controller) {
-                  // controller.loadData(
-                  //     data: widget.detailItem?.htmlText ?? '',
-                  //     mimeType: 'text/html',
-                  //     encoding: 'utf8');
+                  if (htmlText.isEmpty) {
+                    controller.loadUrl(
+                        urlRequest: URLRequest(
+                            url: Uri.parse(
+                                widget.detailItem?.itemInfo?.urlString ?? '')));
+                  }
                 },
                 onLoadStart: (controller, url) {
                   // setState(() {
@@ -113,32 +122,34 @@ class _ExtWebViewState extends State<ExtWebView> {
                   return NavigationActionPolicy.ALLOW;
                 },
                 onLoadStop: (controller, url) async {
-                  if (!Platform.isAndroid ||
-                      await AndroidWebViewFeature.isFeatureSupported(
-                          AndroidWebViewFeature.CREATE_WEB_MESSAGE_CHANNEL)) {
-                    // wait until the page is loaded, and then create the Web Message Channel
-                    var webMessageChannel =
-                        await controller.createWebMessageChannel();
-                    var port1 = webMessageChannel!.port1;
-                    var port2 = webMessageChannel.port2;
+                  if (widget.imageZoomingEnabled) {
+                    if (!Platform.isAndroid ||
+                        await AndroidWebViewFeature.isFeatureSupported(
+                            AndroidWebViewFeature.CREATE_WEB_MESSAGE_CHANNEL)) {
+                      // wait until the page is loaded, and then create the Web Message Channel
+                      var webMessageChannel =
+                          await controller.createWebMessageChannel();
+                      var port1 = webMessageChannel!.port1;
+                      var port2 = webMessageChannel.port2;
 
-                    // set the web message callback for the port1
-                    await port1.setWebMessageCallback((message) async {
-                      Map<String, dynamic> jsonData =
-                          json.decode(message?.trim() ?? '');
-                      String node = jsonData['node'] as String? ?? '';
-                      String ingSrc = jsonData['src'] as String? ?? '';
-                      if (node == "IMG") {
-                        log.info('double tap in dart!');
-                        _displayImageDialog(context, src: ingSrc);
-                      }
-                    });
+                      // set the web message callback for the port1
+                      await port1.setWebMessageCallback((message) async {
+                        Map<String, dynamic> jsonData =
+                            json.decode(message?.trim() ?? '');
+                        String node = jsonData['node'] as String? ?? '';
+                        String ingSrc = jsonData['src'] as String? ?? '';
+                        if (node == "IMG") {
+                          log.info('double tap in dart!');
+                          _displayImageDialog(context, src: ingSrc);
+                        }
+                      });
 
-                    // transfer port2 to the webpage to initialize the communication
-                    await controller.postWebMessage(
-                        message:
-                            WebMessage(data: "capturePort", ports: [port2]),
-                        targetOrigin: Uri.parse("*"));
+                      // transfer port2 to the webpage to initialize the communication
+                      await controller.postWebMessage(
+                          message:
+                              WebMessage(data: "capturePort", ports: [port2]),
+                          targetOrigin: Uri.parse("*"));
+                    }
                   }
                 },
                 onLoadError: (controller, url, code, message) {
@@ -168,7 +179,7 @@ class _ExtWebViewState extends State<ExtWebView> {
                   : Container(),
             ],
           ))
-    ]));
+    ]); //);
   }
 
   Future<void> _saveNetworkImage({String? src}) async {

@@ -6,6 +6,7 @@ import 'package:ses_novajoj/scene/top_list/top_list_page_builder.dart';
 import 'package:ses_novajoj/scene/bbs_main/bbs_main_page_builder.dart';
 import 'package:ses_novajoj/scene/local_list/local_list_page_builder.dart';
 import 'package:ses_novajoj/scene/thread_list/thread_list_page_builder.dart';
+import 'package:ses_novajoj/scene/misc_info_list/misc_info_list_page_builder.dart';
 
 class TabsPage extends StatefulWidget {
   final TabsPresenter presenter;
@@ -21,7 +22,7 @@ class _TabsPageState extends State<TabsPage> with WidgetsBindingObserver {
     L10n.of(context)?.tabBarNameHome ?? '',
     L10n.of(context)?.tabBarNameBBS ?? '',
     L10n.of(context)?.tabBarNameLocal ?? '',
-    L10n.of(context)?.tabBarNameSearch ?? '',
+    L10n.of(context)?.tabBarNameInfoServiceForMe ?? '',
     L10n.of(context)?.tabBarNameThreads ?? ''
   ];
 
@@ -64,7 +65,7 @@ class _TabsPageState extends State<TabsPage> with WidgetsBindingObserver {
               TopListPageBuilder().page,
               BbsMainPageBuilder().page,
               LocalListPageBuilder().page,
-              Container(),
+              MiscInfoListPageBuilder().page,
               ThreadListPageBuilder().page,
             ],
           ),
@@ -84,7 +85,7 @@ class _TabsPageState extends State<TabsPage> with WidgetsBindingObserver {
                 label: _tabTitles[2],
               ),
               BottomNavigationBarItem(
-                icon: const Icon(Icons.search_rounded),
+                icon: const Icon(Icons.person_outline_rounded),
                 label: _tabTitles[3],
               ),
               BottomNavigationBarItem(
