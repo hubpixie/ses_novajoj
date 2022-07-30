@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-//import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/foundation/data/date_util.dart';
@@ -29,13 +28,8 @@ class WeatherInfoOverlay extends StatefulWidget {
 
 class WeatherInfoOverlayState extends State<WeatherInfoOverlay>
     with WidgetsBindingObserver {
-  late CityInfo _cityParam;
-
   @override
   void initState() {
-    _cityParam = CityInfo();
-    //_readPrefsData();
-
     super.initState();
   }
 
@@ -46,101 +40,24 @@ class WeatherInfoOverlayState extends State<WeatherInfoOverlay>
 
   @override
   Widget build(BuildContext context) {
-    return (_cityParam.zip.isEmpty && _cityParam.name.isEmpty)
-        ? const Center(child: CircularProgressIndicator())
-        : Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              const SizedBox(height: 10),
-              _buildWeatherTopArea(itemValue: widget.itemValue),
-              const SizedBox(height: 1),
-              _buildWeatherContentArea(
-                context,
-                itemValue: widget.itemValue,
-              ),
-              const SizedBox(height: 1),
-              _buildWeatherFunctionArea(
-                context,
-                itemValue: widget.itemValue,
-              ),
-            ],
-          );
-  }
-
-  /// データリロード処理
-  /*
-  void reloadData({CityInfo? cityParam, TemperatureUnit? temprtUnit}) {
-    setState(() {
-      if (cityParam != null) {
-        _cityParam.zip = cityParam.zip;
-        _cityParam.name = cityParam.name;
-        _cityParam.nameDesc = cityParam.nameDesc;
-        _cityParam.countryCode = cityParam.countryCode;
-        _cityParam.isFavorite = cityParam.isFavorite;
-      }
-
-      if (temprtUnit != null) {
-        _temprtUnit = TemperatureUnit.values[temprtUnit.index];
-      }
-      // reload this banner due to parameter changed.
-      if (_reloaderKey.currentState != null && !_isTabFirstAppeared) {
-        _reloaderKey.currentState?.reload();
-      }
-    });
-  }*/
-
-/*
-  Widget _buildMessageArea(
-      {required BuildContext context,
-      String? message,
-      bool? needsReload = false}) {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
-        const SizedBox(height: 20),
-        Container(
-            alignment: Alignment.center,
-            child: Text(
-              message ?? '',
-            )),
+        const SizedBox(height: 10),
+        _buildWeatherTopArea(itemValue: widget.itemValue),
+        const SizedBox(height: 1),
+        _buildWeatherContentArea(
+          context,
+          itemValue: widget.itemValue,
+        ),
+        const SizedBox(height: 1),
+        _buildWeatherFunctionArea(
+          context,
+          itemValue: widget.itemValue,
+        ),
       ],
     );
-  }*/
-
-/*
-  Future<void> _readPrefsData() async {
-    final prefs = await SharedPreferences.getInstance();
-    await CityUtil().readCityInfoFromPref(isDefault: true);
-
-    setState(() {
-      // CityInfo
-      _cityParam.zip = CityUtil().savedCity?.zip ?? '';
-      _cityParam.name = CityUtil().savedCity?.name ?? '';
-      _cityParam.nameDesc = CityUtil().savedCity?.nameDesc ?? '';
-      _cityParam.countryCode = CityUtil().savedCity?.countryCode ?? '';
-      _cityParam.isFavorite = CityUtil().savedCity?.isFavorite ?? false;
-
-      // Tempreture Unit
-      _temprtUnit = (prefs.getInt('temprtUnit') != null
-          ? TemperatureUnit.values[prefs.getInt('temprtUnit') ?? 0]
-          : TemperatureUnit.celsius);
-    });
   }
-  */
-
-/*
-  Future<void> _savePrefsData({CityInfo? cityValue}) async {
-    if (cityValue == null) {
-      return;
-    }
-    setState(() {
-      _cityParam.zip = cityValue.zip;
-      _cityParam.name = cityValue.name;
-      _cityParam.nameDesc = cityValue.nameDesc;
-      _cityParam.countryCode = cityValue.countryCode;
-      _cityParam.isFavorite = cityValue.isFavorite;
-    });
-  }*/
 
   Widget _buildWeatherTopArea({WeatherInfo? itemValue}) {
     List<Widget> wlist = <Widget>[

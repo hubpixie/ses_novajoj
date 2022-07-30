@@ -77,24 +77,28 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
 
   Widget _buildMyTimeArea(BuildContext context,
       {List<MiscInfoListViewModel>? viewModelList}) {
+    List<String> rowTitleStrings = [
+      UseL10n.of(context)?.infoServiceMyTimeWork ?? '',
+      UseL10n.of(context)?.infoServiceMyTimeRest ?? '',
+      UseL10n.of(context)?.infoServiceMyTimeHoliday ?? '',
+      UseL10n.of(context)?.infoServiceMyTimeCalendar ?? ''
+    ];
     return InfoServiceCell(
       sectionTitle: UseL10n.of(context)?.infoServiceMyTime ?? '',
       rowTitles: <Widget>[
-        _toTextWidget(UseL10n.of(context)?.infoServiceMyTimeWork),
-        _toTextWidget(UseL10n.of(context)?.infoServiceMyTimeRest),
-        _toTextWidget(UseL10n.of(context)?.infoServiceMyTimeHoliday),
-        _toTextWidget(UseL10n.of(context)?.infoServiceMyTimeCalendar),
+        _toTextWidget(rowTitleStrings[0]),
+        _toTextWidget(rowTitleStrings[1]),
+        _toTextWidget(rowTitleStrings[2]),
+        _toTextWidget(rowTitleStrings[3]),
       ],
       onRowSelecting: (index) {
-        final itemInfo = viewModelList
-            ?.firstWhere((element) =>
-                element.itemInfo.serviceType == ServiceType.time &&
-                element.itemInfo.orderIndex == index)
-            .itemInfo;
         widget.presenter.eventViewWebPage(context,
-            appBarTitle: itemInfo?.title ?? '',
-            itemInfo: itemInfo,
-            completeHandler: () {});
+            input: MiscInfoListPresenterInput(
+                appBarTitle: rowTitleStrings[index],
+                viewModelList: viewModelList,
+                serviceType: ServiceType.time,
+                itemIndex: index,
+                completeHandler: () {}));
       },
       onOtherRowSelecting: (index) {},
     );
@@ -102,23 +106,22 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
 
   Widget _buildOnlineLiveArea(BuildContext context,
       {List<MiscInfoListViewModel>? viewModelList}) {
+    final rowTitles = viewModelList
+        ?.where((element) => element.itemInfo.serviceType == ServiceType.audio)
+        .map((element) => _toTextWidget(element.itemInfo.title))
+        .toList();
     return InfoServiceCell(
       sectionTitle: UseL10n.of(context)?.infoServiceOnline ?? '',
-      rowTitles: <Widget>[
-        _toTextWidget(UseL10n.of(context)?.infoServiceOnlineHotRadio),
-        _toTextWidget(UseL10n.of(context)?.infoServiceOnlineAfn),
-      ],
+      rowTitles: rowTitles ?? [],
       otherTitle: _toTextWidget(UseL10n.of(context)?.infoServiceItemOther),
       onRowSelecting: (index) {
-        final itemInfo = viewModelList
-            ?.firstWhere((element) =>
-                element.itemInfo.serviceType == ServiceType.audio &&
-                element.itemInfo.orderIndex == index)
-            .itemInfo;
         widget.presenter.eventViewWebPage(context,
-            appBarTitle: itemInfo?.title ?? '',
-            itemInfo: itemInfo,
-            completeHandler: () {});
+            input: MiscInfoListPresenterInput(
+                appBarTitle: UseL10n.of(context)?.infoServiceOnline ?? '',
+                viewModelList: viewModelList,
+                serviceType: ServiceType.audio,
+                itemIndex: index,
+                completeHandler: () {}));
       },
       onOtherRowSelecting: (index) {},
     );
@@ -137,15 +140,13 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
       rowTitles: _toRowWeatherWidgets(weatherInfos),
       otherTitle: _toTextWidget(UseL10n.of(context)?.infoServiceItemOther),
       onRowSelecting: (index) {
-        final itemInfo = viewModelList
-            ?.firstWhere((element) =>
-                element.itemInfo.serviceType == ServiceType.weather &&
-                element.itemInfo.orderIndex == index)
-            .itemInfo;
         widget.presenter.eventViewWebPage(context,
-            appBarTitle: itemInfo?.title ?? '',
-            itemInfo: itemInfo,
-            completeHandler: () {});
+            input: MiscInfoListPresenterInput(
+                appBarTitle: UseL10n.of(context)?.infoServiceWeather ?? '',
+                viewModelList: viewModelList,
+                serviceType: ServiceType.weather,
+                itemIndex: index,
+                completeHandler: () {}));
       },
       onRowStartSelecting: (index, tapDownDetails) =>
           _tapDownDetails = tapDownDetails,
@@ -163,15 +164,13 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
       rowTitles: const <Widget>[],
       otherTitle: _toTextWidget(UseL10n.of(context)?.infoServiceItemOther),
       onRowSelecting: (index) {
-        final itemInfo = viewModelList
-            ?.firstWhere((element) =>
-                element.itemInfo.serviceType == ServiceType.favorite &&
-                element.itemInfo.orderIndex == index)
-            .itemInfo;
         widget.presenter.eventViewWebPage(context,
-            appBarTitle: itemInfo?.title ?? '',
-            itemInfo: itemInfo,
-            completeHandler: () {});
+            input: MiscInfoListPresenterInput(
+                appBarTitle: UseL10n.of(context)?.infoServiceFavorites ?? '',
+                viewModelList: viewModelList,
+                serviceType: ServiceType.favorite,
+                itemIndex: index,
+                completeHandler: () {}));
       },
       onOtherRowSelecting: (index) {},
     );
@@ -184,15 +183,13 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
       rowTitles: const <Widget>[],
       otherTitle: _toTextWidget(UseL10n.of(context)?.infoServiceItemOther),
       onRowSelecting: (index) {
-        final itemInfo = viewModelList
-            ?.firstWhere((element) =>
-                element.itemInfo.serviceType == ServiceType.favorite &&
-                element.itemInfo.orderIndex == index)
-            .itemInfo;
         widget.presenter.eventViewWebPage(context,
-            appBarTitle: itemInfo?.title ?? '',
-            itemInfo: itemInfo,
-            completeHandler: () {});
+            input: MiscInfoListPresenterInput(
+                appBarTitle: UseL10n.of(context)?.infoServiceHistory ?? '',
+                viewModelList: viewModelList,
+                serviceType: ServiceType.history,
+                itemIndex: index,
+                completeHandler: () {}));
       },
       onOtherRowSelecting: (index) {},
     );

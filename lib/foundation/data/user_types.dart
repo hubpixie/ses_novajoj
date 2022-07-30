@@ -74,23 +74,35 @@ class NovaItemInfo {
       this.weatherInfo});
 }
 
-class CityInfo {
+class SimpleUrlInfo {
+  String title;
+  String urlString;
+
+  SimpleUrlInfo({this.title = '', this.urlString = ''});
+}
+
+class SimpleCityInfo {
+  String name;
+  String langCode;
+  String countryCode;
+
+  SimpleCityInfo({this.name = '', this.langCode = '', this.countryCode = ''});
+}
+
+class CityInfo extends SimpleCityInfo {
   int id;
   String zip;
-  String langCode;
-  String name; //English name
   String nameDesc; // Name description with current locale.
-  String countryCode;
   int timezone;
   bool isFavorite;
 
   CityInfo(
       {this.id = 0,
       this.zip = '',
-      this.langCode = 'ja',
-      this.name = 'Tokyo',
+      langCode,
+      name,
       this.nameDesc = '',
-      this.countryCode = 'JP',
+      countryCode,
       this.timezone = 0,
       this.isFavorite = false});
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:ses_novajoj/foundation/data/user_data.dart';
 import 'package:ses_novajoj/foundation/firebase_util.dart';
 import 'package:ses_novajoj/foundation/log_util.dart';
 import 'package:ses_novajoj/scene/foundation/screen_route_manager.dart';
@@ -39,6 +40,11 @@ class MyApp extends StatelessWidget {
       log.severe("StackTrace :  ${details.stack}");
       log.severe("----------------------");
     };
+
+    // read UserData
+    UserData().readValues();
+
+    // run app
     runApp(const MyApp());
   }
 }
