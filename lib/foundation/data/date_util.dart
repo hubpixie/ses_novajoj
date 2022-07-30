@@ -64,7 +64,7 @@ class DateUtil {
 
   List<String> _getWeekDaytStrInfo({required DateTime datetime}) {
     String locale = Intl.defaultLocale ?? Intl.systemLocale;
-    final weekday = datetime.weekday;
+    final weekday = datetime.weekday % 7;
     final dateSymbols = DateFormat.E(locale).dateSymbols;
     final weekDayFullStr = dateSymbols.STANDALONESHORTWEEKDAYS[weekday];
     final weekDayShortStr = dateSymbols.STANDALONENARROWWEEKDAYS[weekday];

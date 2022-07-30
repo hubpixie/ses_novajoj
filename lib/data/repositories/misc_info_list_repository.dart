@@ -1,106 +1,163 @@
-import 'dart:convert';
 import 'package:ses_novajoj/foundation/data/result.dart';
-//import 'package:ses_novajoj/networking/api/my_web_api.dart';
-// import 'package:ses_novajoj/networking/response/misc_info_list_item_response.dart';
-// import 'package:ses_novajoj/networking/request/misc_info_list_item_parameter.dart';
-import 'package:ses_novajoj/domain/entities/weather_data_item.dart';
+import 'package:ses_novajoj/networking/api/weather_web_api.dart';
+import 'package:ses_novajoj/networking/response/weather_item_response.dart';
+import 'package:ses_novajoj/networking/request/weather_item_parameter.dart';
 import 'package:ses_novajoj/domain/entities/misc_info_list_item.dart';
+import 'package:ses_novajoj/domain/entities/weather_data_item.dart';
 import 'package:ses_novajoj/domain/repositories/misc_info_list_repository.dart';
+import 'package:ses_novajoj/foundation/data/user_data.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
+import 'package:ses_novajoj/foundation/log_util.dart';
 
-/// TODO: This is dummy Web API class.
 /// You should  web api class is defined in its dart file, like `my_web_api.dart`
 class MyWebApi {}
 
 class MiscInfoListRepositoryImpl extends MiscInfoListRepository {
-  final MyWebApi _api;
+  final WeatherWebApi _api;
 
   // sigleton
   static final MiscInfoListRepositoryImpl _instance =
       MiscInfoListRepositoryImpl._internal();
-  MiscInfoListRepositoryImpl._internal() : _api = MyWebApi();
+  MiscInfoListRepositoryImpl._internal() : _api = WeatherWebApi();
   factory MiscInfoListRepositoryImpl() => _instance;
 
   @override
   Future<Result<List<MiscInfoListItem>>> fetchMiscInfoList(
       {required FetchMiscInfoListRepoInput input}) async {
-    String _json = '''
-{"coord":{"lon":139.6917,"lat":35.6895},"weather":[{"id":803,"main":"Clouds","description":"broken clouds","icon":"04n"}],"base":"stations","main":{"temp":300.52,"feels_like":303.96,"temp_min":299.12,"temp_max":301.28,"pressure":999,"humidity":82},"visibility":10000,"wind":{"speed":7.2,"deg":220},"clouds":{"all":75},"dt":1658236935,"sys":{"type":2,"id":2038398,"country":"JP","sunrise":1658173138,"sunset":1658224537},"timezone":32400,"id":1850144,"name":"Tokyo","cod":200}
-''';
-    var jsonData = await json.decode(_json);
-    final weatherItem = WeatherDataItem.fromJson(jsonData);
+    // prepare to get pref data
+    final miscMyTimes = UserData().miscMyTimes;
+    final miscMyOnlineSites = UserData().miscOnlineSites;
+    List<SimpleCityInfo> miscWeatherCities = () {
+      final ret = UserData().miscWeatherCities;
+      if (ret.isEmpty) {
+        ret.add(_getLocalCityInfo());
+      }
+      return ret;
+    }();
 
-    Result<List<MiscInfoListItem>> result = Result.success(data: [
-      MiscInfoListItem(
-          itemInfo: NovaItemInfo(
-              id: 0,
-              urlString: 'https://tms.kinnosuke.jp/',
-              title: 'Kinnosuke',
-              createAt: DateTime.now(),
-              serviceType: ServiceType.time,
-              orderIndex: 0)),
-      MiscInfoListItem(
-          itemInfo: NovaItemInfo(
-              id: 1,
-              urlString: 'https://www.spreaker.com/user/cock-radio',
-              title: 'Hot Radio',
-              createAt: DateTime.now(),
-              serviceType: ServiceType.audio,
-              orderIndex: 0)),
-      MiscInfoListItem(
-          itemInfo: NovaItemInfo(
-              id: 2,
-              urlString:
-                  'https://www.afnpacific.net/Portals/101/360/AudioPlayer2.html#AFNP_OSN',
-              title: 'Freely Listen',
-              createAt: DateTime.now(),
-              serviceType: ServiceType.audio,
-              orderIndex: 1)),
-      MiscInfoListItem(
-          itemInfo: NovaItemInfo(
-        id: 3,
-        urlString: 'http://',
-        title: 'Weather',
-        createAt: DateTime.now(),
-        serviceType: ServiceType.weather,
-        weatherInfo:
-            weatherItem /*WeatherInfo(
-            city: CityInfo(countryCode: 'JP', name: 'Tokyo'),
-            temperature: Temperature(24 + Temperature.kKelvin),
-            iconCode: '01d')*/
-        ,
-        orderIndex: 0,
-      )),
-    ]);
-    DateTime.now().timeZoneName;
+    // make return value
+    List<MiscInfoListItem> data = await () async {
+      List<MiscInfoListItem> ret = [];
+      int id = 0;
+
+      // My Time
+      for (int idx = 0; idx < miscMyTimes.length; idx++) {
+        ret.add(
+          MiscInfoListItem(
+              itemInfo: NovaItemInfo(
+                  id: id + idx,
+                  urlString: miscMyTimes[idx].urlString,
+                  title: miscMyTimes[idx].title,
+                  createAt: DateTime.now(),
+                  serviceType: ServiceType.time,
+                  orderIndex: idx)),
+        );
+      }
+
+      // My Audio
+      id = miscMyTimes.length;
+      for (int idx = 0; idx < miscMyOnlineSites.length; idx++) {
+        ret.add(
+          MiscInfoListItem(
+              itemInfo: NovaItemInfo(
+                  id: id + idx,
+                  urlString: miscMyOnlineSites[idx].urlString,
+                  title: miscMyOnlineSites[idx].title,
+                  createAt: DateTime.now(),
+                  serviceType: ServiceType.audio,
+                  orderIndex: idx)),
+        );
+      }
+
+      // weather
+      id += miscMyOnlineSites.length;
+      for (int idx = 0; idx < miscWeatherCities.length; idx++) {
+        final weaterData = await _fetchWeatherData(miscWeatherCities[idx]);
+        if (weaterData == null) {
+          continue;
+        }
+        ret.add(
+          MiscInfoListItem(
+              itemInfo: NovaItemInfo(
+            id: id,
+            urlString: 'http://',
+            title: 'Weather',
+            createAt: DateTime.now(),
+            serviceType: ServiceType.weather,
+            weatherInfo: weaterData,
+            orderIndex: 0,
+          )),
+        );
+      }
+      return ret;
+    }();
+    Result<List<MiscInfoListItem>> result = Result.success(data: data);
     return result;
   }
+
+  ///
+  /// fetch weather data using Weather API
+  ///
+  Future<WeatherDataItem?> _fetchWeatherData(
+      SimpleCityInfo simpleCityInfo) async {
+    WeatherDataItem? ret;
+    WeatherItemParamter paramter = WeatherItemParamter();
+    paramter.cityParam = CityInfo();
+    paramter.cityParam?.langCode = simpleCityInfo.langCode;
+    paramter.cityParam?.countryCode = simpleCityInfo.countryCode;
+    Result<WeatherItemRes> result =
+        await _api.getWeatherData(paramter: paramter);
+    result.when(success: (value) {
+      ret = WeatherDataItem.copy(from: value);
+      ret?.city?.name = simpleCityInfo.name;
+      ret?.city?.langCode = simpleCityInfo.langCode;
+      ret?.city?.countryCode = simpleCityInfo.countryCode;
+    }, failure: (error) {
+      log.info('Get weather errors occured: $error');
+    });
+    return ret;
+  }
+
+  ///
+  /// get local city info using timezone
+  ///
+  SimpleCityInfo _getLocalCityInfo() {
+    final duration = DateTime.now().timeZoneOffset;
+    String hourOffset = '';
+    if (duration.isNegative) {
+      hourOffset =
+          ("-${duration.inHours.abs().toString()}:${(duration.inMinutes.abs() - (duration.inHours.abs() * 60)).toString().padLeft(2, '0')}");
+    } else {
+      hourOffset =
+          ("+${duration.inHours.toString()}:${(duration.inMinutes - (duration.inHours * 60)).toString().padLeft(2, '0')}");
+    }
+    switch (hourOffset) {
+      case '-10:00':
+        return SimpleCityInfo(
+            name: 'Hawaii', langCode: 'en', countryCode: 'US');
+      case '-5:00':
+        return SimpleCityInfo(
+            name: 'Sao Paulo', langCode: 'pt', countryCode: 'BR');
+      case '+0:00':
+        return SimpleCityInfo(
+            name: 'London', langCode: 'en', countryCode: 'UK');
+      case '+3:00':
+        return SimpleCityInfo(
+            name: 'London', langCode: 'ru', countryCode: 'RU');
+      case '+6:00':
+        return SimpleCityInfo(
+            name: 'Urumqi', langCode: 'zh', countryCode: 'CN');
+      case '+8:00':
+        return SimpleCityInfo(
+            name: 'Beijing', langCode: 'zh', countryCode: 'CN');
+      case '+9:00':
+        return SimpleCityInfo(name: 'Tokyo', langCode: 'ja', countryCode: 'JP');
+      case '+10:00':
+        return SimpleCityInfo(
+            name: 'Sydney', langCode: 'en', countryCode: 'AU');
+      default:
+        return SimpleCityInfo(
+            name: 'New York', langCode: 'en', countryCode: 'US');
+    }
+  }
 }
-
-/*
-  int? id;
-  int? time;
-  int? sunrise;
-  int? sunset;
-  int? humidity;
-  double? rain; //mm
-  double? snow; //cm
-
-  String? description;
-  String? iconCode;
-  String? main;
-  CityInfo? city;
-
-  double? windSpeed;
-  double? windDeg;
-
-  Temperature? feelsLike;
-  Temperature? temperature;
-  Temperature? maxTemperature;
-  Temperature? minTemperature;
-  Temperature? maxTemperatureOfForecast;
-  Temperature? minTemperatureOfForecast;
-
-  List<WeatherInfo>? forecast;
-
-*/
