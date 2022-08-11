@@ -1,0 +1,58 @@
+{
+    "misc_select_menu": [
+        {
+            "id": 1,
+            "service_type": "time",
+            "order": 0,
+            "select": [
+                {
+                    "title": "Kinnoseke",
+                    "url_string": "https://tms.kinnosuke.jp/"
+                },
+                {
+                    "title": "OBC Cloud",
+                    "url_string": "https://id.obc.jp/513ipy6r7g89/"
+                },
+                {
+                    "title": "Touch On Time",
+                    "url_string": "https://touchontime.com/admin"
+                },
+                {
+                    "title": "jobcan",
+                    "url_string": "https://id.jobcan.jp/users/sign_in?app_key=ats"
+                },
+                {
+                    "title": "WiMS - Raikibo",
+                    "url_string": "https://raikibo.tmjp.jp/login"
+                }
+            ]
+        },
+        {
+            "id": 5,
+            "service_type": "audio",
+            "order": 99,
+            "select": [
+                {
+                    "title": "NHK radio",
+                    "url_string": "https://www.nhk.or.jp/radio/"
+                },
+                {
+                    "title": "radiko",
+                    "url_string": "https://radiko.jp/#!/top"
+                },
+                {
+                    "title": "AFN",
+                    "url_string": "https://www.afnpacific.net/Portals/101/360/AudioPlayer2.html#AFNP_OSN"
+                },
+                {
+                    "title": "Jango",
+                    "url_string": "https://www.jango.com/"
+                },
+                {
+                    "title": "My Radios",
+                    "url_string": "http://www.my-radios.com/en/radio/top/US"
+                }
+            ]
+        }
+    ]
+}

@@ -89,5 +89,14 @@
     "infoServiceFavorites":"收藏",
     "infoServiceHistory":"查看历史",
     "infoServiceItemOther":"其他...",
+    "infoServicelistSelectHintMessage":"请从一览选择自己的Web工作时间管理。",
+    "infoServicelistInputHintMessage":"如果上面一览没有选择的对象，则直接输入自己的Web工作时间管理名及其网址。",
+    "infoServicelistInputOther":"另外指定",
+    "infoServicelistInputWebTitle":"站名",
+    "infoServicelistInputWebTitlePlaceHolder":"输入一个站名或别名.",
+    "infoServicelistInputWebUrl":"网址",
+    "infoServicelistInputWebUrlPlaceHolder":"(http(s)://...",
+    "infoServicelistInputWebUrlValidMessage":"请输入有效的网址",
+    "infoServicelistInputWebUrlEmptyMessage":"请输入网址",
     "msgNetworkUnavailable":"当前网络无法连接，请稍后重试！"
   }

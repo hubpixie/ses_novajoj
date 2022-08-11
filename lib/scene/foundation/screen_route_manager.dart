@@ -8,6 +8,7 @@ import 'package:ses_novajoj/scene/thread_list/thread_list_page_builder.dart';
 import 'package:ses_novajoj/scene/thread_detail/thread_detail_page_builder.dart';
 import 'package:ses_novajoj/scene/bbs_detail/bbs_detail_page_builder.dart';
 import 'package:ses_novajoj/scene/bbs_select_list/bbs_select_list_page_builder.dart';
+import 'package:ses_novajoj/scene/misc_info_select/misc_info_select_page_builder.dart';
 import 'package:ses_novajoj/scene/root/web_page_builder.dart';
 
 class ScreenRouteManager {
@@ -39,6 +40,10 @@ class ScreenRouteManager {
       case ScreenRouteName.bbsSelectList:
         return MaterialPageRoute(
             builder: (_) => BbsSelectListPageBuilder().page,
+            settings: settings);
+      case ScreenRouteName.miscInfoSelect:
+        return MaterialPageRoute(
+            builder: (_) => MiscInfoSelectPageBuilder().page,
             settings: settings);
       case ScreenRouteName.webPage:
         return MaterialPageRoute(
