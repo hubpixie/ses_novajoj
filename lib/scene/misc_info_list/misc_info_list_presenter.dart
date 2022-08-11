@@ -63,16 +63,15 @@ class MiscInfoListPresenterImpl extends MiscInfoListPresenter {
     if (itemInfo == null) {
       return;
     } else if (itemInfo.urlString.isEmpty) {
-      log.info('eventViewWebPage: urlString is empty!');
+      router.gotoSelectPage(context,
+          appBarTitle: input.appBarTitle,
+          itemInfo: itemInfos?.first.itemInfo,
+          completeHandler: input.completeHandler);
       return;
     }
     router.gotoWebPage(context,
         appBarTitle: input.appBarTitle,
         itemInfo: itemInfos?.first.itemInfo,
         completeHandler: input.completeHandler);
-    // router.gotoWebPage(context,
-    //     appBarTitle: appBarTitle,
-    //     itemInfo: itemInfo,
-    //     completeHandler: completeHandler);
   }
 }

@@ -11,6 +11,7 @@ enum ScreenRouteName {
   bbsGuide,
   bbsDetail,
   bbsSelectList,
+  miscInfoSelect,
   webPage,
 }
 
@@ -39,6 +40,8 @@ extension ScreenRouteNameSummary on ScreenRouteName {
         return 'bbsDetail';
       case ScreenRouteName.bbsSelectList:
         return 'bbsSelectList';
+      case ScreenRouteName.miscInfoSelect:
+        return 'miscInfoSelect';
       case ScreenRouteName.webPage:
         return 'webPage';
       default:
@@ -63,6 +66,7 @@ extension ScreenRouteNameSummary on ScreenRouteName {
       case ScreenRouteName.bbsGuide:
       case ScreenRouteName.bbsDetail:
       case ScreenRouteName.bbsSelectList:
+      case ScreenRouteName.miscInfoSelect:
         return toString().split(".").last;
       default:
         return null;

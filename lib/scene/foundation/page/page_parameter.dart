@@ -6,6 +6,8 @@ enum BbsDetailParamKeys { appBarTitle, itemInfo }
 
 enum BbsSelectListParamKeys { appBarTitle, targetUrl }
 
+enum MiscInfoSelectParamKeys { appBarTitle, itemInfo }
+
 enum WebPageParamKeys { appBarTitle, itemInfo }
 
 class PageParameter<T> {

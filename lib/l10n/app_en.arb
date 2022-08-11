@@ -89,5 +89,14 @@
   "infoServiceFavorites":"Favorites",
   "infoServiceHistory":"Historio",
   "infoServiceItemOther":"Other...",
+  "infoServicelistSelectHintMessage":"Select a site name and url as Web work time management.",
+  "infoServicelistInputHintMessage":"If there is no site selected in the above list, directly enter your own Web work time management name and its URL.",
+  "infoServicelistInputOther":"Other",
+  "infoServicelistInputWebTitle":"Web Site Name",
+  "infoServicelistInputWebTitlePlaceHolder":"Input a name here.",
+  "infoServicelistInputWebUrl":"Web Url",
+  "infoServicelistInputWebUrlPlaceHolder":"(http(s)://...",  
+  "infoServicelistInputWebUrlValidMessage":"Please enter a valid url",
+  "infoServicelistInputWebUrlEmptyMessage":"Please enter a url",
   "msgNetworkUnavailable": "Network is unavailable, please try again later"
 }

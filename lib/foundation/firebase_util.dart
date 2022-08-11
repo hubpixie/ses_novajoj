@@ -17,6 +17,7 @@ enum AnalyticsRoute {
   threadDetail,
   bbsDetail,
   bbsSelectList,
+  miscInfoSelect,
   webPage,
 }
 
@@ -35,6 +36,10 @@ extension AnalyticsRouteInfo on AnalyticsRoute {
         return '/bbsDetail';
       case AnalyticsRoute.bbsSelectList:
         return '/bbsSelectList';
+      case AnalyticsRoute.miscInfoSelect:
+        return '/miscInfoSelect';
+      case AnalyticsRoute.webPage:
+        return '/webPage';
       default:
         return '';
     }
@@ -48,6 +53,8 @@ extension AnalyticsRouteInfo on AnalyticsRoute {
       case AnalyticsRoute.localList:
       case AnalyticsRoute.bbsDetail:
       case AnalyticsRoute.bbsSelectList:
+      case AnalyticsRoute.miscInfoSelect:
+      case AnalyticsRoute.webPage:
         return toString().split(".")[1];
       default:
         return '';
