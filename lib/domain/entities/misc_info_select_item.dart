@@ -1,12 +1,7 @@
 import 'package:ses_novajoj/foundation/data/user_types.dart';
-import 'package:ses_novajoj/foundation/data/date_util.dart';
 
 class MiscInfoSelectItem {
-  int id;
-  String string;
+  UrlSelectInfo urlSelectInfo;
 
-  MiscInfoSelectItem({
-    required this.id,
-    required this.string,
-  });
+  MiscInfoSelectItem({required this.urlSelectInfo});
 }

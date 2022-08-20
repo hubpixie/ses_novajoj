@@ -79,14 +79,29 @@ class SimpleUrlInfo {
   String urlString;
 
   SimpleUrlInfo({this.title = '', this.urlString = ''});
-  NovaItemInfo? toItemInfo({ServiceType serviceType = ServiceType.none}) {
+  NovaItemInfo? toItemInfo(
+      {int orderIndex = 0, ServiceType serviceType = ServiceType.none}) {
     return NovaItemInfo(
         id: 0,
+        orderIndex: orderIndex,
         title: title,
         urlString: urlString,
         createAt: DateTime.now(),
         serviceType: serviceType);
   }
+}
+
+class UrlSelectInfo {
+  int id;
+  int order;
+  ServiceType serviceType;
+  List<SimpleUrlInfo>? urlItemList;
+
+  UrlSelectInfo(
+      {this.id = 0,
+      this.order = 0,
+      this.serviceType = ServiceType.none,
+      this.urlItemList});
 }
 
 class SimpleCityInfo {

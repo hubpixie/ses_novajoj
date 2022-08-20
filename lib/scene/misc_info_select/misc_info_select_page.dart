@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 
 import 'package:ses_novajoj/foundation/data/user_types.dart';
@@ -9,6 +8,7 @@ import 'package:ses_novajoj/scene/foundation/page/page_parameter.dart';
 import 'package:ses_novajoj/scene/misc_info_select/misc_info_select_presenter.dart';
 import 'package:ses_novajoj/scene/misc_info_select/misc_info_select_presenter_output.dart';
 import 'package:ses_novajoj/scene/widgets/focus_dismiss_widget.dart';
+import 'package:ses_novajoj/scene/widgets/error_view.dart';
 
 class MiscInfoSelectPage extends StatefulWidget {
   final MiscInfoSelectPresenter presenter;
@@ -20,6 +20,8 @@ class MiscInfoSelectPage extends StatefulWidget {
 }
 
 class _MiscInfoSelectPageState extends State<MiscInfoSelectPage> {
+  late List<SimpleUrlInfo> _inUrlItemList;
+
   bool _pageLoadIsFirst = true;
   late Map? _parameters;
   late String _appBarTitle;
@@ -31,7 +33,6 @@ class _MiscInfoSelectPageState extends State<MiscInfoSelectPage> {
   int? _selectWebIndex;
   String? _valueOfValidatedInputtedUrl;
 
-  MiscInfoSelectViewModelTry? _dataModel;
   @override
   void initState() {
     super.initState();
@@ -75,7 +76,6 @@ class _MiscInfoSelectPageState extends State<MiscInfoSelectPage> {
         child: StreamBuilder<MiscInfoSelectPresenterOutput>(
             stream: widget.presenter.stream,
             builder: (context, snapshot) {
-              /*
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return Center(
                     child: CircularProgressIndicator(
@@ -85,9 +85,36 @@ class _MiscInfoSelectPageState extends State<MiscInfoSelectPage> {
               final data = snapshot.data;
               if (data is ShowMiscInfoSelectPageModel) {
                 if (data.error == null) {
-                  return Column(
-                    children: [Text("${data.viewModel}")],
-                  );
+                  final models = data.viewModelList?.where((elem) =>
+                      elem.urlSelectInfo.serviceType ==
+                          _itemInfo?.serviceType &&
+                      (_itemInfo?.orderIndex == -1 ||
+                          elem.urlSelectInfo.order == _itemInfo?.orderIndex));
+
+                  // TODO: no data displaying
+                  if (models == null || models.isEmpty) {
+                    return const ErrorView(
+                      message: "There's no data to show!",
+                      onFirstButtonTap: null,
+                    );
+                  }
+
+                  // show contents for `misc info select`
+                  return FocusDismiss(
+                      onEndEditing: (focused) {
+                        if (!focused) {
+                          if (!_webUrlFocusNode.hasFocus) {
+                            setState(() {
+                              _valueOfValidatedInputtedUrl =
+                                  _validateInputtedUrl(context,
+                                      inUrl: _webUrlEditController.text);
+                            });
+                          }
+                        }
+                      },
+                      child: CustomScrollView(
+                          slivers: _buildSelectRowsArea(context,
+                              model: models.first)));
                 } else {
                   return Text("${data.error}");
                 }
@@ -95,37 +122,22 @@ class _MiscInfoSelectPageState extends State<MiscInfoSelectPage> {
                 assert(false, "unknown event $data");
                 return Container(color: Colors.red);
               }
-              */
-              return FocusDismiss(
-                  onEndEditing: (focused) {
-                    if (!focused) {
-                      if (!_webUrlFocusNode.hasFocus) {
-                        setState(() {
-                          _valueOfValidatedInputtedUrl = _validateInputtedUrl(
-                              context,
-                              inUrl: _webUrlEditController.text);
-                        });
-                      }
-                    }
-                  },
-                  child: CustomScrollView(
-                      slivers:
-                          _buildSelectRowsArea(context, model: _dataModel)));
             }),
       ),
     );
   }
 
-  List<Widget> _buildSelectRowsArea(context,
-      {MiscInfoSelectViewModelTry? model}) {
-    if (model == null || model.urlInfoList.isEmpty) {
+  List<Widget> _buildSelectRowsArea(context, {MiscInfoSelectViewModel? model}) {
+    _inUrlItemList = model?.urlSelectInfo.urlItemList ?? [];
+
+    if (model == null || _inUrlItemList.isEmpty) {
       return [];
     }
-    int cnt = model.urlInfoList.length;
+    int cnt = model.urlSelectInfo.urlItemList?.length ?? 0;
     return <Widget>[
       SliverList(
           delegate: SliverChildBuilderDelegate((context, index) {
-        final urlInfo = model.urlInfoList[index];
+        final urlInfo = _inUrlItemList[index];
         List<Widget> widgets = [];
         if (index == 0) {
           widgets.add(Align(
@@ -182,9 +194,6 @@ class _MiscInfoSelectPageState extends State<MiscInfoSelectPage> {
             if (index == 0) {
               return const EdgeInsets.only(
                   top: 20, left: 20, bottom: 0, right: 30);
-              // } else if (index == cnt - 1) {
-              //   return const EdgeInsets.only(
-              //       top: 0, left: 20, bottom: 20, right: 20);
             } else {
               return const EdgeInsets.only(left: 20, right: 20);
             }
@@ -211,7 +220,7 @@ class _MiscInfoSelectPageState extends State<MiscInfoSelectPage> {
           _webTitleFocusNode.requestFocus();
           setState(() {
             _valueOfValidatedInputtedUrl = null;
-            _selectWebIndex = (_dataModel?.urlInfoList.length ?? 0) - 1;
+            _selectWebIndex = (_inUrlItemList.length) - 1;
           });
         },
         decoration: InputDecoration(
@@ -242,7 +251,7 @@ class _MiscInfoSelectPageState extends State<MiscInfoSelectPage> {
           _webUrlFocusNode.requestFocus();
           setState(() {
             _valueOfValidatedInputtedUrl = null;
-            _selectWebIndex = (_dataModel?.urlInfoList.length ?? 0) - 1;
+            _selectWebIndex = (_inUrlItemList.length) - 1;
           });
         },
         decoration: InputDecoration(
@@ -288,13 +297,26 @@ class _MiscInfoSelectPageState extends State<MiscInfoSelectPage> {
           ),
           onPressed: _checkNextButtonIsAvailable()
               ? () {
-                  // TODO:save selected url info into shared_pref.
                   // transform current screen to target web site.
-                  widget.presenter.eventSelectingUrlInfo(context,
+                  bool retVal = widget.presenter.eventSelectingUrlInfo(context,
                       input: MiscInfoSelectPresenterInput(
+                          appBarTitle: _appBarTitle,
                           selectedUrlInfo: _getSelectedUrlInfo(),
+                          order: _itemInfo?.orderIndex ?? 0,
                           serviceType:
                               _itemInfo?.serviceType ?? ServiceType.none));
+                  // if selecting is failure
+                  if (!retVal) {
+                    final snackBar = SnackBar(
+                      content: Text(
+                          UseL10n.of(context)?.msgSelectedTargetIsExisted ??
+                              ''),
+                    );
+
+                    // Find the ScaffoldMessenger in the widget tree
+                    // and use it to show a SnackBar.
+                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                  }
                 }
               : null,
           child: const Text('OK')),
@@ -303,23 +325,23 @@ class _MiscInfoSelectPageState extends State<MiscInfoSelectPage> {
   }
 
   SimpleUrlInfo? _getSelectedUrlInfo() {
-    int cnt = _dataModel?.urlInfoList.length ?? 0;
+    int cnt = _inUrlItemList.length;
 
     if (_selectWebIndex == null) {
       return null;
     } else if (_selectWebIndex! < cnt - 1) {
-      return _dataModel?.urlInfoList[_selectWebIndex!];
+      return _inUrlItemList[_selectWebIndex!];
     } else if (_webTitleEditController.text.isEmpty ||
         _webUrlEditController.text.isEmpty) {
       return null;
     }
     return SimpleUrlInfo(
-        title: _webUrlEditController.text,
+        title: _webTitleEditController.text,
         urlString: _webUrlEditController.text);
   }
 
   String? _validateInputtedUrl(BuildContext context, {required String inUrl}) {
-    int cnt = _dataModel?.urlInfoList.length ?? 0;
+    int cnt = _inUrlItemList.length;
     if (_selectWebIndex == null || _selectWebIndex! < cnt - 1) {
       return null;
     }
@@ -336,7 +358,7 @@ class _MiscInfoSelectPageState extends State<MiscInfoSelectPage> {
   }
 
   bool _checkNextButtonIsAvailable() {
-    int cnt = _dataModel?.urlInfoList.length ?? 0;
+    int cnt = _inUrlItemList.length;
     if (_selectWebIndex == null) {
       return false;
     } else if (_selectWebIndex! < cnt - 1) {
@@ -372,21 +394,5 @@ class _MiscInfoSelectPageState extends State<MiscInfoSelectPage> {
     }
   }
 
-  void _loadData() {
-    _dataModel = MiscInfoSelectViewModelTry(_itemInfo!, [
-      SimpleUrlInfo(title: 'AAA', urlString: 'http://google.com/123/'),
-      SimpleUrlInfo(title: 'BBB', urlString: 'http://google.com/123/'),
-      SimpleUrlInfo(title: 'CCC', urlString: 'http://google.com/123/'),
-      SimpleUrlInfo(title: 'DDD', urlString: 'http://google.com/123/'),
-      SimpleUrlInfo(title: 'EEE', urlString: 'http://google.com/123/'),
-      SimpleUrlInfo(title: 'FFF', urlString: 'http://google.com/123/'),
-      SimpleUrlInfo(title: '', urlString: ''),
-    ]);
-    // if (_targetUrl != null) {
-    //   widget.presenter.eventViewReady(
-    //       input: BbsSelectListPresenterInput(targetUrl: _targetUrl ?? ''));
-    // } else {
-    //   log.warning('thread_detail_page: parameter is error!');
-    // }
-  }
+  void _loadData() {}
 }

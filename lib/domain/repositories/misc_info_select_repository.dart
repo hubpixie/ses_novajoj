@@ -1,15 +1,9 @@
 import 'package:ses_novajoj/domain/entities/misc_info_select_item.dart';
-import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/foundation/data/result.dart';
 
-class FetchMiscInfoSelectRepoInput {
-  Object id;
-  String string;
-
-  FetchMiscInfoSelectRepoInput({required this.id, required this.string});
-}
+class FetchMiscInfoSelectRepoInput {}
 
 abstract class MiscInfoSelectRepository {
-  Future<Result<MiscInfoSelectItem>> fetchMiscInfoSelect(
+  Future<Result<List<MiscInfoSelectItem>>> fetchMiscInfoSelectData(
       {required FetchMiscInfoSelectRepoInput input});
 }

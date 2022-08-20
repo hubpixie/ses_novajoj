@@ -1,16 +1,17 @@
+import 'package:ses_novajoj/domain/entities/misc_info_select_item.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
 
-abstract class  MiscInfoSelectUseCaseOutput {}
+abstract class MiscInfoSelectUseCaseOutput {}
 
 class PresentModel extends MiscInfoSelectUseCaseOutput {
-  final MiscInfoSelectUseCaseModel? model;
+  final List<MiscInfoSelectUseCaseRowModel>? models;
   final AppError? error;
-  PresentModel({this.model, this.error});
+  PresentModel({this.models, this.error});
 }
 
-class MiscInfoSelectUseCaseModel {
-  int id;
-  String string;
+class MiscInfoSelectUseCaseRowModel {
+  UrlSelectInfo urlSelectInfo;
 
-  MiscInfoSelectUseCaseModel(this.id, this.string);
+  MiscInfoSelectUseCaseRowModel(MiscInfoSelectItem entity)
+      : urlSelectInfo = entity.urlSelectInfo;
 }

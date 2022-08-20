@@ -1,5 +1,5 @@
 import 'package:ses_novajoj/foundation/data/user_types.dart';
-import 'package:ses_novajoj/foundation/log_util.dart';
+import 'package:ses_novajoj/foundation/data/user_data.dart';
 import 'package:ses_novajoj/domain/foundation/bloc/simple_bloc.dart';
 import 'package:ses_novajoj/domain/usecases/misc_info_list_usecase.dart';
 import 'package:ses_novajoj/domain/usecases/misc_info_list_usecase_output.dart';
@@ -59,19 +59,36 @@ class MiscInfoListPresenterImpl extends MiscInfoListPresenter {
     final itemInfos = input.viewModelList?.where((element) =>
         element.itemInfo.serviceType == input.serviceType &&
         element.itemInfo.orderIndex == input.itemIndex);
-    final itemInfo = itemInfos?.first.itemInfo;
-    if (itemInfo == null) {
-      return;
-    } else if (itemInfo.urlString.isEmpty) {
+
+    void removeAction() {
+      UserData().saveUserInfoList(
+          newValue: input.serviceType == ServiceType.weather
+              ? SimpleCityInfo()
+              : SimpleUrlInfo(),
+          order: input.itemIndex,
+          allowsRemove: true,
+          serviceType: input.serviceType);
+    }
+
+    NovaItemInfo? itemInfo;
+    if (itemInfos == null || itemInfos.isEmpty || input.itemIndex == -1) {
+      itemInfo = SimpleUrlInfo().toItemInfo(
+          orderIndex: input.itemIndex, serviceType: input.serviceType);
+    } else {
+      itemInfo = itemInfos.first.itemInfo;
+    }
+    if (itemInfo?.urlString.isEmpty ?? true) {
       router.gotoSelectPage(context,
           appBarTitle: input.appBarTitle,
-          itemInfo: itemInfos?.first.itemInfo,
+          itemInfo: itemInfo,
           completeHandler: input.completeHandler);
       return;
     }
     router.gotoWebPage(context,
         appBarTitle: input.appBarTitle,
         itemInfo: itemInfos?.first.itemInfo,
+        removeAction:
+            input.serviceType == ServiceType.audio ? removeAction : null,
         completeHandler: input.completeHandler);
   }
 }

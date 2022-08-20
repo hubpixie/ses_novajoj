@@ -6,7 +6,10 @@ abstract class MiscInfoListRouter {
   void gotoSelectPage(Object context,
       {required String appBarTitle, Object? itemInfo, Object? completeHandler});
   void gotoWebPage(Object context,
-      {required String appBarTitle, Object? itemInfo, Object? completeHandler});
+      {required String appBarTitle,
+      Object? itemInfo,
+      Object? removeAction,
+      Object? completeHandler});
 }
 
 class MiscInfoListRouterImpl extends MiscInfoListRouter {
@@ -33,13 +36,49 @@ class MiscInfoListRouterImpl extends MiscInfoListRouter {
   void gotoWebPage(Object context,
       {required String appBarTitle,
       Object? itemInfo,
+      Object? removeAction,
       Object? completeHandler}) {
-    Navigator.pushNamed(context as BuildContext, ScreenRouteName.webPage.name,
-        arguments: {
-          WebPageParamKeys.appBarTitle: appBarTitle,
-          WebPageParamKeys.itemInfo: itemInfo
-        }).then((value) {
-      if (completeHandler != null && completeHandler is Function) {
+    // customize menu items of detail page
+    BuildContext context_ = context as BuildContext;
+    final menuActions = [
+      null,
+      () {
+        Navigator.of(context_).pop();
+        Navigator.pushNamed(context_, ScreenRouteName.miscInfoSelect.name,
+            arguments: {
+              MiscInfoSelectParamKeys.appBarTitle: appBarTitle,
+              MiscInfoSelectParamKeys.itemInfo: itemInfo
+            }).then((value) {
+          if (completeHandler is Function) {
+            completeHandler.call();
+          }
+        });
+      },
+      removeAction == null
+          ? null
+          : () {
+              Navigator.of(context_).pop();
+              if (removeAction is Function) {
+                removeAction.call();
+              }
+              if (completeHandler is Function) {
+                completeHandler.call();
+              }
+            }
+    ];
+
+    // Transfer to web page / detail page.
+    Navigator.pushNamed(context_, ScreenRouteName.webPage.name, arguments: {
+      WebPageParamKeys.appBarTitle: appBarTitle,
+      WebPageParamKeys.itemInfo: itemInfo,
+      WebPageParamKeys.menuItems: [
+        DetailMenuItem.openOriginal,
+        DetailMenuItem.changeSettings,
+        DetailMenuItem.removeSettings
+      ],
+      WebPageParamKeys.menuActions: menuActions
+    }).then((value) {
+      if (completeHandler is Function) {
         completeHandler.call();
       }
     });

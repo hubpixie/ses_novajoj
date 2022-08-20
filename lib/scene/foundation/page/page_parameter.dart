@@ -8,7 +8,14 @@ enum BbsSelectListParamKeys { appBarTitle, targetUrl }
 
 enum MiscInfoSelectParamKeys { appBarTitle, itemInfo }
 
-enum WebPageParamKeys { appBarTitle, itemInfo }
+enum WebPageParamKeys { appBarTitle, itemInfo, menuItems, menuActions }
+
+enum DetailMenuItem {
+  openOriginal,
+  readComments,
+  changeSettings,
+  removeSettings
+}
 
 class PageParameter<T> {
   PageParameter({required this.key, this.value});
