@@ -98,7 +98,10 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
                 viewModelList: viewModelList,
                 serviceType: ServiceType.time,
                 itemIndex: index,
-                completeHandler: () {}));
+                completeHandler: () {
+                  widget.presenter
+                      .eventViewReady(input: MiscInfoListPresenterInput());
+                }));
       },
       onOtherRowSelecting: (index) {},
     );
@@ -121,9 +124,23 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
                 viewModelList: viewModelList,
                 serviceType: ServiceType.audio,
                 itemIndex: index,
-                completeHandler: () {}));
+                completeHandler: () {
+                  widget.presenter
+                      .eventViewReady(input: MiscInfoListPresenterInput());
+                }));
       },
-      onOtherRowSelecting: (index) {},
+      onOtherRowSelecting: (index) {
+        widget.presenter.eventViewWebPage(context,
+            input: MiscInfoListPresenterInput(
+                appBarTitle: UseL10n.of(context)?.infoServiceOnline ?? '',
+                viewModelList: viewModelList,
+                serviceType: ServiceType.audio,
+                itemIndex: -1,
+                completeHandler: () {
+                  widget.presenter
+                      .eventViewReady(input: MiscInfoListPresenterInput());
+                }));
+      },
     );
   }
 
@@ -146,7 +163,10 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
                 viewModelList: viewModelList,
                 serviceType: ServiceType.weather,
                 itemIndex: index,
-                completeHandler: () {}));
+                completeHandler: () {
+                  widget.presenter
+                      .eventViewReady(input: MiscInfoListPresenterInput());
+                }));
       },
       onRowStartSelecting: (index, tapDownDetails) =>
           _tapDownDetails = tapDownDetails,

@@ -67,6 +67,8 @@
     "bbsSelectListForYou":"为您推选",
     "bbsSelectListLatest":"最新",
     "detailPageMenuOpenOriginalPage":"打开原页面",
+    "detailPageMenuChangeMiscInfoSettings":"变更此设置",
+    "detailPageMenuRemoveMiscInfoSettings":"删除此设置",
     "detailPageMenuReadComments":"查看评论",
     "infoServiceTop":"信息定制",
     "infoServiceMyTime":"我的时间",
@@ -98,5 +100,9 @@
     "infoServicelistInputWebUrlPlaceHolder":"(http(s)://...",
     "infoServicelistInputWebUrlValidMessage":"请输入有效的网址",
     "infoServicelistInputWebUrlEmptyMessage":"请输入网址",
+    "msgSelectedTargetIsExisted":"选择的对象已经存在！",
+    "cancelButtonTitle":"取消",
+    "deleteButtonTitle":"删除",
+    "msgConfirmToDeleteSettings":"你确定删除此设置吗？",
     "msgNetworkUnavailable":"当前网络无法连接，请稍后重试！"
   }

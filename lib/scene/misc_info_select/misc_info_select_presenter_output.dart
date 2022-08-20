@@ -4,30 +4,14 @@ import 'package:ses_novajoj/domain/usecases/misc_info_select_usecase_output.dart
 abstract class MiscInfoSelectPresenterOutput {}
 
 class ShowMiscInfoSelectPageModel extends MiscInfoSelectPresenterOutput {
-  final MiscInfoSelectViewModel? viewModel;
+  final List<MiscInfoSelectViewModel>? viewModelList;
   final AppError? error;
-  ShowMiscInfoSelectPageModel({this.viewModel, this.error});
-}
-
-class MiscInfoSelectViewModelTry {
-  NovaItemInfo itemInfo;
-  List<SimpleUrlInfo> urlInfoList;
-
-  MiscInfoSelectViewModelTry(this.itemInfo, this.urlInfoList);
-
-/*
-  MiscInfoSelectViewModel(MiscInfoSelectUseCaseModel model)
-      : id = model.id
-       name = model.name,
-      ...
-      ;*/
+  ShowMiscInfoSelectPageModel({this.viewModelList, this.error});
 }
 
 class MiscInfoSelectViewModel {
-  int id;
-  MiscInfoSelectViewModel(MiscInfoSelectUseCaseModel model)
-      : id = model.id /*
-       name = model.name,
-      ...*/
-  ;
+  UrlSelectInfo urlSelectInfo;
+
+  MiscInfoSelectViewModel(MiscInfoSelectUseCaseRowModel model)
+      : urlSelectInfo = model.urlSelectInfo;
 }

@@ -31,11 +31,9 @@ class _ThreadListPageState extends State<ThreadListPage> {
             automaticallyImplyLeading: false,
             leading: const SizedBox(width: 0),
             centerTitle: false,
-            //title: _buildAppBarTitleArea(context),
             bottom: PreferredSize(
                 child: _buildAppBarTabArea(context),
                 preferredSize: const Size.fromHeight(0.0)),
-            //actions: _buildAppBarActionArea(context),
             titleSpacing: 0,
             leadingWidth: 10,
           ),

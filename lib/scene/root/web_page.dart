@@ -9,8 +9,14 @@ import 'package:ses_novajoj/scene/root/detail_page.dart';
 class WebPageDetailItem {
   NovaItemInfo itemInfo;
   String htmlText;
+  List<DetailMenuItem>? menuItems;
+  List<void Function()?>? menuActions;
 
-  WebPageDetailItem({required this.itemInfo, required this.htmlText});
+  WebPageDetailItem(
+      {required this.itemInfo,
+      required this.htmlText,
+      this.menuItems,
+      this.menuActions});
 }
 
 class WebPage extends StatefulWidget {
@@ -45,7 +51,10 @@ class _WebPageState extends State<WebPage> {
           backgroundColor: const Color(0xFF1B80F3),
           centerTitle: true,
           actions: _detailPage.buildAppBarActionArea(context,
-              itemInfo: _itemInfo, menuItems: [DetailMenuItem.openOriginal]),
+              itemInfo: _itemInfo,
+              menuItems:
+                  _detailItem?.menuItems ?? [DetailMenuItem.openOriginal],
+              menuActions: _detailItem?.menuActions),
         ),
         body: _detailPage.buildContentArea(context,
             detailItem: _detailItem, imageZommingEnabled: false));
@@ -66,7 +75,11 @@ class _WebPageState extends State<WebPage> {
       // WebPageDetailItem
       //
       if (_itemInfo != null) {
-        _detailItem = WebPageDetailItem(itemInfo: _itemInfo!, htmlText: '');
+        _detailItem = WebPageDetailItem(
+            itemInfo: _itemInfo!,
+            htmlText: '',
+            menuItems: _parameters?[WebPageParamKeys.menuItems],
+            menuActions: _parameters?[WebPageParamKeys.menuActions]);
       }
     }
   }

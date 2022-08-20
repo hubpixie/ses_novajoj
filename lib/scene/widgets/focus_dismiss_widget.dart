@@ -4,7 +4,7 @@ import 'package:flutter/widgets.dart';
 typedef _ViewEndEditingDelegate = void Function(bool);
 
 class FocusDismiss extends StatelessWidget {
-  FocusDismiss({Key? key, required this.child, this.onEndEditing})
+  const FocusDismiss({Key? key, required this.child, this.onEndEditing})
       : super(key: key);
 
   final Widget child;

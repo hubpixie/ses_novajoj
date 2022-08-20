@@ -7,6 +7,7 @@ import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/foundation/data/result.dart';
 import 'package:ses_novajoj/networking/api_client/base_api_client.dart';
 import 'package:ses_novajoj/networking/request/nova_item_parameter.dart';
+import 'package:ses_novajoj/networking/response/misc_info_select_item_response.dart';
 
 class BaseNovaWebApi {
   static const String kSampleUrlStr =
@@ -16,6 +17,10 @@ class BaseNovaWebApi {
   static const String kSampleReplacedPkCode =
       'Pihjb29sMTh8NnBhcmspXC5jb208Ly8+IDw=@@';
   static bool _logined = false;
+  static const String kBbsMenuSettingUrl =
+      'https://qczkbaujyxmh9zzbl82kzq.on.drv.tw/www2.pixie.net/www/apps/ses_novajoj/assets/json/bbs_menu.json.txt';
+  static const String kMiscInfoSelectSettingUrl =
+      'https://qczkbaujyxmh9zzbl82kzq.on.drv.tw/www2.pixie.net/www/apps/ses_novajoj/assets/json/misc_info_select.json.txt';
 
   ///
   /// api entry: fetchNovaItemThumbUrl
@@ -186,6 +191,58 @@ extension BaseNovaWebApiForAuth on BaseNovaWebApi {
         return Result.failure(
             error: AppError.fromStatusCode(response.statusCode));
       }
+    } on Exception catch (error) {
+      return Result.failure(error: AppError.fromException(error));
+    }
+  }
+}
+
+extension BaseNovaWebSettings on BaseNovaWebApi {
+  Future<Result<String>> fetchBbsMenuSettings() async {
+    try {
+      // fetch bbs munu settings
+      final response = await BaseApiClient.client
+          .get(Uri.parse(BaseNovaWebApi.kBbsMenuSettingUrl));
+      if (response.statusCode >= HttpStatus.badRequest) {
+        return Result.failure(
+            error: AppError.fromStatusCode(response.statusCode));
+      }
+
+      // set result from response.body.
+
+      return Result.success(data: utf8.decode(response.bodyBytes));
+    } on AppError catch (error) {
+      return Result.failure(error: error);
+    } on Exception catch (error) {
+      return Result.failure(error: AppError.fromException(error));
+    }
+  }
+
+  Future<Result<List<MiscInfoSelectItemItemRes>>>
+      fetchMiscInfoSelectSettings() async {
+    try {
+      // fetch bbs munu settings
+      final response = await BaseApiClient.client
+          .get(Uri.parse(BaseNovaWebApi.kMiscInfoSelectSettingUrl));
+      if (response.statusCode >= HttpStatus.badRequest) {
+        return Result.failure(
+            error: AppError.fromStatusCode(response.statusCode));
+      }
+
+      // set result from response.body.
+      final ret = (dynamic res) {
+        final parsed = jsonDecode(utf8.decode(res));
+        final list = parsed?['misc_select_menu'] as List?;
+        return list != null
+            ? list
+                .map((elem) => MiscInfoSelectItemItemRes.fromJson(elem))
+                .toList()
+            : <MiscInfoSelectItemItemRes>[];
+      }(response.bodyBytes);
+
+      return Result.success(data: ret);
+    } on AppError catch (error) {
+      return Result.failure(error: error);
     } on Exception catch (error) {
       return Result.failure(error: AppError.fromException(error));
     }

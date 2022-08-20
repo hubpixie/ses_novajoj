@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:encrypted_shared_preferences/encrypted_shared_preferences.dart';
 import 'package:ses_novajoj/foundation/log_util.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
-import 'package:ses_novajoj/foundation/data/user_types_summary.dart';
+import 'package:ses_novajoj/foundation/data/user_types_descript.dart';
 
 enum _UserDataKey {
   miscMyTimes,
@@ -76,18 +76,20 @@ class UserData {
         savedValue.isEmpty ? '{"$_kDefaultListValueKey":[]}' : savedValue;
 
     final jsonData = await json.decode(savedValue);
-    final parsed = jsonData[_kDefaultListValueKey] as List<dynamic>?;
+    final parsed = jsonData[_kDefaultListValueKey] as List?;
     final list =
-        parsed?.map((elem) => SimpleUrlInfoSummary.fromJson(elem)).toList() ??
+        parsed?.map((elem) => SimpleUrlInfoDescript.fromJson(elem)).toList() ??
             [];
-    if (outData.isEmpty && list.isNotEmpty) {
-      List.filled(list.length, SimpleUrlInfo());
-    }
+
+    // set result
     list.asMap().forEach((idx, value) {
-      list.asMap().forEach((idx, value) {
+      if (list.length > outData.length) {
+        outData
+            .add(SimpleUrlInfo(title: value.title, urlString: value.urlString));
+      } else {
         outData[idx].title = value.title;
         outData[idx].urlString = value.urlString;
-      });
+      }
     });
   }
 
@@ -101,33 +103,93 @@ class UserData {
         savedValue.isEmpty ? '{"$_kDefaultListValueKey":[]}' : savedValue;
 
     final jsonData = await json.decode(savedValue);
-    final parsed = jsonData[_kDefaultListValueKey] as List<dynamic>?;
+    final parsed = jsonData[_kDefaultListValueKey] as List?;
     final list =
-        parsed?.map((elem) => SimpleCityInfoSummary.fromJson(elem)).toList() ??
+        parsed?.map((elem) => SimpleCityInfoDescript.fromJson(elem)).toList() ??
             [];
-    if (outData.isEmpty && list.isNotEmpty) {
-      List.filled(list.length, SimpleCityInfo());
-    }
     list.asMap().forEach((idx, value) {
-      list.asMap().forEach((idx, value) {
-        outData[idx].name = value.name;
-        outData[idx].langCode = value.langCode;
-        outData[idx].countryCode = value.countryCode;
-      });
+      outData.add(SimpleCityInfo(
+          name: value.name,
+          langCode: value.langCode,
+          countryCode: value.countryCode));
     });
+  }
+
+  ///
+  /// saveUserInfoList
+  ///
+  bool saveUserInfoList(
+      {required dynamic newValue,
+      required int order,
+      bool allowsRemove = false,
+      required ServiceType serviceType}) {
+    String key;
+
+    bool saveIfNeedProc_(dynamic value, List<dynamic> list, bool removed,
+        int index, String key) {
+      if (removed && index < list.length) {
+        list.removeAt(index);
+        return true;
+      }
+      if (value is SimpleUrlInfo) {
+        if (SimpleUrlInfoDescript.isInList(
+            element: newValue, list: list as List<SimpleUrlInfo>)) {
+          return false;
+        }
+      } else if (value is SimpleCityInfo) {
+        if (SimpleCityInfoDescript.isInList(
+            element: newValue, list: list as List<SimpleCityInfo>)) {
+          return false;
+        }
+      }
+      if (index == -1) {
+        list.add(value);
+      } else {
+        list[index] = value;
+      }
+      return true;
+    }
+
+    bool retVal = false;
+    switch (serviceType) {
+      case ServiceType.time:
+        key = 'misc_my_times';
+        retVal =
+            saveIfNeedProc_(newValue, _miscMyTimes, allowsRemove, order, key);
+        if (retVal) {
+          _saveSimpleUrlInfoList(newValues: _miscMyTimes, key: key);
+        }
+        break;
+      case ServiceType.audio:
+        key = 'misc_online_sites';
+        retVal = saveIfNeedProc_(
+            newValue, _miscOnlineSites, allowsRemove, order, key);
+        if (retVal) {
+          _saveSimpleUrlInfoList(newValues: _miscOnlineSites, key: key);
+        }
+        break;
+      case ServiceType.weather:
+        key = 'misc_weather_cities';
+        retVal = saveIfNeedProc_(
+            newValue, _miscOnlineSites, allowsRemove, order, key);
+        if (retVal) {
+          _saveSimpleCityInfoList(newValues: _miscWeatherCities, key: key);
+        }
+        break;
+      default:
+        break;
+    }
+    return retVal;
   }
 
   ///
   /// saveSimpleUrlInfoList
   ///
-  void saveSimpleUrlInfoList(
-      {required List<SimpleUrlInfo> newValue,
-      required String key,
-      required List<SimpleUrlInfo> targetData}) {
-    targetData.clear();
-    targetData.addAll(newValue);
-
-    final jsonData = newValue.map((elem) => elem.toJson()).toList();
+  void _saveSimpleUrlInfoList(
+      {required List<SimpleUrlInfo> newValues, required String key}) {
+    final jsonList = newValues.map((elem) => elem.toJson()).toList();
+    final Map<String, dynamic> jsonData = <String, dynamic>{};
+    jsonData[_kDefaultListValueKey] = jsonList;
     final encoded = jsonEncode(jsonData);
 
     _preferences.setString(key, encoded).then((succeeded) {
@@ -140,14 +202,11 @@ class UserData {
   ///
   /// saveSimpleUrlInfoList
   ///
-  void saveSimpleCityInfoList(
-      {required List<SimpleCityInfo> newValue,
-      required String key,
-      required List<SimpleCityInfo> targetData}) {
-    targetData.clear();
-    targetData.addAll(newValue);
-
-    final jsonData = newValue.map((elem) => elem.toJson()).toList();
+  void _saveSimpleCityInfoList(
+      {required List<SimpleCityInfo> newValues, required String key}) {
+    final jsonList = newValues.map((elem) => elem.toJson()).toList();
+    final Map<String, dynamic> jsonData = <String, dynamic>{};
+    jsonData[_kDefaultListValueKey] = jsonList;
     final encoded = jsonEncode(jsonData);
 
     _preferences.setString(key, encoded).then((succeeded) {
