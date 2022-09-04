@@ -1,0 +1,260 @@
+ID,Code,EnName,JpName,CnName,EnContinent,JpContinent,CnContinent
+1,AC,Ascension Island,アセンション島,阿森松岛,Africa,アフリカ,非洲
+2,AD,Andorra,アンドラ,安道尔,Europe,欧州,欧洲
+3,AE,United Arab Emirates,アラブ首長国連邦,阿拉伯联合酋长国,The Near and Middle East,中近東,中近东
+4,AF,Afghanistan,アフガニスタン,阿富汗,Asia,アジア,亚洲
+5,AG,Antigua And Barbuda,アンティグア・バーブーダ,安提瓜和巴布达,South and Central America,中南米,中南美
+6,AI,Anguilla,アンギラ,安圭拉,South and Central America,中南米,中南美
+7,AL,Albania,アルバニア,阿尔巴尼亚,Europe,欧州,欧洲
+8,AM,Armenia,アルメニア,亚美尼亚,Eastern Europe,東欧,东欧
+9,AN,Netherlands Antilles,オランダ領アンティル,荷属安的列斯群岛,South and Central America,中南米,中南美
+10,AO,Angola,アンゴラ,安哥拉,Africa,アフリカ,非洲
+11,AP,Asia Pacific,アジア太平洋連合,亚太地区,Asia,アジア,亚洲
+12,AQ,Antarctica,南極,南极,Antarctica,南極,南极洲
+13,AR,Argentina,アルゼンチン,阿根廷,South and Central America,中南米,中南美
+14,AS,American Samoa,アメリカ領サモア,美属萨摩亚,Oceania,オセアニア,大洋洲
+15,AT,Austria,オーストリア,奥地利,Europe,欧州,欧洲
+16,AU,Australia,オーストラリア,澳大利亚,Oceania,オセアニア,大洋洲
+17,AW,Aruba,アルバ,阿鲁巴,South and Central America,中南米,中南美
+18,AX,Åland Islands,オーランド諸島,奥兰群岛,Europe,欧州,欧洲
+19,AZ,Azerbaijan,アゼルバイジャン,阿塞拜疆,Eastern Europe,東欧,东周
+20,BA,Bosnia And Herzegowina,ボスニア・ヘルツェゴビナ,波斯尼亚和黑塞哥维那,Europe,欧州,欧洲
+21,BB,Barbados,バルバドス,巴巴多斯,South and Central America,中南米,中南美
+22,BD,Bangladesh,バングラデシュ,孟加拉,Asia,アジア,亚洲
+23,BE,Belgium,ベルギー,比利时,Europe,欧州,欧洲
+24,BF,Burkina Faso,ブルキナファソ,布基纳法索,Africa,アフリカ,非洲
+25,BG,Bulgaria,ブルガリア,保加利亚,Europe,欧州,欧洲
+26,BH,Bahrain,バーレーン,巴林,The Near and Middle East,中近東,中近东
+27,BI,Burundi,ブルンジ,布隆迪,Africa,アフリカ,非洲
+28,BJ,Benin,ベナン,贝宁,Africa,アフリカ,非洲
+29,BL,Saint Barthélemy,サン・バルテルミー島,圣巴泰勒米岛,Central America,中米,中美
+30,BM,Bermuda,バミューダ諸島,百慕大群岛,Northern America,北米,北美
+31,BN,Brunei Darussalam,ブルネイ,文莱,Asia,アジア,亚洲
+32,BO,Bolivia,ボリビア,玻利维亚,South and Central America,中南米,中南美
+33,BQ,Bonaire,ボネール島,博奈尔岛,South and Central America,中南米,中南美
+34,BR,Brazil,ブラジル,巴西,South and Central America,中南米,中南美
+35,BS,Bahamas,バハマ,巴哈马,South and Central America,中南米,中南美
+36,BT,Bhutan,ブータン,不丹,Asia,アジア,亚洲
+37,BV,Bouvet Island,ブーベ島,布韦岛,Antarctica,南極,南极洲
+38,BW,Botswana,ボツワナ,博茨瓦纳,Africa,アフリカ,非洲
+39,BY,Belarus,ベラルーシ,白俄罗斯,Eastern Europe,東欧,东欧
+40,BZ,Belize,ベリーズ,伯利兹城,South and Central America,中南米,中南美
+41,CA,Canada,カナダ,加拿大,Northern America,北米,北美
+42,CC,Cocos (Keeling) Islands,ココス諸島,科科斯群岛,Asia,アジア,亚洲
+43,CD,Democratic Republic of the Congo,コンゴ民主共和国,刚果民主共和国,Africa,アフリカ,非洲
+44,CF,Central African Republic,中央アフリカ共和国,中非共和国,Africa,アフリカ,非洲
+45,CG,Congo,コンゴ共和国,刚果,Africa,アフリカ,非洲
+46,CH,Switzerland,スイス,瑞士,Europe,欧州,欧洲
+47,CI,Côte d'Ivoire,コートジボワール,科特迪瓦,Africa,アフリカ,非洲
+48,CK,Cook Islands,クック諸島,库克群岛,Oceania,オセアニア,大洋洲
+49,CL,Chile,チリ,智利,South and Central America,中南米,中南美
+50,CM,Cameroon,カメルーン,喀麦隆,Africa,アフリカ,非洲
+51,CN,China,中国,中国,Asia,アジア,亚洲
+52,CO,Colombia,コロンビア,哥伦比亚,South and Central America,中南米,中南美
+53,CR,Costa Rica,コスタリカ,哥斯达黎加,Central America,中米,中美洲
+54,CS,Czechoslovakia (former),旧チェコスロバキア,前捷克斯洛伐克,Europe,欧州,欧洲
+55,CU,Cuba,キューバ,古巴,South and Central America,中南米,中南美
+56,CV,Cape Verde,カーボベルデ,佛得角,Africa,アフリカ,非洲
+57,CW,Curaçao,キュラソー島,库拉索岛,South and Central America,中南米,中南美
+58,CX,Christmas Island,クリスマス島,圣诞岛,Oceania,オセアニア,大洋洲
+59,CY,Cyprus,キプロス,塞浦路斯,The Near and Middle East,中近東,中近东
+60,CZ,Czech Republic,チェコ,捷克,Europe,欧州,欧洲
+61,DE,Germany,ドイツ,德国,Europe,欧州,欧洲
+62,DJ,Djibouti,ジブチ,吉布提,Africa,アフリカ,非洲
+63,DK,Denmark,デンマーク,丹麦,Europe,欧州,欧洲
+64,DM,Dominica,ドミニカ国,多米尼克,South and Central America,中南米,中南美
+65,DO,Dominican Republic,ドミニカ共和国,多米尼加,South and Central America,中南米,中南美
+66,DZ,Algeria,アルジェリア,阿尔及利亚,Africa,アフリカ,非洲
+67,EC,Ecuador,エクアドル,厄瓜多尔,South and Central America,中南米,中南美
+68,EE,Estonia,エストニア,爱沙尼亚,Eastern Europe,東欧,东欧
+69,EG,Egypt,エジプト,埃及,The Near and Middle East,中近東,中近东
+70,EH,Western Sahara,西サハラ,西撒哈拉,Africa,アフリカ,非洲
+71,ER,Eritrea,エリトリア,厄立特里亚,Africa,アフリカ,非洲
+72,ES,Spain,スペイン,西班牙,Europe,欧州,欧洲
+73,ET,Ethiopia,エチオピア,埃塞俄比亚,Africa,アフリカ,非洲
+74,EU,EU,欧州連合,欧盟,Europe,欧州,欧洲
+75,FI,Finland,フィンランド,芬兰,Europe,欧州,欧洲
+76,FJ,Fiji,フィジー,斐济,Oceania,オセアニア,大洋洲
+77,FK,Falkland Islands (Malvinas),フォークランド諸島,马尔维纳斯群岛,South and Central America,中南米,中南美
+78,FM,"Micronesia, Federated States Of Micronesia",ミクロネシア連邦,密克罗尼西亚联邦,Oceania,オセアニア,大洋洲
+79,FO,Faroe Islands,フェロー諸島,法罗群岛,Europe,欧州,欧洲
+80,FR,France,フランス,法国,Europe,欧州,非洲
+81,GA,Gabon,ガボン,加蓬,Africa,アフリカ,非洲
+82,GB,Great Britain(United Kingdom),イギリス,英国,Europe,欧州,欧洲
+83,GD,Grenada,グレナダ,格林纳达,South and Central America,中南米,中南美
+84,GE,Georgia,ジョージア,格鲁吉亚,Eastern Europe,東欧,东欧
+85,GF,French Guiana,フランス領ギアナ,法属圭亚那,South and Central America,中南米,中南美
+86,GG,Guernsey,ガーンジー,根西岛,Europe,欧州,欧洲
+87,GH,Ghana,ガーナ,加纳,Africa,アフリカ,非洲
+88,GI,Gibraltar,ジブラルタル,直布罗陀,Europe,欧州,欧洲
+89,GL,Greenland,グリーンランド,格陵兰,Europe,欧州,欧洲
+90,GM,Gambia,ガンビア,冈比亚,Africa,アフリカ,非洲
+91,GN,Guinea,ギニア,几内亚,Africa,アフリカ,非洲
+92,GP,Guadeloupe,グアドループ,瓜德罗普,South and Central America,中南米,中南美
+93,GQ,Equatorial Guinea,赤道ギニア,赤道几内亚,Africa,アフリカ,非洲
+94,GR,Greece,ギリシャ,希腊,Europe,欧州,欧洲
+95,GS,South Georgia And The South Sandwich Islands,サウスジョージア・サウスサンドウィッチ諸島,南乔治亚和南桑威奇群岛,South and Central America,中南米,中南美
+96,GT,Guatemala,グアテマラ,危地马拉,Central America,中米,中美洲
+97,GU,Guam,グアム,关岛,Oceania,オセアニア,大洋洲
+98,GW,Guinea-Bissau,ギニアビサウ,几内亚比绍,Africa,アフリカ,非洲
+99,GY,Guyana,ガイアナ,圭亚那,South and Central America,中南米,中南美
+100,HK,Hong Kong,香港,香港,Asia,アジア,亚洲
+101,HM,Heard And Mc Donald Islands,ハード島とマクドナルド諸島,赫德岛和麦克唐纳群岛,Africa,アフリカ,非洲
+102,HN,Honduras,ホンジュラス,洪都拉斯,South and Central America,中南米,中南美
+103,HR,Croatia (Hrvatska),クロアチア,克罗地亚,Europe,欧州,欧洲
+104,HT,Haiti,ハイチ,海地,South and Central America,中南米,中南美
+105,HU,Hungary,ハンガリー,匈牙利,Europe,欧州,欧洲
+106,ID,Indonesia,インドネシア,印度尼西亚,Asia,アジア,亚洲
+107,IE,Ireland,アイルランド,爱尔兰,Europe,欧州,欧洲
+108,IL,Israel,イスラエル,以色列,The Near and Middle East,中近東,中近东
+109,IM,Isle of Man,マン島,马恩岛,Europe,欧州,欧洲
+110,IN,India,インド,印度,Asia,アジア,亚洲
+111,IO,British Indian Ocean Territory,イギリス領インド洋地域,英属印度洋地区,Africa,アフリカ,非洲
+112,IQ,Iraq,イラク,伊拉克,The Near and Middle East,中近東,中近东
+113,IR,Iran (Islamic Republic Of),イラン,伊朗,The Near and Middle East,中近東,中近东
+114,IS,Iceland,アイスランド,冰岛,Europe,欧州,欧洲
+115,IT,Italy,イタリア,意大利,Europe,欧州,欧洲
+116,JE,Jersey,ジャージー,泽西,Europe,欧州,欧洲
+117,JM,Jamaica,ジャマイカ,牙买加,South and Central America,中南米,中南美
+118,JO,Jordan,ヨルダン,约旦,The Near and Middle East,中近東,中近东
+119,JP,Japan,日本,日本,Asia,アジア,亚洲
+120,KE,Kenya,ケニア,肯尼亚,Africa,アフリカ,非洲
+121,KG,Kyrgyzstan,キルギス,吉尔吉斯,Central Asia,中央アジア,中亚
+122,KH,Cambodia,カンボジア,柬埔寨,Asia,アジア,亚洲
+123,KI,Kiribati,キリバス,基里巴斯,Oceania,オセアニア,大洋洲
+124,KM,Comoros,コモロ,科摩罗,Africa,アフリカ,非洲
+125,KN,Saint Kitts And Nevis,セントクリストファー・ネイビス,圣基茨和尼维斯,South and Central America,中南米,中南美
+126,KP,Korea(North),北朝鮮,朝鲜,Asia,アジア,亚洲
+127,KR,"Korea, Republic Of",韓国,韩国,Asia,アジア,亚洲
+128,KRD,Iraqi Kurdistan,クルディスタン地域,伊拉克库尔德斯坦,The Near and Middle East,中近東,中近东
+129,KW,Kuwait,クウェート,科威特,The Near and Middle East,中近東,中近东
+130,KY,Cayman Islands,ケイマン諸島,开曼群岛,South and Central America,中南米,中南美
+131,KZ,Kazakhstan,カザフスタン,哈萨克斯坦,Central Asia,中央アジア,中亚
+132,LA,Laos,ラオス,老挝,Asia,アジア,亚洲
+133,LB,Lebanon,レバノン,黎巴嫩,The Near and Middle East,中近東,中近东
+134,LC,Saint Lucia,セントルシア,圣卢西亚,South and Central America,中南米,中南美
+135,LI,Liechtenstein,リヒテンシュタイン,列支敦士登,Europe,欧州,欧洲
+136,LK,Sri Lanka,スリランカ,斯里兰卡,Asia,アジア,亚洲
+137,LR,Liberia,リベリア,利比里亚,Africa,アフリカ,非洲
+138,LS,Lesotho,レソト,莱索托,Africa,アフリカ,非洲
+139,LT,Lithuania,リトアニア,立陶宛,Eastern Europe,東欧,东欧
+140,LU,Luxembourg,ルクセンブルク,卢森堡,Europe,欧州,欧洲
+141,LV,Latvia,ラトビア,拉脱维亚,Eastern Europe,東欧,东欧
+142,LY,Libyan Arab Jamahiriya,リビア,利比亚,Africa,アフリカ,非洲
+143,MA,Morocco,モロッコ,摩洛哥,Africa,アフリカ,非洲
+144,MC,Monaco,モナコ,摩纳哥,Europe,欧州,欧洲
+145,MD,"Moldova, Republic Of",モルドバ,摩尔多瓦,Eastern Europe,東欧,东欧
+146,ME,147,モンテネグロ,黑山共和国,Europe,欧州,欧洲
+147,MG,Madagascar,マダガスカル,马达加斯加,Africa,アフリカ,非洲
+148,MH,Marshall Islands,マーシャル諸島,马绍尔群岛,Oceania,オセアニア,大洋洲
+149,MK,The Former Yugoslav Republic Of Macedonia,マケドニア,马其顿共和国,Europe,欧州,欧洲
+150,ML,Mali,マリ,马里,Africa,アフリカ,非洲
+151,MM,Myanmar,ミャンマー,缅甸,Asia,アジア,亚洲
+152,MN,Mongolia,モンゴル,蒙古国,Asia,アジア,亚洲
+153,MO,Macau,マカオ,澳门,Asia,アジア,亚洲
+154,MP,Northern Mariana Islands,北マリアナ諸島,北马里亚纳群岛,Oceania,オセアニア,大洋洲
+155,MQ,Martinique,マルティニーク,马提尼克,South and Central America,中南米,中南美
+156,MR,Mauritania,モーリタニア,毛里塔尼亚,Africa,アフリカ,非洲
+157,MS,Montserrat,モントセラト,蒙塞拉特,South and Central America,中南米,中南美
+158,MT,Malta,マルタ,马耳他,Europe,欧州,欧洲
+159,MU,Mauritius,モーリシャス,毛里求斯,Africa,アフリカ,非洲
+160,MV,Maldives,モルディブ,马尔代夫,Asia,アジア,亚洲
+161,MW,Malawi,マラウイ,马拉维,Africa,アフリカ,非洲
+162,MX,Mexico,メキシコ,墨西哥,Northern America,北米,北美
+163,MY,Malaysia,マレーシア,马来西亚,Asia,アジア,亚洲
+164,MZ,Mozambique,モザンビーク,莫桑比克,Africa,アフリカ,非洲
+165,NA,Namibia,ナミビア,纳米比亚,Africa,アフリカ,非洲
+166,NC,New Caledonia,ニューカレドニア,新咯里多尼亚,Oceania,オセアニア,大洋洲
+167,NE,Niger,ニジェール,尼日尔,Africa,アフリカ,非洲
+168,NF,Norfolk Island,ノーフォーク島,诺福克岛,Oceania,オセアニア,大洋洲
+169,NG,Nigeria,ナイジェリア,尼日利亚,Africa,アフリカ,非洲
+170,NI,Nicaragua,ニカラグア,尼加拉瓜,Central America,中米,中美洲
+171,NL,Netherlands,オランダ,荷兰,Europe,欧州,欧洲
+172,NO,Norway,ノルウェー,挪威,Europe,欧州,欧洲
+173,NP,Nepal,ネパール,尼泊尔,Asia,アジア,亚洲
+174,NR,Nauru,ナウル,瑙鲁,Oceania,オセアニア,大洋洲
+175,NT,Neutral Zone,中立地帯,中立区,The Near and Middle East,中近東,中近东
+176,NU,Niue,ニウエ,纽埃,Oceania,オセアニア,大洋洲
+177,NZ,New Zealand,ニュージーランド,新西兰,Oceania,オセアニア,大洋洲
+178,OM,Oman,オマーン,阿曼,The Near and Middle East,中近東,中近东
+179,PA,Panama,パナマ,巴拿马,South and Central America,中南米,中南美
+180,PE,Peru,ペルー,秘鲁,South and Central America,中南米,中南美
+181,PF,French Polynesia,フランス領ポリネシア,法属波利尼西亚,Oceania,オセアニア,大洋洲
+182,PG,Papua New Guinea,パプアニューギニア,巴布亚新几内亚,Oceania,オセアニア,大洋洲
+183,PH,Philippines,フィリピン,菲律宾,Asia,アジア,亚洲
+184,PK,Pakistan,パキスタン,巴基斯坦,Asia,アジア,亚洲
+185,PL,Poland,ポーランド,波兰,Europe,欧州,欧洲
+186,PM,St. Pierre And Miquelon,サンピエール島・ミクロン島,圣皮埃尔和密克隆群岛,Northern America,北米,北美
+187,PN,Pitcairn,ピトケアン諸島,皮特凯恩群岛,Oceania,オセアニア,大洋洲
+188,PR,Puerto Rico,プエルトリコ,波多黎各,South and Central America,中南米,中南美
+189,PS,Palestina,パレスチナ,巴勒斯坦,Europe,欧州,欧洲
+190,PT,Portugal,ポルトガル,葡萄牙,Europe,欧州,欧洲
+191,PW,Palau,パラオ,帕劳,Asia,アジア,亚洲
+192,PY,Paraguay,パラグアイ,巴拉圭,South and Central America,中南米,中南美
+193,QA,Qatar,カタール,卡塔尔,The Near and Middle East,中近東,中近东
+194,RE,Reunion,レユニオン,留尼汪,Africa,アフリカ,非洲
+195,RO,Romania,ルーマニア,罗马尼亚,Europe,欧州,欧洲
+196,RS,Serbia,セルビア,塞尔维亚,Europe,欧州,欧洲
+197,RU,Russian Federation,ロシア,俄罗斯,Russia,ロシア,俄罗斯
+198,RW,Rwanda,ルワンダ,卢旺达,Africa,アフリカ,非洲
+199,SA,Saudi Arabia,サウジアラビア,沙特阿拉伯,The Near and Middle East,中近東,中近东
+200,SB,Solomon Islands,ソロモン諸島,所罗门群岛,Oceania,オセアニア,大洋洲
+201,SC,Seychelles,セーシェル,塞舌尔,Africa,アフリカ,非洲
+202,SD,Sudan,スーダン,苏丹,Africa,アフリカ,非洲
+203,SE,Sweden,スウェーデン,瑞典,Europe,欧州,欧洲
+204,SG,Singapore,シンガポール,新加坡,Asia,アジア,亚洲
+205,SH,St. Helena,セントヘレナ,圣海伦纳,Africa,アフリカ,非洲
+206,SI,Slovenia,スロベニア,斯洛文尼亚,Europe,欧州,欧洲
+207,SJ,Svalbard And Jan Mayen Islands,スヴァールバル諸島・ヤンマイエン島,"斯瓦尔巴群岛和扬马延岛 ",Europe,欧州,欧洲
+208,SK,Slovakia (Slovak Republic),スロバキア,斯洛伐克,Europe,欧州,欧洲
+209,SL,Sierra Leone,シエラレオネ,塞拉利昂,Africa,アフリカ,非洲
+210,SM,San Marino,サンマリノ,圣马力诺,Europe,欧州,欧洲
+211,SN,Senegal,セネガル,塞内加尔,Africa,アフリカ,非洲
+212,SO,Somalia,ソマリア,索马里,Africa,アフリカ,非洲
+213,SR,Suriname,スリナム,苏里南,South and Central America,中南米,中南美
+214,SS,South Sudan,南スーダン,南苏丹,Africa,アフリカ,非洲
+215,ST,Sao Tome And Principe,サントメ・プリンシペ,圣多美和普林西比,Africa,アフリカ,非洲
+216,SU,USSR (former),旧ソビエト連邦,前苏联,Russia,ロシア,俄罗斯
+217,SV,El Salvador,エルサルバドル,萨尔瓦多,Central America,中米,中美洲
+218,SX,Sint Maarten,シント・マールテン,圣马丁,Central America,中米,中美洲
+219,SY,Syrian Arab Republic,シリア,叙利亚,The Near and Middle East,中近東,中近东
+220,SZ,Swaziland,スワジランド,斯威士兰,Africa,アフリカ,非洲
+221,TC,Turks And Caicos Islands,タークス・カイコス諸島,特克斯和凯科斯群岛,The Near and Middle East,中南米,中南美
+222,TD,Chad,チャド,乍得,Africa,アフリカ,非洲
+223,TF,French Southern Territories,フランス領南方・南極地域,法属南部领地,Antarctica,南極,南极洲
+224,TG,Togo,トーゴ,多哥,Asia,アフリカ,非洲
+225,TH,Thailand,タイ,泰国,The Near and Middle East,アジア,亚洲
+226,TJ,Tajikistan,タジキスタン,塔吉克斯坦,Central Asia,中央アジア,中亚
+227,TK,Tokelau,トケラウ,托克劳,Oceania,オセアニア,大洋洲
+228,TL,Timor-Leste,東ティモール,东帝汶,Asia,アジア,亚洲
+229,TM,Turkmenistan,トルクメニスタン,土库曼斯坦,Central Asia,中央アジア,中亚
+230,TN,Tunisia,チュニジア,突尼斯,Africa,アフリカ,非洲
+231,TO,Tonga,トンガ,汤加,Oceania,オセアニア,大洋洲
+232,TR,Turkey,トルコ,土耳其,The Near and Middle East,中近東,中近东
+233,TT,Trinidad And Tobago,トリニダード・トバゴ,特立尼达和多巴哥,South and Central America,中南米,中南美
+234,TV,Tuvalu,ツバル,图瓦卢,Oceania,オセアニア,大洋洲
+235,TW,"Taiwan, Province Of China",台湾,台湾,Asia,アジア,亚洲
+236,TZ,"Tanzania, United Republic Of",タンザニア,坦桑尼亚,Africa,アフリカ,非洲
+237,UA,Ukraine,ウクライナ,乌克兰,Eastern Europe,東欧,东欧
+238,UG,Uganda,ウガンダ,乌干达,Africa,アフリカ,非洲
+239,UK,United Kingdom,イギリス,英国,Europe,欧州,欧洲
+240,UM,United States Minor Outlying Islands,合衆国領有小離島,美国本土外小岛屿,Northern America,北米,北美
+241,US,United States,アメリカ,美国,Northern America,北米,北美
+242,UY,Uruguay,ウルグアイ,乌拉圭,South and Central America,中南米,中南美
+243,UZ,Uzbekistan,ウズベキスタン,乌兹别克斯坦,Central Asia,中央アジア,中亚
+244,VA,Vatican City State (Holy See),バチカン市国,梵蒂冈,Europe,欧州,欧洲
+245,VC,Saint Vincent And The Grenadines,セントビンセント・グレナディーン,圣文森特和格林纳丁斯,South and Central America,中南米,中南美
+246,VE,Venezuela,ベネズエラ,委内瑞拉,South and Central America,中南米,中南美
+247,VG,Virgin Islands (British),イギリス領ヴァージン諸島,英属维尔京群岛,South and Central America,中南米,中南美
+248,VI,Virgin Islands (U.S.),アメリカ領ヴァージン諸島,美属维尔京群岛,South and Central America,中南米,中南美
+249,VN,Viet Nam,ベトナム,越南,Asia,アジア,亚洲
+250,VU,Vanuatu,バヌアツ,瓦努阿图,Oceania,オセアニア,大洋洲
+251,WF,Wallis And Futuna Islands,ウォリス・フツナ,瓦利斯和富图纳群岛,Oceania,オセアニア,大洋洲
+252,WS,Samoa,サモア,萨摩亚,Oceania,オセアニア,大洋洲
+253,YE,Yemen,イエメン,也门,The Near and Middle East,中近東,中近东
+254,YT,Mayotte,マヨット島,马约特岛,Africa,アフリカ,非洲
+255,YU,Yugoslavia,ユーゴスラビア,南斯拉夫,Europe,欧州,欧洲
+256,ZA,South Africa,南アフリカ,南非,Africa,アフリカ,非洲
+257,ZM,Zambia,ザンビア,赞比亚,Africa,アフリカ,非洲
+258,ZR,Zaire,ザイール,扎伊尔,Africa,アフリカ,非洲
+259,ZW,Zimbabwe,ジンバブエ,津巴布韦,Africa,アフリカ,非洲

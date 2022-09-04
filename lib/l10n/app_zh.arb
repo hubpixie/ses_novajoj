@@ -1,6 +1,10 @@
 {
     "@@locale": "zh",
     
+    "cancelButtonTitle":"取消",
+    "deleteButtonTitle":"删除",
+    "requiredLabelOfTextField": "[必须]",
+
     "appBarIconNameLatest": "即",
     "appBarFullNameLatest": "即时新闻",
     "@appBarIconNameLatest": {
@@ -80,6 +84,14 @@
     "infoServiceOnlineHotRadio":"收听热点",
     "infoServiceOnlineAfn":"音自本营",
     "infoServiceWeather":"天气☁️",
+    "infoServiceWeatherSelectCity":"选择城市",
+    "infoServiceWeatherSelectCityLabelCityName":"城市名（地名）/City (Place)",
+    "infoServiceWeatherSelectCityLabelCountryName":"国家 /Country",
+    "infoServiceWeatherSelectCityHintCityName":"请用拼音输入城市名或地名",
+    "infoServiceWeatherSelectCityHintCountryName":"请输入或选择国家名",
+    "infoServiceWeatherSelectCityGuideFirstMessage":"输入国家名，或直接输入城市名（地名）。",
+    "infoServiceWeatherSelectCityGuideSecondMessage":"以下主要城市名，可直接点选。",
+    "infoServiceWeatherSelectCitySearchGuideMessage":"输入国家名，或直接输入城市名（地名）后，会自动搜索。从匹配的搜索结果选择一个城市名。",
     "infoServiceWeatherTokyo":"东京",
     "infoServiceWeatherPeking":"北京",
     "infoServiceWeatherLabelHumidity":"湿度",
@@ -101,8 +113,6 @@
     "infoServicelistInputWebUrlValidMessage":"请输入有效的网址",
     "infoServicelistInputWebUrlEmptyMessage":"请输入网址",
     "msgSelectedTargetIsExisted":"选择的对象已经存在！",
-    "cancelButtonTitle":"取消",
-    "deleteButtonTitle":"删除",
     "msgConfirmToDeleteSettings":"你确定删除此设置吗？",
     "msgNetworkUnavailable":"当前网络无法连接，请稍后重试！"
   }

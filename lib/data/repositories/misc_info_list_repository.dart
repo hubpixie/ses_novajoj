@@ -7,6 +7,7 @@ import 'package:ses_novajoj/domain/entities/weather_data_item.dart';
 import 'package:ses_novajoj/domain/repositories/misc_info_list_repository.dart';
 import 'package:ses_novajoj/foundation/data/user_data.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
+import 'package:ses_novajoj/foundation/data/user_types_descript.dart';
 import 'package:ses_novajoj/foundation/log_util.dart';
 
 /// You should  web api class is defined in its dart file, like `my_web_api.dart`
@@ -133,31 +134,25 @@ class MiscInfoListRepositoryImpl extends MiscInfoListRepository {
     }
     switch (hourOffset) {
       case '-10:00':
-        return SimpleCityInfo(
-            name: 'Hawaii', langCode: 'en', countryCode: 'US');
+        return SimpleCityInfoDescript.asCurrentLocale(name: 'Hawaii');
       case '-5:00':
-        return SimpleCityInfo(
-            name: 'Sao Paulo', langCode: 'pt', countryCode: 'BR');
+        return SimpleCityInfoDescript.asCurrentLocale(name: 'Sao Paulo');
       case '+0:00':
-        return SimpleCityInfo(
-            name: 'London', langCode: 'en', countryCode: 'UK');
+        return SimpleCityInfoDescript.asCurrentLocale(name: 'London');
+      case '+1:00':
+        return SimpleCityInfoDescript.asCurrentLocale(name: 'Paris');
       case '+3:00':
-        return SimpleCityInfo(
-            name: 'London', langCode: 'ru', countryCode: 'RU');
+        return SimpleCityInfoDescript.asCurrentLocale(name: 'Moscow');
       case '+6:00':
-        return SimpleCityInfo(
-            name: 'Urumqi', langCode: 'zh', countryCode: 'CN');
+        return SimpleCityInfoDescript.asCurrentLocale(name: 'Urumqi');
       case '+8:00':
-        return SimpleCityInfo(
-            name: 'Beijing', langCode: 'zh', countryCode: 'CN');
+        return SimpleCityInfoDescript.asCurrentLocale(name: 'Beijing');
       case '+9:00':
-        return SimpleCityInfo(name: 'Tokyo', langCode: 'ja', countryCode: 'JP');
+        return SimpleCityInfoDescript.asCurrentLocale(name: 'Tokyo');
       case '+10:00':
-        return SimpleCityInfo(
-            name: 'Sydney', langCode: 'en', countryCode: 'AU');
+        return SimpleCityInfoDescript.asCurrentLocale(name: 'Sydney');
       default:
-        return SimpleCityInfo(
-            name: 'New York', langCode: 'en', countryCode: 'US');
+        return SimpleCityInfoDescript.asCurrentLocale(name: 'New York');
     }
   }
 }

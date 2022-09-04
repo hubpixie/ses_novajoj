@@ -1,5 +1,9 @@
 {
   "@@locale": "en",
+
+  "cancelButtonTitle":"Cancel",
+  "deleteButtonTitle":"Delete",
+  "requiredLabelOfTextField": "[Required]",
   
   "appBarIconNameLatest": "L",
   "appBarFullNameLatest": "Latest",
@@ -80,6 +84,14 @@
   "infoServiceOnlineHotRadio":"Hot Radio",
   "infoServiceOnlineAfn":"Freely Listen",
   "infoServiceWeather":"Weather☁️",
+  "infoServiceWeatherSelectCity":"Select a city",
+  "infoServiceWeatherSelectCityLabelCityName":"City (Place)",
+  "infoServiceWeatherSelectCityLabelCountryName":"Country",
+  "infoServiceWeatherSelectCityHintCityName":"Please enter a city name or place.",
+  "infoServiceWeatherSelectCityHintCountryName":"Plese enter a country name.",
+  "infoServiceWeatherSelectCityGuideFirstMessage":"Enter a country name, or directly enter a city name.",
+  "infoServiceWeatherSelectCityGuideSecondMessage":"Top to select main cities around the world.",
+  "infoServiceWeatherSelectCitySearchGuideMessage":"After entering country name (code) or city/place name, it will be started searching. Please select a matched city/place name.",
   "infoServiceWeatherTokyo":"Tokyo",
   "infoServiceWeatherPeking":"Beijing",
   "infoServiceWeatherLabelHumidity":"humídity",
@@ -101,8 +113,6 @@
   "infoServicelistInputWebUrlValidMessage":"Please enter a valid url",
   "infoServicelistInputWebUrlEmptyMessage":"Please enter a url",
   "msgSelectedTargetIsExisted":"The selected target is existd!",
-  "cancelButtonTitle":"Cancel",
-  "deleteButtonTitle":"Delete",
   "msgConfirmToDeleteSettings":"Do you want to delete this settings?",
   "msgNetworkUnavailable": "Network is unavailable, please try again later"
 }
