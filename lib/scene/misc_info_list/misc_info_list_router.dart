@@ -5,6 +5,8 @@ import 'package:ses_novajoj/scene/foundation/page/screen_route_enums.dart';
 abstract class MiscInfoListRouter {
   void gotoSelectPage(Object context,
       {required String appBarTitle, Object? itemInfo, Object? completeHandler});
+  void gotoCitySelectPage(Object context,
+      {required String appBarTitle, Object? itemInfo, Object? completeHandler});
   void gotoWebPage(Object context,
       {required String appBarTitle,
       Object? itemInfo,
@@ -25,6 +27,23 @@ class MiscInfoListRouterImpl extends MiscInfoListRouter {
         arguments: {
           MiscInfoSelectParamKeys.appBarTitle: appBarTitle,
           MiscInfoSelectParamKeys.itemInfo: itemInfo
+        }).then((value) {
+      if (completeHandler != null && completeHandler is Function) {
+        completeHandler.call();
+      }
+    });
+  }
+
+  @override
+  void gotoCitySelectPage(Object context,
+      {required String appBarTitle,
+      Object? itemInfo,
+      Object? completeHandler}) {
+    Navigator.pushNamed(
+        context as BuildContext, ScreenRouteName.citySelect.name,
+        arguments: {
+          CitySelectParamKeys.appBarTitle: appBarTitle,
+          CitySelectParamKeys.itemInfo: itemInfo
         }).then((value) {
       if (completeHandler != null && completeHandler is Function) {
         completeHandler.call();

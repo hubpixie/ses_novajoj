@@ -227,9 +227,11 @@ class _MiscInfoSelectPageState extends State<MiscInfoSelectPage> {
             labelText: UseL10n.of(context)?.infoServicelistInputWebTitle,
             hintText:
                 UseL10n.of(context)?.infoServicelistInputWebTitlePlaceHolder,
+            hintStyle: TextStyle(color: Colors.grey[350]),
+            floatingLabelBehavior: FloatingLabelBehavior.always,
             fillColor: Colors.white,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10.0),
+              borderRadius: BorderRadius.circular(5.0),
               borderSide: const BorderSide(),
             ),
             suffixIcon: IconButton(
@@ -258,9 +260,11 @@ class _MiscInfoSelectPageState extends State<MiscInfoSelectPage> {
             labelText: UseL10n.of(context)?.infoServicelistInputWebUrl,
             hintText:
                 UseL10n.of(context)?.infoServicelistInputWebUrlPlaceHolder,
+            hintStyle: TextStyle(color: Colors.grey[350]),
+            floatingLabelBehavior: FloatingLabelBehavior.always,
             fillColor: Colors.white,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10.0),
+              borderRadius: BorderRadius.circular(5.0),
               borderSide: const BorderSide(),
             ),
             errorStyle: const TextStyle(
@@ -275,7 +279,6 @@ class _MiscInfoSelectPageState extends State<MiscInfoSelectPage> {
                   _webUrlFocusNode.requestFocus();
                   _webUrlEditController.clear();
                 })),
-        autovalidateMode: AutovalidateMode.always,
         validator: (val) => _valueOfValidatedInputtedUrl,
         keyboardType: TextInputType.url,
         style: const TextStyle(

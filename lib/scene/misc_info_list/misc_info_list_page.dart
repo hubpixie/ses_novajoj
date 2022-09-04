@@ -173,7 +173,18 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
       onRowLongPress: (index) {
         _showModeless(context, itemValue: weatherInfos?[index]);
       },
-      onOtherRowSelecting: (index) {},
+      onOtherRowSelecting: (index) {
+        widget.presenter.eventViewWebPage(context,
+            input: MiscInfoListPresenterInput(
+                appBarTitle: UseL10n.of(context)?.infoServiceWeather ?? '',
+                viewModelList: viewModelList,
+                serviceType: ServiceType.weather,
+                itemIndex: -1,
+                completeHandler: () {
+                  widget.presenter
+                      .eventViewReady(input: MiscInfoListPresenterInput());
+                }));
+      },
     );
   }
 

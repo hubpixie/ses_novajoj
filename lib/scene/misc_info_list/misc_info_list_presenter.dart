@@ -78,10 +78,17 @@ class MiscInfoListPresenterImpl extends MiscInfoListPresenter {
       itemInfo = itemInfos.first.itemInfo;
     }
     if (itemInfo?.urlString.isEmpty ?? true) {
-      router.gotoSelectPage(context,
-          appBarTitle: input.appBarTitle,
-          itemInfo: itemInfo,
-          completeHandler: input.completeHandler);
+      if (input.serviceType == ServiceType.weather) {
+        router.gotoCitySelectPage(context,
+            appBarTitle: input.appBarTitle,
+            itemInfo: itemInfo,
+            completeHandler: input.completeHandler);
+      } else {
+        router.gotoSelectPage(context,
+            appBarTitle: input.appBarTitle,
+            itemInfo: itemInfo,
+            completeHandler: input.completeHandler);
+      }
       return;
     }
     router.gotoWebPage(context,
