@@ -102,8 +102,9 @@ class MiscInfoListRepositoryImpl extends MiscInfoListRepository {
   Future<WeatherDataItem?> _fetchWeatherData(
       SimpleCityInfo simpleCityInfo) async {
     WeatherDataItem? ret;
-    WeatherItemParamter paramter = WeatherItemParamter();
+    WeatherItemParameter paramter = WeatherItemParameter();
     paramter.cityParam = CityInfo();
+    paramter.cityParam?.name = simpleCityInfo.name;
     paramter.cityParam?.langCode = simpleCityInfo.langCode;
     paramter.cityParam?.countryCode = simpleCityInfo.countryCode;
     Result<WeatherItemRes> result =

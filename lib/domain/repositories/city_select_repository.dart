@@ -3,13 +3,12 @@ import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/foundation/data/result.dart';
 
 class FetchCitySelectRepoInput {
-  Object id;
-  String string;
+  SimpleCityInfo cityInfo;
 
-  FetchCitySelectRepoInput({required this.id, required this.string});
+  FetchCitySelectRepoInput({required this.cityInfo});
 }
 
 abstract class CitySelectRepository {
-  Future<Result<CitySelectItem>> fetchCitySelect(
+  Future<Result<CitySelectItem>> fetchCityInfos(
       {required FetchCitySelectRepoInput input});
 }

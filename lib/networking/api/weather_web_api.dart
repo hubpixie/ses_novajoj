@@ -8,6 +8,8 @@ import 'package:ses_novajoj/foundation/data/result.dart';
 import 'package:ses_novajoj/networking/api_client/base_api_client.dart';
 import 'package:ses_novajoj/networking/request/weather_item_parameter.dart';
 import 'package:ses_novajoj/networking/response/weather_item_response.dart';
+import 'package:ses_novajoj/networking/request/city_item_parameter.dart';
+import 'package:ses_novajoj/networking/response/city_select_item_response.dart';
 
 /// Wrapper around the open weather map api
 /// https://openweathermap.org/current
@@ -16,7 +18,7 @@ class WeatherWebApi {
   static const String _apiKey = '2f8796eefe67558dc205b09dd336d022';
 
   Future<Result<WeatherItemRes>> getWeatherWithLocation(
-      {required WeatherItemParamter paramter}) async {
+      {required WeatherItemParameter paramter}) async {
     final url =
         '$_endpoint/data/2.5/weather?lat=${paramter.latitude}&lon=${paramter.longitude}&appid=$_apiKey';
     log.info('getCityNameFromLocation $url');
@@ -45,7 +47,7 @@ class WeatherWebApi {
   }
 
   Future<Result<WeatherItemRes>> getWeatherData(
-      {required WeatherItemParamter paramter}) async {
+      {required WeatherItemParameter paramter}) async {
     final url = !(paramter.cityParam?.zip.isEmpty ?? true)
         ? '$_endpoint/data/2.5/weather?zip=${paramter.cityParam?.zip},${paramter.cityParam?.countryCode}&appid=$_apiKey'
         : '$_endpoint/data/2.5/weather?q=${paramter.cityParam?.name},${paramter.cityParam?.countryCode}&appid=$_apiKey';
@@ -72,7 +74,7 @@ class WeatherWebApi {
   }
 
   Future<Result<List<WeatherItemRes>>> getForecast(
-      {required WeatherItemParamter paramter}) async {
+      {required WeatherItemParameter paramter}) async {
     final url = !(paramter.cityParam?.zip.isEmpty ?? true)
         ? '$_endpoint/data/2.5/forecast?zip=${paramter.cityParam?.zip},${paramter.cityParam?.countryCode}&appid=$_apiKey'
         : '$_endpoint/data/2.5/forecast?q=${paramter.cityParam?.name},${paramter.cityParam?.countryCode}&appid=$_apiKey';
@@ -90,6 +92,44 @@ class WeatherWebApi {
         var list =
             parsed?.map((element) => WeatherItemRes.fromJson(element)).toList();
         return Result.success(data: list ?? []);
+      }
+    } on AppError catch (error) {
+      return Result.failure(error: error);
+    } on Exception catch (error) {
+      log.severe('$error');
+      return Result.failure(error: AppError.fromException(error));
+    }
+  }
+
+  Future<Result<CitySelectItemRes>> getWeatherCities(
+      {required CitytItemParameter paramter}) async {
+    String nameParam = () {
+      String ret = paramter.cityInfo.name;
+      if (paramter.cityInfo.countryCode.isNotEmpty) {
+        ret = '$ret,${paramter.cityInfo.countryCode}';
+      }
+      return ret;
+    }();
+
+    final url =
+        '$_endpoint/geo/1.0/direct?q=$nameParam&limit=50&appid=$_apiKey';
+    log.info('getCityNameFromLocation $url');
+
+    try {
+      // check network state
+      final networkState = await BaseApiClient.connectivityState();
+      if (networkState == ConnectivityResult.none) {
+        throw const SocketException('Network is unavailable!');
+      }
+
+      final response = await BaseApiClient.client.get(Uri.parse(url));
+      if (response.statusCode >= HttpStatus.badRequest) {
+        return Result.failure(
+            error: AppError.fromStatusCode(response.statusCode));
+      } else {
+        CitySelectItemRes ret =
+            CitySelectItemRes.fromJson(json.decode(response.body));
+        return Result.success(data: ret);
       }
     } on AppError catch (error) {
       return Result.failure(error: error);

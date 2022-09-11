@@ -2,10 +2,10 @@
 
 import 'package:ses_novajoj/foundation/data/user_types.dart';
 
-class WeatherItemParamter {
+class WeatherItemParameter {
   double latitude;
   double longitude;
   CityInfo? cityParam;
 
-  WeatherItemParamter({this.latitude = 0, this.longitude = 0, this.cityParam});
+  WeatherItemParameter({this.latitude = 0, this.longitude = 0, this.cityParam});
 }

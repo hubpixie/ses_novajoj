@@ -6,7 +6,9 @@ import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'city_select_usecase_output.dart';
 
 class CitySelectUseCaseInput {
-
+  SimpleCityInfo cityInfo;
+  bool dataCleared;
+  CitySelectUseCaseInput({required this.cityInfo, this.dataCleared = false});
 }
 
 abstract class CitySelectUseCase with SimpleBloc<CitySelectUseCaseOutput> {
@@ -19,13 +21,17 @@ class CitySelectUseCaseImpl extends CitySelectUseCase {
 
   @override
   void fetchCitySelect({required CitySelectUseCaseInput input}) async {
-    final result = await repository.fetchCitySelect(
-        input: FetchCitySelectRepoInput(
-            id: 9999, string: "99999" /* // TODO: dummy code*/));
+    if (input.dataCleared) {
+      streamAdd(
+          PresentModel(model: CitySelectUseCaseModel(<CityInfo>[], true)));
+      return;
+    }
+    final result = await repository.fetchCityInfos(
+        input: FetchCitySelectRepoInput(cityInfo: input.cityInfo));
 
     result.when(success: (value) {
       streamAdd(
-          PresentModel(model: CitySelectUseCaseModel(9999, value.toString() /* // TODO: dummy code*/)));
+          PresentModel(model: CitySelectUseCaseModel(value.cityInfos, false)));
     }, failure: (error) {
       streamAdd(PresentModel(error: error));
     });

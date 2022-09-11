@@ -20,7 +20,6 @@ class CitySelectPage extends StatefulWidget {
 
 class _CitySelectPageState extends State<CitySelectPage> {
   bool _pageLoadIsFirst = true;
-  bool _searchEnabled = false;
   late Map? _parameters;
   late String _appBarTitle;
   late NovaItemInfo? _itemInfo;
@@ -36,9 +35,6 @@ class _CitySelectPageState extends State<CitySelectPage> {
     _cityNameFocusNode = FocusNode();
     _countryNameEditController = TextEditingController();
     _cityNameEditController = TextEditingController();
-
-    // TODO: Initialize your variables.
-    widget.presenter.eventViewReady(input: CitySelectPresenterInput());
   }
 
   @override
@@ -55,51 +51,24 @@ class _CitySelectPageState extends State<CitySelectPage> {
     _parseRouteParameter();
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(UseL10n.of(context)?.infoServiceWeatherSelectCity ?? ''),
-        backgroundColor: const Color(0xFF1B80F3),
-        centerTitle: true,
-      ),
-      resizeToAvoidBottomInset: true,
-      body: BlocProvider<CitySelectPresenter>(
-        bloc: widget.presenter,
-        child: StreamBuilder<CitySelectPresenterOutput>(
-            stream: widget.presenter.stream,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(
-                    child: CircularProgressIndicator(
-                        color: Colors.amber,
-                        backgroundColor: Colors.grey[850]));
-              }
-              /*
-              final data = snapshot.data;
-              if (data is ShowCitySelectPageModel) {
-                if (data.error == null) {
-                  return Column(
-                    children: [Text("${data.viewModel}")],
-                  );
-                } else {
-                  return Text("${data.error}");
-                }
-              } else {
-                assert(false, "unknown event $data");
-                return Container(color: Colors.red);
-              }
-              */
-              List<Widget> widgets = [];
-              _buildInputRowsArea(context, sourceWidgets: widgets);
-              _buildMainCitiesArea(context, sourceWidgets: widgets);
-              return SingleChildScrollView(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: widgets,
-                ),
-              );
-            }),
-      ),
-    );
+        appBar: AppBar(
+          title: Text(UseL10n.of(context)?.infoServiceWeatherSelectCity ?? ''),
+          backgroundColor: const Color(0xFF1B80F3),
+          centerTitle: true,
+        ),
+        resizeToAvoidBottomInset: true,
+        body: () {
+          List<Widget> widgets = [];
+          _buildInputRowsArea(context, sourceWidgets: widgets);
+          _buildMainCitiesArea(context, sourceWidgets: widgets);
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: widgets,
+            ),
+          );
+        }());
   }
 
   void _buildInputRowsArea(BuildContext context,
@@ -165,10 +134,8 @@ class _CitySelectPageState extends State<CitySelectPage> {
               _countryNameFocusNode = FocusNode();
             });
           } else {
-            if (_searchEnabled) {
-              setState(() {
-                _searchEnabled = false;
-              });
+            if (_cityNameEditController.text.isNotEmpty) {
+              _submitSelectCityData(dataCleared: true);
             }
             _cityNameFocusNode.requestFocus();
           }
@@ -207,9 +174,7 @@ class _CitySelectPageState extends State<CitySelectPage> {
         textInputAction: TextInputAction.search,
         keyboardType: TextInputType.text,
         onFieldSubmitted: (string) {
-          setState(() {
-            _searchEnabled = _cityNameEditController.text.isNotEmpty;
-          });
+          _submitSelectCityData(dataCleared: false);
         },
         style: const TextStyle(
           fontFamily: "Poppins",
@@ -220,22 +185,42 @@ class _CitySelectPageState extends State<CitySelectPage> {
     }
 
     sourceWidgets.add(
-      _searchEnabled
-          ? FutureBuilder<List<Widget>>(
-              future: _buildSuggestions(keyword: _cityNameEditController.text),
+      BlocProvider<CitySelectPresenter>(
+          bloc: widget.presenter,
+          child: StreamBuilder<CitySelectPresenterOutput>(
+              stream: widget.presenter.stream,
               builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return Container(
-                      padding: const EdgeInsets.only(top: 5),
-                      height: 300,
-                      child: ListView(children: snapshot.data!));
-                } else if (snapshot.hasError) {
-                  return Text('${snapshot.error}');
+                if (_cityNameEditController.text.isEmpty) {
+                  return const SizedBox(height: 0.0, width: 0.0);
                 }
-                return const Center(child: CircularProgressIndicator());
-              },
-            )
-          : const SizedBox(height: 0.0, width: 0.0),
+                if (!snapshot.hasData) {
+                  return Center(
+                      child: CircularProgressIndicator(
+                          color: Colors.amber,
+                          backgroundColor: Colors.grey[850]));
+                }
+
+                final data = snapshot.data;
+                if (data is ShowCitySelectPageModel) {
+                  if (data.error == null) {
+                    if (data.viewModel!.dataCleared) {
+                      return const SizedBox(height: 0.0, width: 0.0);
+                    } else {
+                      return Container(
+                          padding: const EdgeInsets.only(top: 5),
+                          height: 300,
+                          child: ListView(
+                              children: _buildSuggestions(
+                                  viewModel: data.viewModel)));
+                    }
+                  } else {
+                    return Text("${data.error}");
+                  }
+                } else {
+                  assert(false, "unknown event $data");
+                  return Container(color: Colors.red);
+                }
+              })),
     );
   }
 
@@ -285,26 +270,27 @@ class _CitySelectPageState extends State<CitySelectPage> {
         )));
   }
 
-  Future<List<Widget>> _buildSuggestions({required String keyword}) async {
+  List<Widget> _buildSuggestions({CitySelectViewModel? viewModel}) {
     final list = <Widget>[];
-    final suggestions = await Future.delayed(Duration(seconds: 1),
-        () => ["New York", "New City", "City Land", "Tokyo", "TomoroW"]);
-    final keyword_ = keyword.toLowerCase();
-    suggestions.where((elem) => elem.toLowerCase().contains(keyword_)).forEach(
-        (elem) => list.add(ListTile(
-            tileColor: Colors.grey[100],
-            shape: const ContinuousRectangleBorder(
-                side: BorderSide(width: 0.5, color: Colors.grey),
-                borderRadius: BorderRadius.zero),
-            title: Text(elem),
-            subtitle: Text(elem),
-            trailing: Image.asset('icons/flags/png/au.png',
-                package: 'country_icons', width: 30),
-            onTap: () {
-              // FIXME: there are dummy codes.
-              Navigator.of(context).pop();
-              Navigator.of(context).pop();
-            })));
+
+    for (CityInfo elem in viewModel?.cityInfos ?? []) {
+      list.add(ListTile(
+          tileColor: Colors.grey[100],
+          shape: const ContinuousRectangleBorder(
+              side: BorderSide(width: 0.5, color: Colors.grey),
+              borderRadius: BorderRadius.zero),
+          title: Text(elem.nameDesc),
+          subtitle: Text('${elem.state} - ${elem.countryCode}'),
+          trailing: Image.asset(
+              'icons/flags/png/${elem.countryCode.toLowerCase()}.png',
+              package: 'country_icons',
+              width: 30),
+          onTap: () {
+            // FIXME: there are dummy codes.
+            Navigator.of(context).pop();
+            Navigator.of(context).pop();
+          }));
+    }
     return list;
   }
 
@@ -355,11 +341,15 @@ class _CitySelectPageState extends State<CitySelectPage> {
       //
       // send viewEvent
       FirebaseUtil().sendViewEvent(route: AnalyticsRoute.citySelect);
-
-      // fetch data
-      _loadData();
     }
   }
 
-  void _loadData() {}
+  void _submitSelectCityData({required dataCleared}) {
+    widget.presenter.eventViewReady(
+        input: CitySelectPresenterInput(
+            selectedCityInfo: SimpleCityInfo(
+                countryCode: _countryNameEditController.text,
+                name: _cityNameEditController.text),
+            dataCleared: dataCleared));
+  }
 }
