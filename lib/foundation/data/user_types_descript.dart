@@ -27,6 +27,38 @@ extension SimpleUrlInfoDescript on SimpleUrlInfo {
 }
 
 extension SimpleCityInfoDescript on SimpleCityInfo {
+  static SimpleCityInfo fromJson(Map<String, dynamic> json) {
+    SimpleCityInfo self = SimpleCityInfo();
+
+    self.name = json['name'] ?? '';
+    self.state = json['state'] ?? self.name;
+    self.langCode = json['lang_code'] ?? '';
+    self.countryCode = json['country_code'] ?? '';
+    return self;
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+
+    data['name'] = name;
+    data['state'] = state;
+    data['lang_code'] = langCode;
+    data['country_code'] = countryCode;
+    return data;
+  }
+
+  static isInList(
+      {required SimpleCityInfo element, required List<SimpleCityInfo> list}) {
+    final found = list.where((e) =>
+        e.name == element.name &&
+        e.state == element.state &&
+        e.langCode == element.langCode &&
+        e.countryCode == element.countryCode);
+    return found.isNotEmpty;
+  }
+}
+
+extension CityInfoDescript on CityInfo {
   static const Map<String, List<String>> kMainCities = {
     "Hawaii": ["en", "US", "夏威夷", "ハワイ"],
     "Sao Paulo": ["pt", "BR", "圣保罗", "サンパロ"],
@@ -41,8 +73,8 @@ extension SimpleCityInfoDescript on SimpleCityInfo {
     "New York": ["en", "US", "纽约", "ニューヨーク"],
   };
 
-  static SimpleCityInfo asCurrentLocale({required String name}) {
-    SimpleCityInfo self = SimpleCityInfo();
+  static CityInfo asCurrentLocale({required String name}) {
+    CityInfo self = CityInfo();
     String locale = Intl.defaultLocale ?? Intl.systemLocale;
     final nameIndex = (String loc) {
       final lang = loc.split('-').first;
@@ -52,9 +84,10 @@ extension SimpleCityInfoDescript on SimpleCityInfo {
 
     final cityItem = kMainCities[name];
     self.name = name;
+    self.nameDesc = name;
     if (cityItem != null) {
       if (nameIndex >= 2) {
-        self.name = cityItem[nameIndex];
+        self.nameDesc = cityItem[nameIndex];
       }
       self.langCode = cityItem[0];
       self.countryCode = cityItem[1];
@@ -62,28 +95,35 @@ extension SimpleCityInfoDescript on SimpleCityInfo {
     return self;
   }
 
-  static SimpleCityInfo fromJson(Map<String, dynamic> json) {
-    SimpleCityInfo self = SimpleCityInfo();
-
+  static CityInfo fromJson(Map<String, dynamic> json) {
+    CityInfo self = CityInfo();
+    self.id = json['id'] ?? 0;
     self.name = json['name'] ?? '';
+    self.nameDesc = json['name_desc'] ?? '';
+    self.state = json['state'] ?? self.name;
     self.langCode = json['lang_code'] ?? '';
     self.countryCode = json['country_code'] ?? '';
+    self.timezone = json['timezone'] ?? 0;
     return self;
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
 
+    data['id'] = id;
     data['name'] = name;
+    data['name_desc'] = nameDesc;
+    data['state'] = state;
     data['lang_code'] = langCode;
     data['country_code'] = countryCode;
+    data['timezone'] = timezone;
     return data;
   }
 
-  static isInList(
-      {required SimpleCityInfo element, required List<SimpleCityInfo> list}) {
+  static isInList({required CityInfo element, required List<CityInfo> list}) {
     final found = list.where((e) =>
         e.name == element.name &&
+        e.state == element.state &&
         e.langCode == element.langCode &&
         e.countryCode == element.countryCode);
     return found.isNotEmpty;

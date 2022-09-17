@@ -1,17 +1,21 @@
 import 'package:ses_novajoj/foundation/data/user_types.dart';
 
 class CitySelectItemRes {
+  Map<String, List<double>>? locations;
   List<CityInfo>? cityInfos;
 
-  CitySelectItemRes({
-    required this.cityInfos,
-  });
+  CitySelectItemRes({required this.cityInfos, this.locations});
+
+  Map<String, List<double>>? _locations;
+  List<CityInfo>? _cityInfos;
 
   CitySelectItemRes.fromJson(dynamic jsonList) {
-    cityInfos = () {
+    _locations ??= {};
+    _cityInfos = () {
       final parsed = jsonList as List?;
       if (parsed != null) {
         final list = parsed.map((elem) {
+          // CityInfo
           CityInfo cityInfo = CityInfo();
           _findLocalNameAndEtc(cityInfo,
               nameDic: elem['local_names'],
@@ -20,19 +24,25 @@ class CitySelectItemRes {
           cityInfo.name = elem['name'];
           cityInfo.state = elem['state'] ?? elem['name'];
           cityInfo.countryCode = elem['country'];
+
+          // LocationInfo
+          _locations?[cityInfo.toCityKey()] = [elem['lat'], elem['lon']];
+
           return cityInfo;
         }).toList();
-        final keys = list
-            .map((elem) => "${elem.name}_${elem.state}_${elem.countryCode}")
-            .toSet();
-        return list
-            .where((elem) =>
-                keys.remove("${elem.name}_${elem.state}_${elem.countryCode}"))
-            .toList();
+
+        final keys = list.map((elem) => elem.toCityKey()).toSet();
+
+        // remove duplicated data
+        // set result
+        return list.where((elem) => keys.remove(elem.toCityKey())).toList();
       } else {
         return <CityInfo>[];
       }
     }();
+
+    cityInfos = _cityInfos;
+    locations = _locations;
   }
 
   void _findLocalNameAndEtc(CityInfo cityInfo,

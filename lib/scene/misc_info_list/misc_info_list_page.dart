@@ -85,12 +85,7 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
     ];
     return InfoServiceCell(
       sectionTitle: UseL10n.of(context)?.infoServiceMyTime ?? '',
-      rowTitles: <Widget>[
-        _toTextWidget(rowTitleStrings[0]),
-        _toTextWidget(rowTitleStrings[1]),
-        _toTextWidget(rowTitleStrings[2]),
-        _toTextWidget(rowTitleStrings[3]),
-      ],
+      rowTitles: rowTitleStrings.map((elem) => _buildTextWidget(elem)).toList(),
       onRowSelecting: (index) {
         widget.presenter.eventViewWebPage(context,
             input: MiscInfoListPresenterInput(
@@ -111,12 +106,12 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
       {List<MiscInfoListViewModel>? viewModelList}) {
     final rowTitles = viewModelList
         ?.where((element) => element.itemInfo.serviceType == ServiceType.audio)
-        .map((element) => _toTextWidget(element.itemInfo.title))
+        .map((element) => _buildTextWidget(element.itemInfo.title))
         .toList();
     return InfoServiceCell(
       sectionTitle: UseL10n.of(context)?.infoServiceOnline ?? '',
       rowTitles: rowTitles ?? [],
-      otherTitle: _toTextWidget(UseL10n.of(context)?.infoServiceItemOther),
+      otherTitle: _buildTextWidget(UseL10n.of(context)?.infoServiceItemOther),
       onRowSelecting: (index) {
         widget.presenter.eventViewWebPage(context,
             input: MiscInfoListPresenterInput(
@@ -154,8 +149,8 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
 
     return InfoServiceCell(
       sectionTitle: UseL10n.of(context)?.infoServiceWeather ?? '',
-      rowTitles: _toRowWeatherWidgets(weatherInfos),
-      otherTitle: _toTextWidget(UseL10n.of(context)?.infoServiceItemOther),
+      rowTitles: _buildRowWeatherWidgets(weatherInfos),
+      otherTitle: _buildTextWidget(UseL10n.of(context)?.infoServiceItemOther),
       onRowSelecting: (index) {
         widget.presenter.eventViewWebPage(context,
             input: MiscInfoListPresenterInput(
@@ -193,7 +188,7 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
     return InfoServiceCell(
       sectionTitle: UseL10n.of(context)?.infoServiceFavorites ?? '',
       rowTitles: const <Widget>[],
-      otherTitle: _toTextWidget(UseL10n.of(context)?.infoServiceItemOther),
+      otherTitle: _buildTextWidget(UseL10n.of(context)?.infoServiceItemOther),
       onRowSelecting: (index) {
         widget.presenter.eventViewWebPage(context,
             input: MiscInfoListPresenterInput(
@@ -212,7 +207,7 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
     return InfoServiceCell(
       sectionTitle: UseL10n.of(context)?.infoServiceHistory ?? '',
       rowTitles: const <Widget>[],
-      otherTitle: _toTextWidget(UseL10n.of(context)?.infoServiceItemOther),
+      otherTitle: _buildTextWidget(UseL10n.of(context)?.infoServiceItemOther),
       onRowSelecting: (index) {
         widget.presenter.eventViewWebPage(context,
             input: MiscInfoListPresenterInput(
@@ -226,20 +221,20 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
     );
   }
 
-  Widget _toTextWidget(String? str) {
+  Widget _buildTextWidget(String? str) {
     return Text(
       str ?? '',
       style: const TextStyle(color: Color(0xFF8D918D)),
     );
   }
 
-  List<Widget> _toRowWeatherWidgets(List<WeatherInfo?>? infos) {
+  List<Widget> _buildRowWeatherWidgets(List<WeatherInfo?>? infos) {
     return infos
             ?.map((info) => Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      info?.city?.name ?? '',
+                      info?.city?.nameDesc ?? '',
                       style: const TextStyle(color: Color(0xFF8D918D)),
                     ),
                     const SizedBox(width: 10),
@@ -249,7 +244,7 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
                     ),
                     const SizedBox(width: 10),
                     Container(
-                        padding: const EdgeInsets.only(bottom: 8),
+                        padding: const EdgeInsets.only(bottom: 4),
                         child: Icon(
                           WeatherUtil().getIconData(info?.iconCode),
                           color: Colors.black45,

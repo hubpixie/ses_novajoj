@@ -134,6 +134,21 @@ class CityInfo extends SimpleCityInfo {
       countryCode = '',
       this.timezone = 0,
       this.isFavorite = false});
+
+  NovaItemInfo? toItemInfo(
+      {int orderIndex = 0, ServiceType serviceType = ServiceType.none}) {
+    return NovaItemInfo(
+        id: 0,
+        orderIndex: orderIndex,
+        title: nameDesc,
+        urlString: 'http://',
+        createAt: DateTime.now(),
+        serviceType: serviceType);
+  }
+
+  String toCityKey() {
+    return "$name}_$state}_$countryCode";
+  }
 }
 
 enum TemperatureUnit { kelvin, celsius, fahrenheit }

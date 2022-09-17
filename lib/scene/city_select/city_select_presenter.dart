@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:ses_novajoj/foundation/data/user_data.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/domain/foundation/bloc/simple_bloc.dart';
 import 'package:ses_novajoj/domain/usecases/city_select_usecase.dart';
@@ -10,7 +11,7 @@ import 'city_select_router.dart';
 
 class CitySelectPresenterInput {
   String appBarTitle;
-  SimpleCityInfo? selectedCityInfo;
+  CityInfo? selectedCityInfo;
   Object? completeHandler;
   ServiceType serviceType;
   int order;
@@ -59,7 +60,20 @@ class CitySelectPresenterImpl extends CitySelectPresenter {
   @override
   bool eventSelectingCityInfo(Object context,
       {required CitySelectPresenterInput input}) {
-    return true;
+    // save the selected url info
+    bool saved = UserData().saveUserInfoList(
+        newValue: input.selectedCityInfo,
+        order: input.order,
+        serviceType: input.serviceType);
+
+    // navigate the target as web page if exists
+    if (saved) {
+      router.gotoMiscListPage(context,
+          itemInfo: input.selectedCityInfo
+              ?.toItemInfo(serviceType: input.serviceType),
+          completeHandler: input.completeHandler);
+    }
+    return saved;
   }
 
   StreamSubscription<CitySelectUseCaseOutput> _addStreamListener() {

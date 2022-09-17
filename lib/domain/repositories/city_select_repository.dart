@@ -3,7 +3,7 @@ import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/foundation/data/result.dart';
 
 class FetchCitySelectRepoInput {
-  SimpleCityInfo cityInfo;
+  CityInfo cityInfo;
 
   FetchCitySelectRepoInput({required this.cityInfo});
 }

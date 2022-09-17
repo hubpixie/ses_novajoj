@@ -6,7 +6,7 @@ import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'city_select_usecase_output.dart';
 
 class CitySelectUseCaseInput {
-  SimpleCityInfo cityInfo;
+  CityInfo cityInfo;
   bool dataCleared;
   CitySelectUseCaseInput({required this.cityInfo, this.dataCleared = false});
 }

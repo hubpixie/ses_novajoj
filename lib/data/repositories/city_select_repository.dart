@@ -1,13 +1,9 @@
 import 'package:ses_novajoj/foundation/data/result.dart';
-import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/networking/api/weather_web_api.dart';
 import 'package:ses_novajoj/networking/response/city_select_item_response.dart';
 import 'package:ses_novajoj/networking/request/city_item_parameter.dart';
 import 'package:ses_novajoj/domain/entities/city_select_item.dart';
 import 'package:ses_novajoj/domain/repositories/city_select_repository.dart';
-
-/// TODO: This is dummy Web API class.
-/// You should  web api class is defined in its dart file, like `my_web_api.dart`
 
 class CitySelectRepositoryImpl extends CitySelectRepository {
   final WeatherWebApi _api;

@@ -1,13 +1,18 @@
+import 'package:flutter/material.dart';
+
 abstract class CitySelectRouter {
-  //void gotoTop(Object context);
+  void gotoMiscListPage(Object context,
+      {Object? itemInfo, Object? completeHandler});
 }
 
 class CitySelectRouterImpl extends CitySelectRouter {
   CitySelectRouterImpl();
 
-  // @override
-  // void gotoTop(Object context) {
-  //   log.info('gotoTop');
-  //   Navigator.pushNamed(context as BuildContext, ScreenRouteName.tabs.name);
-  // }
+  @override
+  void gotoMiscListPage(Object context,
+      {Object? itemInfo, Object? completeHandler}) {
+    BuildContext context_ = context as BuildContext;
+    Navigator.of(context_).pop();
+    Navigator.of(context_).pop();
+  }
 }

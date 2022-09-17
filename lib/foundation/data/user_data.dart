@@ -36,13 +36,14 @@ class UserData {
   /// variables for properties
   final List<SimpleUrlInfo> _miscMyTimes = [];
   final List<SimpleUrlInfo> _miscOnlineSites = [];
-  final List<SimpleCityInfo> _miscWeatherCities = [];
+  //final List<SimpleCityInfo> _miscWeatherCities = [];
+  final List<CityInfo> _miscWeatherCities = [];
 
   final EncryptedSharedPreferences _preferences = EncryptedSharedPreferences();
 
   List<SimpleUrlInfo> get miscMyTimes => _miscMyTimes;
   List<SimpleUrlInfo> get miscOnlineSites => _miscOnlineSites;
-  List<SimpleCityInfo> get miscWeatherCities => _miscWeatherCities;
+  List<CityInfo> get miscWeatherCities => _miscWeatherCities;
 
   ///
   /// read all keys and their values
@@ -62,7 +63,7 @@ class UserData {
 
     // _miscWeatherCities
     _miscWeatherCities.clear();
-    _getSimpleCityInfoList(
+    _getCityInfoList(
         key: _UserDataKey.miscWeatherCities.name, outData: _miscWeatherCities);
   }
 
@@ -96,6 +97,7 @@ class UserData {
   ///
   /// getSimpleCityInfoList
   ///
+  /// ignore: unused_element
   void _getSimpleCityInfoList(
       {required String key, required List<SimpleCityInfo> outData}) async {
     String savedValue = await _preferences.getString(key);
@@ -112,6 +114,24 @@ class UserData {
           name: value.name,
           langCode: value.langCode,
           countryCode: value.countryCode));
+    });
+  }
+
+  ///
+  /// getCityInfoList
+  ///
+  void _getCityInfoList(
+      {required String key, required List<CityInfo> outData}) async {
+    String savedValue = await _preferences.getString(key);
+    savedValue =
+        savedValue.isEmpty ? '{"$_kDefaultListValueKey":[]}' : savedValue;
+
+    final jsonData = await json.decode(savedValue);
+    final parsed = jsonData[_kDefaultListValueKey] as List?;
+    final list =
+        parsed?.map((elem) => CityInfoDescript.fromJson(elem)).toList() ?? [];
+    list.asMap().forEach((idx, value) {
+      outData.add(value);
     });
   }
 
@@ -136,9 +156,9 @@ class UserData {
             element: newValue, list: list as List<SimpleUrlInfo>)) {
           return false;
         }
-      } else if (value is SimpleCityInfo) {
-        if (SimpleCityInfoDescript.isInList(
-            element: newValue, list: list as List<SimpleCityInfo>)) {
+      } else if (value is CityInfo) {
+        if (CityInfoDescript.isInList(
+            element: newValue, list: list as List<CityInfo>)) {
           return false;
         }
       }
@@ -171,9 +191,9 @@ class UserData {
       case ServiceType.weather:
         key = 'misc_weather_cities';
         retVal = saveIfNeedProc_(
-            newValue, _miscOnlineSites, allowsRemove, order, key);
+            newValue, _miscWeatherCities, allowsRemove, order, key);
         if (retVal) {
-          _saveSimpleCityInfoList(newValues: _miscWeatherCities, key: key);
+          _saveCityInfoList(newValues: _miscWeatherCities, key: key);
         }
         break;
       default:
@@ -200,10 +220,27 @@ class UserData {
   }
 
   ///
-  /// saveSimpleUrlInfoList
+  /// _saveSimpleCityInfoList
   ///
   void _saveSimpleCityInfoList(
       {required List<SimpleCityInfo> newValues, required String key}) {
+    final jsonList = newValues.map((elem) => elem.toJson()).toList();
+    final Map<String, dynamic> jsonData = <String, dynamic>{};
+    jsonData[_kDefaultListValueKey] = jsonList;
+    final encoded = jsonEncode(jsonData);
+
+    _preferences.setString(key, encoded).then((succeeded) {
+      if (!succeeded) {
+        log.warning('Cannot save $key info SharedPref!');
+      }
+    });
+  }
+
+  ///
+  /// _saveCityInfoList
+  ///
+  void _saveCityInfoList(
+      {required List<CityInfo> newValues, required String key}) {
     final jsonList = newValues.map((elem) => elem.toJson()).toList();
     final Map<String, dynamic> jsonData = <String, dynamic>{};
     jsonData[_kDefaultListValueKey] = jsonList;

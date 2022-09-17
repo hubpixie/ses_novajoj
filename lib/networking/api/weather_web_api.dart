@@ -55,6 +55,29 @@ class WeatherWebApi {
 
     try {
       final response = await BaseApiClient.client.get(Uri.parse(url));
+      if (response.statusCode == HttpStatus.notFound) {
+        // Here get a error as 'City Not Found'
+        // Get city lacation and fetch weather info
+        if (paramter.cityParam != null) {
+          final citySelRes = await getWeatherCities(
+              paramter: CitytItemParameter(cityInfo: paramter.cityParam!));
+          List<dynamic>? cityLoc;
+          citySelRes.when(
+              success: (value) {
+                final cityKey = value.cityInfos?.first.toCityKey();
+                if (cityKey != null) {
+                  cityLoc = value.locations?[cityKey];
+                }
+              },
+              failure: (error) {});
+          // Use cityLoc
+          if (cityLoc != null) {
+            return getWeatherWithLocation(
+                paramter: WeatherItemParameter(
+                    latitude: cityLoc?.first, longitude: cityLoc?.last));
+          }
+        }
+      }
 
       // Convert and return
       if (response.statusCode >= HttpStatus.badRequest) {
@@ -113,7 +136,7 @@ class WeatherWebApi {
 
     final url =
         '$_endpoint/geo/1.0/direct?q=$nameParam&limit=50&appid=$_apiKey';
-    log.info('getCityNameFromLocation $url');
+    log.info('getWeatherCities $url');
 
     try {
       // check network state

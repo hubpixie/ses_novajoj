@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
-import 'package:country_icons/country_icons.dart';
+// import 'package:country_icons/country_icons.dart';
 import 'package:ses_novajoj/foundation/firebase_util.dart';
 import 'package:ses_novajoj/domain/foundation/bloc/bloc_provider.dart';
 import 'package:ses_novajoj/scene/foundation/use_l10n.dart';
@@ -273,7 +273,7 @@ class _CitySelectPageState extends State<CitySelectPage> {
   List<Widget> _buildSuggestions({CitySelectViewModel? viewModel}) {
     final list = <Widget>[];
 
-    for (CityInfo elem in viewModel?.cityInfos ?? []) {
+    (viewModel?.cityInfos ?? []).asMap().forEach((idx, elem) {
       list.add(ListTile(
           tileColor: Colors.grey[100],
           shape: const ContinuousRectangleBorder(
@@ -286,11 +286,9 @@ class _CitySelectPageState extends State<CitySelectPage> {
               package: 'country_icons',
               width: 30),
           onTap: () {
-            // FIXME: there are dummy codes.
-            Navigator.of(context).pop();
-            Navigator.of(context).pop();
+            _didSelectedCity(cityInfo: elem);
           }));
-    }
+    });
     return list;
   }
 
@@ -317,12 +315,25 @@ class _CitySelectPageState extends State<CitySelectPage> {
         });
   }
 
-  SimpleCityInfo _getSelectedCityInfo() {
-    return SimpleCityInfo();
-  }
+  void _didSelectedCity({required CityInfo cityInfo}) {
+    // transform current screen to target web site.
+    bool retVal = widget.presenter.eventSelectingCityInfo(context,
+        input: CitySelectPresenterInput(
+            appBarTitle: _appBarTitle,
+            selectedCityInfo: cityInfo,
+            order: _itemInfo?.orderIndex ?? 0,
+            serviceType: _itemInfo?.serviceType ?? ServiceType.none));
+    // if selecting is failure
+    if (!retVal) {
+      Navigator.of(context).pop();
+      final snackBar = SnackBar(
+        content: Text(UseL10n.of(context)?.msgSelectedTargetIsExisted ?? ''),
+      );
 
-  bool _checkNextButtonIsAvailable() {
-    return true;
+      // Find the ScaffoldMessenger in the widget tree
+      // and use it to show a SnackBar.
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
   }
 
   void _parseRouteParameter() {
@@ -344,12 +355,15 @@ class _CitySelectPageState extends State<CitySelectPage> {
     }
   }
 
-  void _submitSelectCityData({required dataCleared}) {
+  void _submitSelectCityData({required bool dataCleared}) {
     widget.presenter.eventViewReady(
         input: CitySelectPresenterInput(
-            selectedCityInfo: SimpleCityInfo(
-                countryCode: _countryNameEditController.text,
-                name: _cityNameEditController.text),
+            selectedCityInfo: () {
+              CityInfo cityInfo = CityInfo();
+              cityInfo.countryCode = _countryNameEditController.text;
+              cityInfo.name = _cityNameEditController.text;
+              return cityInfo;
+            }(),
             dataCleared: dataCleared));
   }
 }
