@@ -10,11 +10,10 @@ class ShowCitySelectPageModel extends CitySelectPresenterOutput {
 }
 
 class CitySelectViewModel {
-  int id; 
+  List<CityInfo> cityInfos;
+  bool dataCleared;
 
   CitySelectViewModel(CitySelectUseCaseModel model)
-      : id = model.id/*,
-       name = model.name,
-      ...
-      */;
+      : cityInfos = model.cityInfos,
+        dataCleared = model.dataCleared;
 }

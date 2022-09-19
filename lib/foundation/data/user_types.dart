@@ -107,15 +107,20 @@ class UrlSelectInfo {
 class SimpleCityInfo {
   String name;
   String langCode;
+  String state;
   String countryCode;
 
-  SimpleCityInfo({this.name = '', this.langCode = '', this.countryCode = ''});
+  SimpleCityInfo(
+      {this.name = '',
+      this.langCode = '',
+      this.state = '',
+      this.countryCode = ''});
 }
 
 class CityInfo extends SimpleCityInfo {
   int id;
   String zip;
-  String nameDesc; // Name description with current locale.
+  String nameDesc; // Name description with current locale.(same as localName)
   int timezone;
   bool isFavorite;
 
@@ -123,11 +128,27 @@ class CityInfo extends SimpleCityInfo {
       {this.id = 0,
       this.zip = '',
       langCode,
-      name,
+      name = '',
       this.nameDesc = '',
-      countryCode,
+      state = '',
+      countryCode = '',
       this.timezone = 0,
       this.isFavorite = false});
+
+  NovaItemInfo? toItemInfo(
+      {int orderIndex = 0, ServiceType serviceType = ServiceType.none}) {
+    return NovaItemInfo(
+        id: 0,
+        orderIndex: orderIndex,
+        title: nameDesc,
+        urlString: 'http://',
+        createAt: DateTime.now(),
+        serviceType: serviceType);
+  }
+
+  String toCityKey() {
+    return "$name}_$state}_$countryCode";
+  }
 }
 
 enum TemperatureUnit { kelvin, celsius, fahrenheit }

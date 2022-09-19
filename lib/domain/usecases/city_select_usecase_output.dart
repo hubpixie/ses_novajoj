@@ -1,6 +1,6 @@
 import 'package:ses_novajoj/foundation/data/user_types.dart';
 
-abstract class  CitySelectUseCaseOutput {}
+abstract class CitySelectUseCaseOutput {}
 
 class PresentModel extends CitySelectUseCaseOutput {
   final CitySelectUseCaseModel? model;
@@ -9,8 +9,8 @@ class PresentModel extends CitySelectUseCaseOutput {
 }
 
 class CitySelectUseCaseModel {
-  int id;
-  String string;
+  List<CityInfo> cityInfos;
+  bool dataCleared;
 
-  CitySelectUseCaseModel(this.id, this.string);
+  CitySelectUseCaseModel(this.cityInfos, this.dataCleared);
 }

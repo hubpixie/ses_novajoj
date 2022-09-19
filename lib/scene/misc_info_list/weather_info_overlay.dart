@@ -112,56 +112,74 @@ class WeatherInfoOverlayState extends State<WeatherInfoOverlay>
   Widget _buildWeatherContentArea(BuildContext context,
       {WeatherInfo? itemValue}) {
     final double screenWidth = MediaQuery.of(context).size.width;
-
+    final leftSideWidth = () {
+      if (screenWidth <= 280) return 110.0;
+      if (screenWidth <= 360) return 150.0;
+      if (screenWidth <= 420) {
+        return 210.0;
+      } else {
+        return 250.0;
+      }
+    }();
     return SizedBox(
-        width: screenWidth - 60,
+        width: screenWidth - 40,
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            const Spacer(),
             Container(
-                constraints: BoxConstraints(
-                    minWidth: 80,
-                    maxWidth: () {
-                      if (screenWidth <= 280) return 110.0;
-                      if (screenWidth <= 360) return 150.0;
-                      if (screenWidth <= 420) {
-                        return 180.0;
-                      } else {
-                        return 250.0;
-                      }
-                    }()),
+                constraints:
+                    BoxConstraints(minWidth: 80, maxWidth: leftSideWidth),
                 child: GestureDetector(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: Text('${itemValue?.city?.name}',
-                            softWrap: false,
-                            overflow: TextOverflow.ellipsis,
-                            style: _createTextStyle(
-                                fontSize: 19.0, color: Colors.black54)),
-                      ),
-                      Text('${itemValue?.getWeatherDesc()}',
-                          softWrap: false,
-                          overflow: TextOverflow.ellipsis,
-                          style: _createTextStyle(
-                              fontSize: 11.0, color: Colors.black54)),
-                    ],
-                  ),
+                  child: Padding(
+                      padding: const EdgeInsets.only(top: 10, bottom: 0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('${itemValue?.city?.nameDesc}',
+                              softWrap: true,
+                              overflow: TextOverflow.ellipsis,
+                              style: _createTextStyle(
+                                  fontSize: 19.0, color: Colors.black54)),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Spacer(),
+                              itemValue?.city?.state.isEmpty ?? false
+                                  ? const SizedBox()
+                                  : Container(
+                                      padding: const EdgeInsets.only(
+                                          top: 6, right: 8),
+                                      alignment: Alignment.center,
+                                      width: leftSideWidth - 20,
+                                      child: Text(
+                                          '${itemValue?.city?.state}, ${itemValue?.city?.countryCode}',
+                                          softWrap: true,
+                                          overflow: TextOverflow.clip,
+                                          style: _createTextStyle(
+                                              fontSize: 10.0,
+                                              color: Colors.black54)),
+                                    ),
+                            ],
+                          ),
+                          Text('${itemValue?.getWeatherDesc()}',
+                              softWrap: false,
+                              overflow: TextOverflow.ellipsis,
+                              style: _createTextStyle(
+                                  fontSize: 14.0, color: Colors.black54)),
+                        ],
+                      )),
                   onTap: () {
                     // setState(() {
                     //   widget.onCellEditing?.call();
                     // });
                   },
                 )),
-            const Spacer(),
             Text('${itemValue?.temperature?.as(widget.temprtUnit).round()}°',
-                style: _createTextStyle(fontSize: 40.0, color: Colors.black54)),
+                style: _createTextStyle(fontSize: 32.0, color: Colors.black54)),
             const Spacer(),
             Padding(
-                padding: const EdgeInsets.only(bottom: 15),
+                padding: const EdgeInsets.only(bottom: 5),
                 child: Icon(
                   itemValue?.getIconData(),
                   color: Colors.black54,
@@ -169,7 +187,7 @@ class WeatherInfoOverlayState extends State<WeatherInfoOverlay>
                 )),
             const Spacer(),
             Container(
-                width: 40,
+                width: 32,
                 padding: const EdgeInsets.symmetric(vertical: 5.0),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -184,7 +202,6 @@ class WeatherInfoOverlayState extends State<WeatherInfoOverlay>
                             fontSize: 16.0, color: Colors.black54)),
                   ],
                 )),
-            const Spacer(),
           ],
         ));
   }

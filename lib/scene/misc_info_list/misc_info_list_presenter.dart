@@ -63,7 +63,7 @@ class MiscInfoListPresenterImpl extends MiscInfoListPresenter {
     void removeAction() {
       UserData().saveUserInfoList(
           newValue: input.serviceType == ServiceType.weather
-              ? SimpleCityInfo()
+              ? CityInfo()
               : SimpleUrlInfo(),
           order: input.itemIndex,
           allowsRemove: true,
@@ -72,12 +72,17 @@ class MiscInfoListPresenterImpl extends MiscInfoListPresenter {
 
     NovaItemInfo? itemInfo;
     if (itemInfos == null || itemInfos.isEmpty || input.itemIndex == -1) {
-      itemInfo = SimpleUrlInfo().toItemInfo(
-          orderIndex: input.itemIndex, serviceType: input.serviceType);
+      if (input.serviceType == ServiceType.weather) {
+        itemInfo = CityInfo().toItemInfo(
+            orderIndex: input.itemIndex, serviceType: input.serviceType);
+      } else {
+        itemInfo = SimpleUrlInfo().toItemInfo(
+            orderIndex: input.itemIndex, serviceType: input.serviceType);
+      }
     } else {
       itemInfo = itemInfos.first.itemInfo;
     }
-    if (itemInfo?.urlString.isEmpty ?? true) {
+    if (input.itemIndex == -1) {
       if (input.serviceType == ServiceType.weather) {
         router.gotoCitySelectPage(context,
             appBarTitle: input.appBarTitle,

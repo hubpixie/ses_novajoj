@@ -164,7 +164,7 @@ class WeatherUtil {
         case 500:
           return 'light rain,小雨,小雨';
         case 501:
-          return 'moderate rain,雨，適度な雨';
+          return 'moderate rain,雨,適度な雨';
         case 502:
           return 'heavy intensity rain,强降雨,重い強度の雨';
         case 503:
