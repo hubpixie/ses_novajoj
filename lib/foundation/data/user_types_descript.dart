@@ -67,19 +67,19 @@ extension CityInfoDescript on CityInfo {
     "Moscow": ["ru", "RU", "莫斯科", "パリ"],
     "Urumqi": ["zh", "CN", "乌鲁木齐", "ウルムチ"],
     "Beijing": ["zh", "CN", "北京", "北京"],
-    "Seoul": ["kr", "RU", "首尔", "ソウル"],
+    "Seoul": ["ko", "KR", "首尔", "ソウル"],
     "Tokyo": ["ja", "JP", "东京", "東京"],
     "Sydney": ["en", "AU", "悉尼", "シドニー"],
     "New York": ["en", "US", "纽约", "ニューヨーク"],
   };
 
-  static CityInfo asCurrentLocale({required String name}) {
+  static CityInfo fromCurrentLocale({required String name}) {
     CityInfo self = CityInfo();
     String locale = Intl.defaultLocale ?? Intl.systemLocale;
     final nameIndex = (String loc) {
       final lang = loc.split('-').first;
       final index = ['en', 'zh', 'ja'].indexOf(lang);
-      return index < 0 ? 0 : index + 2;
+      return index < 0 ? 0 : index + 1;
     }(locale);
 
     final cityItem = kMainCities[name];
@@ -123,7 +123,7 @@ extension CityInfoDescript on CityInfo {
   static isInList({required CityInfo element, required List<CityInfo> list}) {
     final found = list.where((e) =>
         e.name == element.name &&
-        e.state == element.state &&
+        ((e.state != '' && e.state == element.state) || e.state == '') &&
         e.langCode == element.langCode &&
         e.countryCode == element.countryCode);
     return found.isNotEmpty;

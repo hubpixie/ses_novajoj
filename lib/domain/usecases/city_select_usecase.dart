@@ -2,6 +2,7 @@ import 'package:ses_novajoj/domain/foundation/bloc/simple_bloc.dart';
 import 'package:ses_novajoj/domain/repositories/city_select_repository.dart';
 import 'package:ses_novajoj/data/repositories/city_select_repository.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
+import 'package:ses_novajoj/foundation/data/user_types_descript.dart';
 
 import 'city_select_usecase_output.dart';
 
@@ -13,6 +14,7 @@ class CitySelectUseCaseInput {
 
 abstract class CitySelectUseCase with SimpleBloc<CitySelectUseCaseOutput> {
   void fetchCitySelect({required CitySelectUseCaseInput input});
+  Future<PresentModel> fetchMainCities({required CitySelectUseCaseInput input});
 }
 
 class CitySelectUseCaseImpl extends CitySelectUseCase {
@@ -35,5 +37,15 @@ class CitySelectUseCaseImpl extends CitySelectUseCase {
     }, failure: (error) {
       streamAdd(PresentModel(error: error));
     });
+  }
+
+  @override
+  Future<PresentModel> fetchMainCities(
+      {required CitySelectUseCaseInput input}) async {
+    final list = CityInfoDescript.kMainCities.keys
+        .map((elem) => CityInfoDescript.fromCurrentLocale(name: elem))
+        .toList();
+
+    return PresentModel(model: CitySelectUseCaseModel(list, false));
   }
 }

@@ -139,25 +139,25 @@ class MiscInfoListRepositoryImpl extends MiscInfoListRepository {
     return () {
       switch (hourOffset) {
         case '-10:00':
-          return CityInfoDescript.asCurrentLocale(name: 'Hawaii');
+          return CityInfoDescript.fromCurrentLocale(name: 'Hawaii');
         case '-5:00':
-          return CityInfoDescript.asCurrentLocale(name: 'Sao Paulo');
+          return CityInfoDescript.fromCurrentLocale(name: 'Sao Paulo');
         case '+0:00':
-          return CityInfoDescript.asCurrentLocale(name: 'London');
+          return CityInfoDescript.fromCurrentLocale(name: 'London');
         case '+1:00':
-          return CityInfoDescript.asCurrentLocale(name: 'Paris');
+          return CityInfoDescript.fromCurrentLocale(name: 'Paris');
         case '+3:00':
-          return CityInfoDescript.asCurrentLocale(name: 'Moscow');
+          return CityInfoDescript.fromCurrentLocale(name: 'Moscow');
         case '+6:00':
-          return CityInfoDescript.asCurrentLocale(name: 'Urumqi');
+          return CityInfoDescript.fromCurrentLocale(name: 'Urumqi');
         case '+8:00':
-          return CityInfoDescript.asCurrentLocale(name: 'Beijing');
+          return CityInfoDescript.fromCurrentLocale(name: 'Beijing');
         case '+9:00':
-          return CityInfoDescript.asCurrentLocale(name: 'Tokyo');
+          return CityInfoDescript.fromCurrentLocale(name: 'Tokyo');
         case '+10:00':
-          return CityInfoDescript.asCurrentLocale(name: 'Sydney');
+          return CityInfoDescript.fromCurrentLocale(name: 'Sydney');
         default:
-          return CityInfoDescript.asCurrentLocale(name: 'New York');
+          return CityInfoDescript.fromCurrentLocale(name: 'New York');
       }
     }();
   }

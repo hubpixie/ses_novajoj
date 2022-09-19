@@ -13,6 +13,5 @@ class CitySelectRouterImpl extends CitySelectRouter {
       {Object? itemInfo, Object? completeHandler}) {
     BuildContext context_ = context as BuildContext;
     Navigator.of(context_).pop();
-    Navigator.of(context_).pop();
   }
 }

@@ -222,6 +222,7 @@ class UserData {
   ///
   /// _saveSimpleCityInfoList
   ///
+  // ignore: unused_element
   void _saveSimpleCityInfoList(
       {required List<SimpleCityInfo> newValues, required String key}) {
     final jsonList = newValues.map((elem) => elem.toJson()).toList();

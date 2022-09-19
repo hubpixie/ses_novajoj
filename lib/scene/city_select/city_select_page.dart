@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
-// import 'package:country_icons/country_icons.dart';
 import 'package:ses_novajoj/foundation/firebase_util.dart';
 import 'package:ses_novajoj/domain/foundation/bloc/bloc_provider.dart';
 import 'package:ses_novajoj/scene/foundation/use_l10n.dart';
@@ -245,28 +244,53 @@ class _CitySelectPageState extends State<CitySelectPage> {
     sourceWidgets.add(const SizedBox(height: 10));
     sourceWidgets.add(SizedBox(
         height: 300,
-        child: GridView.count(
-          // Create a grid with 4 columns. If you change the scrollDirection to
-          // horizontal, this produces 2 rows.
-          childAspectRatio: (itemWidth / itemHeight) * 4.0,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: 3,
-          // Generate 30 widgets that display their index in the List.
-          children: List.generate(12, (index) {
-            return Container(
-                height: 30,
-                padding: const EdgeInsets.all(5),
-                child: ElevatedButton(
-                    style: ButtonStyle(
-                        backgroundColor:
-                            MaterialStateProperty.all<Color>(Colors.lightBlue)),
-                    onPressed: () {},
-                    child: Text(
-                      'Item $index',
-                      style: TextStyle(color: Colors.white, fontSize: 14),
-                    )));
-          }),
+        child: FutureBuilder(
+          future: widget.presenter
+              .eventSelectMainCities(input: CitySelectPresenterInput()),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return Center(
+                  child: CircularProgressIndicator(
+                      color: Colors.amber, backgroundColor: Colors.grey[850]));
+            }
+            final data = snapshot.data;
+            if (data is ShowCitySelectPageModel) {
+              if (data.error == null) {
+                return GridView.count(
+                    // Create a grid with 4 columns. If you change the scrollDirection to
+                    // horizontal, this produces 2 rows.
+                    childAspectRatio: (itemWidth / itemHeight) * 4.0,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    crossAxisCount: 3,
+                    // Generate 30 widgets that display their index in the List.
+                    children: data.viewModel?.cityInfos.map((elem) {
+                          return Container(
+                              height: 30,
+                              padding: const EdgeInsets.all(5),
+                              child: ElevatedButton(
+                                  style: ButtonStyle(
+                                      backgroundColor:
+                                          MaterialStateProperty.all<Color>(
+                                              Colors.lightBlue)),
+                                  onPressed: () {
+                                    _didSelectedCity(context, cityInfo: elem);
+                                  },
+                                  child: Text(
+                                    elem.nameDesc,
+                                    style: const TextStyle(
+                                        color: Colors.white, fontSize: 14),
+                                  )));
+                        }).toList() ??
+                        []);
+              } else {
+                return Text("${data.error}");
+              }
+            } else {
+              assert(false, "unknown event $data");
+              return Container(color: Colors.red);
+            }
+          },
         )));
   }
 
@@ -286,7 +310,7 @@ class _CitySelectPageState extends State<CitySelectPage> {
               package: 'country_icons',
               width: 30),
           onTap: () {
-            _didSelectedCity(cityInfo: elem);
+            _didSelectedCity(context, cityInfo: elem, modal: true);
           }));
     });
     return list;
@@ -315,7 +339,11 @@ class _CitySelectPageState extends State<CitySelectPage> {
         });
   }
 
-  void _didSelectedCity({required CityInfo cityInfo}) {
+  void _didSelectedCity(BuildContext context,
+      {required CityInfo cityInfo, bool? modal}) {
+    if (modal == true) {
+      Navigator.of(context).pop();
+    }
     // transform current screen to target web site.
     bool retVal = widget.presenter.eventSelectingCityInfo(context,
         input: CitySelectPresenterInput(
@@ -325,7 +353,6 @@ class _CitySelectPageState extends State<CitySelectPage> {
             serviceType: _itemInfo?.serviceType ?? ServiceType.none));
     // if selecting is failure
     if (!retVal) {
-      Navigator.of(context).pop();
       final snackBar = SnackBar(
         content: Text(UseL10n.of(context)?.msgSelectedTargetIsExisted ?? ''),
       );

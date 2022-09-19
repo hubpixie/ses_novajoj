@@ -30,6 +30,8 @@ abstract class CitySelectPresenter with SimpleBloc<CitySelectPresenterOutput> {
   void eventViewReady({required CitySelectPresenterInput input});
   bool eventSelectingCityInfo(Object context,
       {required CitySelectPresenterInput input});
+  Future<ShowCitySelectPageModel> eventSelectMainCities(
+      {required CitySelectPresenterInput input});
 }
 
 class CitySelectPresenterImpl extends CitySelectPresenter {
@@ -52,9 +54,12 @@ class CitySelectPresenterImpl extends CitySelectPresenter {
     } else {
       _isRefreshed = true;
     }
-    useCase.fetchCitySelect(
-        input: CitySelectUseCaseInput(
-            cityInfo: input.selectedCityInfo!, dataCleared: input.dataCleared));
+    Future.delayed(const Duration(seconds: 1), () {
+      useCase.fetchCitySelect(
+          input: CitySelectUseCaseInput(
+              cityInfo: input.selectedCityInfo!,
+              dataCleared: input.dataCleared));
+    });
   }
 
   @override
@@ -74,6 +79,14 @@ class CitySelectPresenterImpl extends CitySelectPresenter {
           completeHandler: input.completeHandler);
     }
     return saved;
+  }
+
+  @override
+  Future<ShowCitySelectPageModel> eventSelectMainCities(
+      {required CitySelectPresenterInput input}) async {
+    final ret = await useCase.fetchMainCities(
+        input: CitySelectUseCaseInput(cityInfo: CityInfo()));
+    return ShowCitySelectPageModel(viewModel: CitySelectViewModel(ret.model!));
   }
 
   StreamSubscription<CitySelectUseCaseOutput> _addStreamListener() {
