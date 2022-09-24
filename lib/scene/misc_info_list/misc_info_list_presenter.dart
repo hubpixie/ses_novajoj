@@ -26,6 +26,8 @@ abstract class MiscInfoListPresenter
   void eventViewReady({required MiscInfoListPresenterInput input});
   void eventViewWebPage(Object context,
       {required MiscInfoListPresenterInput input});
+  void eventViewReportPage(Object context,
+      {required MiscInfoListPresenterInput input});
 }
 
 class MiscInfoListPresenterImpl extends MiscInfoListPresenter {
@@ -54,7 +56,18 @@ class MiscInfoListPresenterImpl extends MiscInfoListPresenter {
   }
 
   @override
+  void eventViewReportPage(Object context,
+      {required MiscInfoListPresenterInput input}) {
+    _viewSelectPage(context, input: input);
+  }
+
+  @override
   void eventViewWebPage(Object context,
+      {required MiscInfoListPresenterInput input}) {
+    _viewSelectPage(context, input: input);
+  }
+
+  void _viewSelectPage(Object context,
       {required MiscInfoListPresenterInput input}) {
     final itemInfos = input.viewModelList?.where((element) =>
         element.itemInfo.serviceType == input.serviceType &&
@@ -96,11 +109,22 @@ class MiscInfoListPresenterImpl extends MiscInfoListPresenter {
       }
       return;
     }
-    router.gotoWebPage(context,
-        appBarTitle: input.appBarTitle,
-        itemInfo: itemInfos?.first.itemInfo,
-        removeAction:
-            input.serviceType == ServiceType.audio ? removeAction : null,
-        completeHandler: input.completeHandler);
+
+    // transit the screen page via router
+    if (input.serviceType == ServiceType.weather) {
+      router.gotoReportPage(context,
+          appBarTitle: input.appBarTitle,
+          itemInfo: itemInfo,
+          removeAction:
+              input.serviceType == ServiceType.weather ? removeAction : null,
+          completeHandler: input.completeHandler);
+    } else {
+      router.gotoWebPage(context,
+          appBarTitle: input.appBarTitle,
+          itemInfo: itemInfo,
+          removeAction:
+              input.serviceType == ServiceType.audio ? removeAction : null,
+          completeHandler: input.completeHandler);
+    }
   }
 }

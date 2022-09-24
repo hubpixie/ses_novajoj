@@ -12,6 +12,8 @@ enum MiscInfoSelectParamKeys { appBarTitle, itemInfo }
 
 enum WebPageParamKeys { appBarTitle, itemInfo, menuItems, menuActions }
 
+enum WeeklyReportParamKeys { appBarTitle, itemInfo, menuItems, menuActions }
+
 enum DetailMenuItem {
   openOriginal,
   readComments,
