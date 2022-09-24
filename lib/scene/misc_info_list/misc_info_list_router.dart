@@ -12,6 +12,11 @@ abstract class MiscInfoListRouter {
       Object? itemInfo,
       Object? removeAction,
       Object? completeHandler});
+  void gotoReportPage(Object context,
+      {required String appBarTitle,
+      Object? itemInfo,
+      Object? removeAction,
+      Object? completeHandler});
 }
 
 class MiscInfoListRouterImpl extends MiscInfoListRouter {
@@ -97,6 +102,58 @@ class MiscInfoListRouterImpl extends MiscInfoListRouter {
       ],
       WebPageParamKeys.menuActions: menuActions
     }).then((value) {
+      if (completeHandler is Function) {
+        completeHandler.call();
+      }
+    });
+  }
+
+  @override
+  void gotoReportPage(Object context,
+      {required String appBarTitle,
+      Object? itemInfo,
+      Object? removeAction,
+      Object? completeHandler}) {
+    // customize menu items of detail page
+    BuildContext context_ = context as BuildContext;
+    final menuActions = [
+      () {
+        Navigator.of(context_).pop();
+        Navigator.pushNamed(context_, ScreenRouteName.citySelect.name,
+            arguments: {
+              CitySelectParamKeys.appBarTitle: appBarTitle,
+              CitySelectParamKeys.itemInfo: itemInfo
+            }).then((value) {
+          if (completeHandler is Function) {
+            //Navigator.of(context_).pop();
+            completeHandler.call();
+          }
+        });
+      },
+      removeAction == null
+          ? null
+          : () {
+              Navigator.of(context_).pop();
+              if (removeAction is Function) {
+                removeAction.call();
+              }
+              if (completeHandler is Function) {
+                completeHandler.call();
+              }
+            }
+    ];
+
+    // Transfer to web page / detail page.
+    Navigator.pushNamed(context_, ScreenRouteName.weeklyReport.name,
+        arguments: {
+          WeeklyReportParamKeys.appBarTitle: appBarTitle,
+          WeeklyReportParamKeys.itemInfo: itemInfo,
+          WeeklyReportParamKeys.menuItems: [
+            DetailMenuItem.changeSettings,
+            DetailMenuItem.removeSettings
+          ],
+          WeeklyReportParamKeys.menuActions: menuActions
+        }).then((value) {
       if (completeHandler is Function) {
         completeHandler.call();
       }

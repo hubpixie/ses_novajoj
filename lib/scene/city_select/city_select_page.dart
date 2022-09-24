@@ -374,6 +374,10 @@ class _CitySelectPageState extends State<CitySelectPage> {
           _parameters?[CitySelectParamKeys.appBarTitle] as String? ?? '';
       _itemInfo = _parameters?[CitySelectParamKeys.itemInfo] as NovaItemInfo?;
 
+      _cityNameEditController.text = _itemInfo?.weatherInfo?.city?.name ?? '';
+      _countryNameEditController.text =
+          _itemInfo?.weatherInfo?.city?.countryCode ?? '';
+
       //
       // FA
       //

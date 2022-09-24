@@ -152,7 +152,7 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
       rowTitles: _buildRowWeatherWidgets(weatherInfos),
       otherTitle: _buildTextWidget(UseL10n.of(context)?.infoServiceItemOther),
       onRowSelecting: (index) {
-        widget.presenter.eventViewWebPage(context,
+        widget.presenter.eventViewReportPage(context,
             input: MiscInfoListPresenterInput(
                 appBarTitle: UseL10n.of(context)?.infoServiceWeather ?? '',
                 viewModelList: viewModelList,
