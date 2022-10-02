@@ -166,7 +166,10 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
       onRowStartSelecting: (index, tapDownDetails) =>
           _tapDownDetails = tapDownDetails,
       onRowLongPress: (index) {
-        _showModeless(context, itemValue: weatherInfos?[index]);
+        _showModeless(context,
+            viewModelList: viewModelList,
+            index: index,
+            itemValue: weatherInfos?[index]);
       },
       onOtherRowSelecting: (index) {
         widget.presenter.eventViewWebPage(context,
@@ -261,14 +264,17 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
   ///
   OverlayEntry? _modeless;
 
-  void _showModeless(BuildContext context, {WeatherInfo? itemValue}) {
+  void _showModeless(BuildContext context,
+      {List<MiscInfoListViewModel>? viewModelList,
+      int? index,
+      WeatherInfo? itemValue}) {
     final double screenHeight = MediaQuery.of(context).size.height;
 
     _modeless?.remove();
     _modeless = null;
     _modeless = OverlayEntry(
         opaque: false,
-        builder: (context) {
+        builder: (context_) {
           return Positioned(
             top: _tapDownDetails != null
                 ? _tapDownDetails!.globalPosition.dy - 170
@@ -283,6 +289,21 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
                   borderRadius: const BorderRadius.all(Radius.circular(8.0))),
               child: WeatherInfoOverlay(
                 itemValue: itemValue,
+                onPresentWeeklyForecast: () {
+                  _modeless?.remove();
+                  _modeless = null;
+                  widget.presenter.eventViewReportPage(context,
+                      input: MiscInfoListPresenterInput(
+                          appBarTitle:
+                              UseL10n.of(context)?.infoServiceWeather ?? '',
+                          viewModelList: viewModelList,
+                          serviceType: ServiceType.weather,
+                          itemIndex: index ?? 0,
+                          completeHandler: () {
+                            widget.presenter.eventViewReady(
+                                input: MiscInfoListPresenterInput());
+                          }));
+                },
               ),
             ),
           );

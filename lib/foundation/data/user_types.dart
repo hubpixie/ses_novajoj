@@ -140,10 +140,11 @@ class CityInfo extends SimpleCityInfo {
     return NovaItemInfo(
         id: 0,
         orderIndex: orderIndex,
-        title: nameDesc,
+        title: 'weather',
         urlString: 'http://',
         createAt: DateTime.now(),
-        serviceType: serviceType);
+        serviceType: serviceType,
+        weatherInfo: WeatherInfo(city: this));
   }
 
   String toCityKey() {

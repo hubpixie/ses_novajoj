@@ -115,7 +115,7 @@ class _BbsDetailPageState extends State<BbsDetailPage> {
       widget.presenter
           .eventViewReady(input: BbsDetailPresenterInput(itemInfo: _itemInfo!));
     } else {
-      log.warning('thread_detail_page: parameter is error!');
+      log.warning('bbs_detail_page: parameter is error!');
     }
   }
 }

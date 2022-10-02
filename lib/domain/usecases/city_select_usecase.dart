@@ -13,8 +13,10 @@ class CitySelectUseCaseInput {
 }
 
 abstract class CitySelectUseCase with SimpleBloc<CitySelectUseCaseOutput> {
-  void fetchCitySelect({required CitySelectUseCaseInput input});
-  Future<PresentModel> fetchMainCities({required CitySelectUseCaseInput input});
+  Future<CitySelectUseCaseOutput> fetchCitySelect(
+      {required CitySelectUseCaseInput input});
+  Future<CitySelectUseCaseOutput> fetchMainCities(
+      {required CitySelectUseCaseInput input});
 }
 
 class CitySelectUseCaseImpl extends CitySelectUseCase {
@@ -22,25 +24,26 @@ class CitySelectUseCaseImpl extends CitySelectUseCase {
   CitySelectUseCaseImpl() : repository = CitySelectRepositoryImpl();
 
   @override
-  void fetchCitySelect({required CitySelectUseCaseInput input}) async {
+  Future<CitySelectUseCaseOutput> fetchCitySelect(
+      {required CitySelectUseCaseInput input}) async {
     if (input.dataCleared) {
-      streamAdd(
-          PresentModel(model: CitySelectUseCaseModel(<CityInfo>[], true)));
-      return;
+      return PresentModel(model: CitySelectUseCaseModel(<CityInfo>[], true));
     }
     final result = await repository.fetchCityInfos(
         input: FetchCitySelectRepoInput(cityInfo: input.cityInfo));
 
+    late CitySelectUseCaseOutput output;
     result.when(success: (value) {
-      streamAdd(
-          PresentModel(model: CitySelectUseCaseModel(value.cityInfos, false)));
+      output =
+          PresentModel(model: CitySelectUseCaseModel(value.cityInfos, false));
     }, failure: (error) {
-      streamAdd(PresentModel(error: error));
+      output = PresentModel(error: error);
     });
+    return output;
   }
 
   @override
-  Future<PresentModel> fetchMainCities(
+  Future<CitySelectUseCaseOutput> fetchMainCities(
       {required CitySelectUseCaseInput input}) async {
     final list = CityInfoDescript.kMainCities.keys
         .map((elem) => CityInfoDescript.fromCurrentLocale(name: elem))

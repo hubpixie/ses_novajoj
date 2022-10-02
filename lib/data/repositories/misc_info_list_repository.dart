@@ -117,7 +117,7 @@ class MiscInfoListRepositoryImpl extends MiscInfoListRepository {
       ret?.city?.langCode = cityInfo.langCode;
       ret?.city?.countryCode = cityInfo.countryCode;
     }, failure: (error) {
-      log.info('Get weather errors occured: $error');
+      log.severe('Get weather errors occured: $error');
     });
     return ret;
   }

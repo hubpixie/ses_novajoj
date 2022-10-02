@@ -116,17 +116,23 @@ class MiscInfoListRouterImpl extends MiscInfoListRouter {
       Object? completeHandler}) {
     // customize menu items of detail page
     BuildContext context_ = context as BuildContext;
+    dynamic newItemInfo = itemInfo;
     final menuActions = [
-      () {
-        Navigator.of(context_).pop();
+      ({dynamic afterAction}) {
+        //Navigator.of(context_).pop();
         Navigator.pushNamed(context_, ScreenRouteName.citySelect.name,
             arguments: {
               CitySelectParamKeys.appBarTitle: appBarTitle,
-              CitySelectParamKeys.itemInfo: itemInfo
+              CitySelectParamKeys.itemInfo: newItemInfo,
+              CitySelectParamKeys.sourceRoute:
+                  ScreenRouteName.weeklyReport.name,
             }).then((value) {
-          if (completeHandler is Function) {
-            //Navigator.of(context_).pop();
-            completeHandler.call();
+          if (value == null) {
+            return;
+          }
+          if (afterAction is Function({dynamic itemInfo})?) {
+            newItemInfo = value;
+            afterAction?.call(itemInfo: value);
           }
         });
       },

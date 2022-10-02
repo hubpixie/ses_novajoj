@@ -51,12 +51,12 @@ class _HourlyForecastCellState extends State<HourlyForecastCell> {
         Text(hourValue.getTimeFormattedString()),
         Container(
           padding: const EdgeInsets.only(bottom: 15.0),
-          width: 70,
-          height: 70,
+          width: 60,
+          height: 60,
           child: Icon(
             hourValue.getIconData(),
             color: Colors.black45,
-            size: 40,
+            size: 35,
           ),
         ),
         Text('${hourValue.temperature?.as(_temprtUnit!).round()}°'),

@@ -1,7 +1,5 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:ses_novajoj/foundation/log_util.dart';
-import 'package:ses_novajoj/foundation/firebase_util.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/domain/foundation/bloc/bloc_provider.dart';
 import 'package:ses_novajoj/scene/foundation/color_def.dart';
@@ -18,12 +16,14 @@ class ReportDetailItem {
   String htmlText;
   List<DetailMenuItem>? menuItems;
   List<void Function()?>? menuActions;
+  dynamic afterAction;
 
   ReportDetailItem(
       {required this.itemInfo,
       required this.htmlText,
       this.menuItems,
-      this.menuActions});
+      this.menuActions,
+      this.afterAction});
 }
 
 class WeeklyReportPage extends StatefulWidget {
@@ -34,9 +34,6 @@ class WeeklyReportPage extends StatefulWidget {
 }
 
 class _WeeklyReportPageState extends State<WeeklyReportPage> {
-  // FIXME: testDataViewModel
-  WeeklyReportViewModel? _testDataViewModel;
-
   bool _pageLoadIsFirst = true;
   late TemperatureUnit _temprtUnit;
 
@@ -52,8 +49,6 @@ class _WeeklyReportPageState extends State<WeeklyReportPage> {
     _detailPage = DetailPage();
 
     _temprtUnit = TemperatureUnit.celsius;
-    // TODO: Initialize your variables.
-    widget.presenter.eventViewReady(input: WeeklyReportPresenterInput());
   }
 
   @override
@@ -68,14 +63,14 @@ class _WeeklyReportPageState extends State<WeeklyReportPage> {
         actions: _detailPage.buildAppBarActionArea(context,
             itemInfo: _itemInfo,
             menuItems: _detailItem?.menuItems ?? [],
-            menuActions: _detailItem?.menuActions),
+            menuActions: _detailItem?.menuActions,
+            afterAction: _detailItem?.afterAction),
       ),
       body: BlocProvider<WeeklyReportPresenter>(
         bloc: widget.presenter,
         child: StreamBuilder<WeeklyReportPresenterOutput>(
             stream: widget.presenter.stream,
             builder: (context, snapshot) {
-              /*
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return Center(
                     child: CircularProgressIndicator(
@@ -85,17 +80,14 @@ class _WeeklyReportPageState extends State<WeeklyReportPage> {
               final data = snapshot.data;
               if (data is ShowWeeklyReportPageModel) {
                 if (data.error == null) {
-                  return Column(
-                    children: [Text("${data.viewModel}")],
-                  );
+                  return _buildBody(context, data.viewModel);
                 } else {
                   return Text("${data.error}");
                 }
               } else {
                 assert(false, "unknown event $data");
                 return Container(color: Colors.red);
-              }*/
-              return _buildBody(context, _testDataViewModel);
+              }
             }),
       ),
     );
@@ -112,20 +104,12 @@ class _WeeklyReportPageState extends State<WeeklyReportPage> {
             child: ForecastSummaryCell(
               itemValue: viewModel?.data,
               temprtUnit: _temprtUnit,
-              onCellEditing: (cityChanged, temprtUnit) {
-                /*if (cityChanged) {
-                  Navigator.pushNamed(
-                      context, ScreenRouteName.selectCity.name ?? '',
-                      arguments: {'city': _cityItem}).then((value) async {
-                    CityInfo? cityValue2 = value as CityInfo?;
-                    if (cityValue2 != null) {
-                      await _savePrefsData(cityValue: cityValue2);
-                      BaseView.of(context).reload();
-                    }
+              onCellEditing: (_, temprtUnit) {
+                if (temprtUnit != _temprtUnit) {
+                  setState(() {
+                    _temprtUnit = temprtUnit;
                   });
-                } else if (temprtUnit != null) {
-                  _savePrefsData(temprtUnit: temprtUnit);
-                }*/
+                }
               },
             ),
           ),
@@ -154,60 +138,6 @@ class _WeeklyReportPageState extends State<WeeklyReportPage> {
     );
   }
 
-  Widget _buildMessageArea(
-      {required BuildContext context,
-      String message = '',
-      bool needsReload = false}) {
-    return SafeArea(
-        child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        const SizedBox(height: 20),
-        Container(
-            alignment: Alignment.center,
-            child: Text(
-              message,
-            )),
-        SizedBox(height: needsReload ? 10 : 1),
-        needsReload
-            ? SizedBox(
-                height: 20.0,
-                child: TextButton(
-                    child: const Text(
-                      '再表示',
-                      style: TextStyle(color: Colors.blueAccent),
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        // 再表示する
-                        //BaseView.of(context).reload();
-                      });
-                    }))
-            : const SizedBox(height: 1),
-        Container(
-          margin: const EdgeInsets.symmetric(vertical: 5.0),
-          height: 20.0,
-          child: TextButton(
-              child: const Text(
-                '地域変更',
-                style: TextStyle(color: Colors.blueAccent),
-              ),
-              onPressed: () {
-                /*Navigator.pushNamed(
-                    context, ScreenRouteName.selectCity.name ?? '', arguments: {
-                  'city': CityInfo(name: 'Tokyo', countryCode: 'JP')
-                }).then((value) async {
-                  CityInfo? cityValue = value as CityInfo?;
-                  if (cityValue != null) {
-                    //_savePrefsData(cityValue: cityValue);
-                  }
-                });*/
-              }),
-        ),
-      ],
-    ));
-  }
-
   void _parseRouteParameter() {
     if (_pageLoadIsFirst) {
       _pageLoadIsFirst = false;
@@ -227,12 +157,15 @@ class _WeeklyReportPageState extends State<WeeklyReportPage> {
             itemInfo: _itemInfo!,
             htmlText: '',
             menuItems: _parameters?[WeeklyReportParamKeys.menuItems],
-            menuActions: _parameters?[WeeklyReportParamKeys.menuActions]);
+            menuActions: _parameters?[WeeklyReportParamKeys.menuActions],
+            afterAction: ({dynamic itemInfo}) {
+              if (itemInfo == null) {
+                return;
+              }
+              _itemInfo = itemInfo;
+              _loadData(itemInfo: itemInfo);
+            });
       }
-
-      // FIME: Dummy Code
-      _testDataViewModel = WeeklyReportViewModel(null);
-      _testDataViewModel?.data = _itemInfo?.weatherInfo;
 
       //
       // FA
@@ -244,16 +177,17 @@ class _WeeklyReportPageState extends State<WeeklyReportPage> {
       // }
 
       // fetch data
-      _loadData();
+      _loadData(itemInfo: _itemInfo);
     }
   }
 
-  void _loadData() {
-    if (_itemInfo != null) {
-      // widget.presenter
-      //     .eventViewReady(input: WeeklyReportPresenterInput(itemInfo: _itemInfo!));
+  void _loadData({dynamic itemInfo}) {
+    if (itemInfo != null) {
+      widget.presenter.eventViewReady(
+          input: WeeklyReportPresenterInput(
+              cityInfo: itemInfo?.weatherInfo?.city ?? CityInfo()));
     } else {
-      log.warning('thread_detail_page: parameter is error!');
+      log.warning('weekly_report_page: parameter is error!');
     }
   }
 }

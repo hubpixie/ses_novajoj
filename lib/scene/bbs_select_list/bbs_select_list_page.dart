@@ -274,7 +274,7 @@ class _BbsSelectListPageState extends State<BbsSelectListPage> {
       widget.presenter.eventViewReady(
           input: BbsSelectListPresenterInput(targetUrl: _targetUrl ?? ''));
     } else {
-      log.warning('thread_detail_page: parameter is error!');
+      log.warning('bbs_select_list_page: parameter is error!');
     }
   }
 }

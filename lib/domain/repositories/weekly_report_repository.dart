@@ -3,10 +3,9 @@ import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/foundation/data/result.dart';
 
 class FetchWeeklyReportRepoInput {
-  Object id;
-  String string;
+  CityInfo cityInfo;
 
-  FetchWeeklyReportRepoInput({required this.id, required this.string});
+  FetchWeeklyReportRepoInput({required this.cityInfo});
 }
 
 abstract class WeeklyReportRepository {
