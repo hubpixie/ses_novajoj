@@ -169,11 +169,7 @@ class WeatherInfoOverlayState extends State<WeatherInfoOverlay>
                                   fontSize: 14.0, color: Colors.black54)),
                         ],
                       )),
-                  onTap: () {
-                    // setState(() {
-                    //   widget.onCellEditing?.call();
-                    // });
-                  },
+                  onTap: () {},
                 )),
             Text('${itemValue?.temperature?.as(widget.temprtUnit).round()}°',
                 style: _createTextStyle(fontSize: 32.0, color: Colors.black54)),

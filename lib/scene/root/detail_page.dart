@@ -18,7 +18,8 @@ class DetailPage {
   List<Widget> buildAppBarActionArea(BuildContext context,
       {dynamic itemInfo,
       List<DetailMenuItem>? menuItems,
-      List<void Function()?>? menuActions}) {
+      List<void Function()?>? menuActions,
+      dynamic afterAction}) {
     final menuItems_ =
         menuItems ?? [DetailMenuItem.openOriginal, DetailMenuItem.readComments];
     return <Widget>[
@@ -81,7 +82,11 @@ class DetailPage {
           ExtWebView.openBrowser(context, url: itemInfo?.urlString);
           return;
         } else if (value == DetailMenuItem.changeSettings) {
-          action?.call();
+          if (action is Function({dynamic afterAction})) {
+            action.call(afterAction: afterAction);
+          } else {
+            action?.call();
+          }
           return;
         } else if (value == DetailMenuItem.removeSettings) {
           ConfirmDialog().show(context,

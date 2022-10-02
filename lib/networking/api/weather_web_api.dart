@@ -21,7 +21,7 @@ class WeatherWebApi {
       {required WeatherItemParameter paramter}) async {
     final url =
         '$_endpoint/data/2.5/weather?lat=${paramter.latitude}&lon=${paramter.longitude}&appid=$_apiKey';
-    log.info('getCityNameFromLocation $url');
+    log.info('getWeatherWithLocation $url');
     try {
       // check network state
       final networkState = await BaseApiClient.connectivityState();
@@ -61,7 +61,7 @@ class WeatherWebApi {
         if (paramter.cityParam != null) {
           final citySelRes = await getWeatherCities(
               paramter: CitytItemParameter(cityInfo: paramter.cityParam!));
-          List<dynamic>? cityLoc;
+          List<double>? cityLoc;
           citySelRes.when(
               success: (value) {
                 final cityKey = value.cityInfos?.first.toCityKey();
@@ -72,9 +72,20 @@ class WeatherWebApi {
               failure: (error) {});
           // Use cityLoc
           if (cityLoc != null) {
-            return getWeatherWithLocation(
+            late Result<WeatherItemRes> ret;
+            final retVal = await getWeatherWithLocation(
                 paramter: WeatherItemParameter(
-                    latitude: cityLoc?.first, longitude: cityLoc?.last));
+                    latitude: cityLoc?.first ?? 0,
+                    longitude: cityLoc?.last ?? 0));
+            retVal.when(success: (value) {
+              WeatherItemRes data = value;
+              data.latitude = cityLoc?.first ?? 0;
+              data.longitude = cityLoc?.last ?? 0;
+              ret = Result.success(data: data);
+            }, failure: (error) {
+              ret = Result.failure(error: error);
+            });
+            return ret;
           }
         }
       }
@@ -96,8 +107,39 @@ class WeatherWebApi {
     }
   }
 
+  Future<Result<List<WeatherItemRes>>> getForecastWithLocation(
+      {required WeatherItemParameter paramter}) async {
+    final url =
+        '$_endpoint/data/2.5/forecast?lat=${paramter.latitude}&lon=${paramter.longitude}&appid=$_apiKey';
+    log.info('getForecastWithLocation $url');
+
+    try {
+      final response = await BaseApiClient.client.get(Uri.parse(url));
+      // set result to return
+      //
+      if (response.statusCode >= HttpStatus.badRequest) {
+        return Result.failure(
+            error: AppError.fromStatusCode(response.statusCode));
+      } else {
+        var parsed = json.decode(response.body)['list'] as List<dynamic>?;
+        var list =
+            parsed?.map((element) => WeatherItemRes.fromJson(element)).toList();
+        return Result.success(data: list ?? []);
+      }
+    } on AppError catch (error) {
+      return Result.failure(error: error);
+    } on Exception catch (error) {
+      log.severe('$error');
+      return Result.failure(error: AppError.fromException(error));
+    }
+  }
+
   Future<Result<List<WeatherItemRes>>> getForecast(
       {required WeatherItemParameter paramter}) async {
+    if (paramter.latitude != 0 && paramter.longitude != 0) {
+      return getForecastWithLocation(paramter: paramter);
+    }
+
     final url = !(paramter.cityParam?.zip.isEmpty ?? true)
         ? '$_endpoint/data/2.5/forecast?zip=${paramter.cityParam?.zip},${paramter.cityParam?.countryCode}&appid=$_apiKey'
         : '$_endpoint/data/2.5/forecast?q=${paramter.cityParam?.name},${paramter.cityParam?.countryCode}&appid=$_apiKey';

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/foundation/firebase_util.dart';
-import 'package:ses_novajoj/domain/foundation/bloc/bloc_provider.dart';
+import 'package:ses_novajoj/foundation/log_util.dart';
+//import 'package:ses_novajoj/domain/foundation/bloc/bloc_provider.dart';
 import 'package:ses_novajoj/scene/foundation/use_l10n.dart';
 import 'package:ses_novajoj/scene/foundation/page/page_parameter.dart';
 import 'package:ses_novajoj/scene/city_select/city_select_presenter.dart';
@@ -19,9 +20,12 @@ class CitySelectPage extends StatefulWidget {
 
 class _CitySelectPageState extends State<CitySelectPage> {
   bool _pageLoadIsFirst = true;
-  late Map? _parameters;
+  bool _suggestChanged = false;
+  Map? _parameters;
   late String _appBarTitle;
-  late NovaItemInfo? _itemInfo;
+  NovaItemInfo? _itemInfo;
+  String? _sourceRoute;
+  String? _cityNameDesc;
   late FocusNode _countryNameFocusNode;
   late FocusNode _cityNameFocusNode;
   late TextEditingController _countryNameEditController;
@@ -73,7 +77,10 @@ class _CitySelectPageState extends State<CitySelectPage> {
   void _buildInputRowsArea(BuildContext context,
       {required List<Widget> sourceWidgets,
       _InputMode inputMode = _InputMode.direct}) {
-    sourceWidgets.add(Align(
+    sourceWidgets.add(Container(
+        padding: const EdgeInsets.only(left: 5),
+        height: inputMode == _InputMode.direct ? 30 : 50,
+        color: inputMode == _InputMode.direct ? Colors.blue[50] : Colors.white,
         alignment: Alignment.centerLeft,
         child: Text(
             inputMode == _InputMode.direct
@@ -98,6 +105,7 @@ class _CitySelectPageState extends State<CitySelectPage> {
           }
         },
         decoration: InputDecoration(
+            contentPadding: const EdgeInsets.only(left: 15),
             labelText: UseL10n.of(context)
                 ?.infoServiceWeatherSelectCityLabelCountryName,
             hintText: UseL10n.of(context)
@@ -110,7 +118,6 @@ class _CitySelectPageState extends State<CitySelectPage> {
                 icon: const Icon(Icons.clear),
                 onPressed: () {
                   _countryNameEditController.clear();
-                  _countryNameFocusNode.requestFocus();
                 })),
         keyboardType: TextInputType.text,
         style: const TextStyle(
@@ -123,7 +130,6 @@ class _CitySelectPageState extends State<CitySelectPage> {
         controller: _cityNameEditController,
         onTap: () {
           _countryNameFocusNode.unfocus();
-          //FocusScope.of(context).requestFocus(FocusNode());
           if (inputMode == _InputMode.direct) {
             _cityNameFocusNode.unfocus();
             _showModalSheet(context);
@@ -134,12 +140,14 @@ class _CitySelectPageState extends State<CitySelectPage> {
             });
           } else {
             if (_cityNameEditController.text.isNotEmpty) {
+              _suggestChanged = false;
               _submitSelectCityData(dataCleared: true);
             }
             _cityNameFocusNode.requestFocus();
           }
         },
         decoration: InputDecoration(
+            contentPadding: const EdgeInsets.only(left: 15),
             label: Row(children: [
               Text(UseL10n.of(context)
                       ?.infoServiceWeatherSelectCityLabelCityName ??
@@ -167,59 +175,77 @@ class _CitySelectPageState extends State<CitySelectPage> {
                 : IconButton(
                     icon: const Icon(Icons.clear),
                     onPressed: () {
+                      if (_cityNameEditController.text.isEmpty) {
+                        return;
+                      }
                       _cityNameEditController.clear();
+                      setState(() {
+                        _suggestChanged = false;
+                      });
+                      _submitSelectCityData(dataCleared: true);
+                      _cityNameFocusNode.requestFocus();
                     })),
         autovalidateMode: AutovalidateMode.always,
         textInputAction: TextInputAction.search,
         keyboardType: TextInputType.text,
         onFieldSubmitted: (string) {
+          _suggestChanged = true;
           _submitSelectCityData(dataCleared: false);
         },
         style: const TextStyle(
           fontFamily: "Poppins",
         )));
+    inputMode == _InputMode.searching || _cityNameEditController.text.isEmpty
+        ? const SizedBox(height: 0.0, width: 0.0)
+        : sourceWidgets.add(Container(
+            padding: const EdgeInsets.only(top: 5, left: 20),
+            alignment: Alignment.centerLeft,
+            height: 25,
+            child: Text(
+              _cityNameEditController.text.isEmpty ? '' : _cityNameDesc ?? '',
+              style: const TextStyle(fontSize: 11),
+            ),
+          ));
 
     if (inputMode == _InputMode.direct) {
       return;
     }
 
     sourceWidgets.add(
-      BlocProvider<CitySelectPresenter>(
-          bloc: widget.presenter,
-          child: StreamBuilder<CitySelectPresenterOutput>(
-              stream: widget.presenter.stream,
-              builder: (context, snapshot) {
-                if (_cityNameEditController.text.isEmpty) {
-                  return const SizedBox(height: 0.0, width: 0.0);
-                }
-                if (!snapshot.hasData) {
-                  return Center(
-                      child: CircularProgressIndicator(
-                          color: Colors.amber,
-                          backgroundColor: Colors.grey[850]));
-                }
+      StreamBuilder<CitySelectPresenterOutput>(
+          stream: widget.presenter.stream,
+          builder: (context, snapshot) {
+            if (!_suggestChanged) {
+              return const SizedBox(height: 0.0, width: 0.0);
+            }
+            if (!snapshot.hasData) {
+              return Center(
+                  child: CircularProgressIndicator(
+                      color: Colors.amber, backgroundColor: Colors.grey[850]));
+            }
 
-                final data = snapshot.data;
-                if (data is ShowCitySelectPageModel) {
-                  if (data.error == null) {
-                    if (data.viewModel!.dataCleared) {
-                      return const SizedBox(height: 0.0, width: 0.0);
-                    } else {
-                      return Container(
-                          padding: const EdgeInsets.only(top: 5),
-                          height: 300,
-                          child: ListView(
-                              children: _buildSuggestions(
-                                  viewModel: data.viewModel)));
-                    }
-                  } else {
-                    return Text("${data.error}");
-                  }
+            final data = snapshot.data;
+            if (data is ShowCitySelectPageModel) {
+              if (data.error == null) {
+                if (data.viewModel!.dataCleared) {
+                  return const SizedBox(height: 0.0, width: 0.0);
                 } else {
-                  assert(false, "unknown event $data");
-                  return Container(color: Colors.red);
+                  return Container(
+                      padding: const EdgeInsets.only(top: 5),
+                      height: 300,
+                      child: ListView(
+                          children:
+                              _buildSuggestions(viewModel: data.viewModel)));
                 }
-              })),
+              } else {
+                log.severe('${data.error}');
+                return const Text("Not found");
+              }
+            } else {
+              assert(false, "unknown event $data");
+              return Container(color: Colors.red);
+            }
+          }),
     );
   }
 
@@ -232,7 +258,10 @@ class _CitySelectPageState extends State<CitySelectPage> {
     final double itemWidth = size.width / 2;
 
     sourceWidgets.add(const SizedBox(height: 30));
-    sourceWidgets.add(Align(
+    sourceWidgets.add(Container(
+        padding: const EdgeInsets.only(left: 5),
+        height: 30,
+        color: Colors.blue[50],
         alignment: Alignment.centerLeft,
         child: Text(
           UseL10n.of(context)?.infoServiceWeatherSelectCityGuideSecondMessage ??
@@ -311,12 +340,14 @@ class _CitySelectPageState extends State<CitySelectPage> {
               width: 30),
           onTap: () {
             _didSelectedCity(context, cityInfo: elem, modal: true);
+            setState(() {});
           }));
     });
     return list;
   }
 
   void _showModalSheet(BuildContext context) {
+    _suggestChanged = false;
     showModalBottomSheet<void>(
         isScrollControlled: true,
         context: context,
@@ -336,7 +367,13 @@ class _CitySelectPageState extends State<CitySelectPage> {
               ),
             ),
           );
-        });
+        }).whenComplete(() {
+      if (_cityNameEditController.text !=
+          (_itemInfo?.weatherInfo?.city?.name ?? '')) {
+        _cityNameDesc = '';
+        setState(() {});
+      }
+    });
   }
 
   void _didSelectedCity(BuildContext context,
@@ -345,12 +382,16 @@ class _CitySelectPageState extends State<CitySelectPage> {
       Navigator.of(context).pop();
     }
     // transform current screen to target web site.
-    bool retVal = widget.presenter.eventSelectingCityInfo(context,
-        input: CitySelectPresenterInput(
-            appBarTitle: _appBarTitle,
-            selectedCityInfo: cityInfo,
-            order: _itemInfo?.orderIndex ?? 0,
-            serviceType: _itemInfo?.serviceType ?? ServiceType.none));
+    bool retVal = widget.presenter.eventSelectingCityInfo(
+      context,
+      input: CitySelectPresenterInput(
+          appBarTitle: _appBarTitle,
+          selectedCityInfo: cityInfo,
+          order: _itemInfo?.orderIndex ?? 0,
+          serviceType: _itemInfo?.serviceType ?? ServiceType.none,
+          sourceRoute: _sourceRoute),
+    );
+
     // if selecting is failure
     if (!retVal) {
       final snackBar = SnackBar(
@@ -373,7 +414,8 @@ class _CitySelectPageState extends State<CitySelectPage> {
       _appBarTitle =
           _parameters?[CitySelectParamKeys.appBarTitle] as String? ?? '';
       _itemInfo = _parameters?[CitySelectParamKeys.itemInfo] as NovaItemInfo?;
-
+      _sourceRoute = _parameters?[CitySelectParamKeys.sourceRoute] as String?;
+      _cityNameDesc = _itemInfo?.weatherInfo?.city?.nameDesc;
       _cityNameEditController.text = _itemInfo?.weatherInfo?.city?.name ?? '';
       _countryNameEditController.text =
           _itemInfo?.weatherInfo?.city?.countryCode ?? '';

@@ -14,8 +14,8 @@ class WeeklyReportViewModel {
   List<WeatherInfo>? hourlyForecastData;
   List<WeatherInfo>? weeklyForecastData;
 
-// FIXME: DUMMY CODE
   WeeklyReportViewModel(WeeklyReportUseCaseModel? model)
       : data = model?.data,
+        hourlyForecastData = model?.hourlyForecastData,
         weeklyForecastData = model?.weeklyForecastData;
 }

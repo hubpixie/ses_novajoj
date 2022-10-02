@@ -62,7 +62,7 @@ extension CityInfoDescript on CityInfo {
   static const Map<String, List<String>> kMainCities = {
     "Hawaii": ["en", "US", "夏威夷", "ハワイ"],
     "Sao Paulo": ["pt", "BR", "圣保罗", "サンパロ"],
-    "London": ["en", "UK", "伦敦", "サンパロ"],
+    "London": ["en", "GB", "伦敦", "サンパロ"],
     "Paris": ["fr", "FR", "巴黎", "パリ"],
     "Moscow": ["ru", "RU", "莫斯科", "パリ"],
     "Urumqi": ["zh", "CN", "乌鲁木齐", "ウルムチ"],

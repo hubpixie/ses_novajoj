@@ -59,11 +59,12 @@ class _WeeklyForecastCellState extends State<WeeklyForecastCell> {
       children: <Widget>[
         Text('${weeklyValue?.getDataFormattedString()}'),
         SizedBox(
-          height: 70,
+          width: 60,
+          height: 60,
           child: Icon(
             weeklyValue?.getIconData(),
             color: Colors.black45,
-            size: 40,
+            size: 35,
           ),
         ),
         Text(

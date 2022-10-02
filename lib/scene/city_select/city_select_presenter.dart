@@ -1,10 +1,10 @@
-import 'dart:async';
-
 import 'package:ses_novajoj/foundation/data/user_data.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
+import 'package:ses_novajoj/foundation/log_util.dart';
 import 'package:ses_novajoj/domain/foundation/bloc/simple_bloc.dart';
 import 'package:ses_novajoj/domain/usecases/city_select_usecase.dart';
 import 'package:ses_novajoj/domain/usecases/city_select_usecase_output.dart';
+import 'package:ses_novajoj/scene/foundation/page/screen_route_enums.dart';
 import 'city_select_presenter_output.dart';
 
 import 'city_select_router.dart';
@@ -12,16 +12,18 @@ import 'city_select_router.dart';
 class CitySelectPresenterInput {
   String appBarTitle;
   CityInfo? selectedCityInfo;
-  Object? completeHandler;
   ServiceType serviceType;
+  String? sourceRoute;
   int order;
+  Object? completeHandler;
   bool dataCleared;
 
   CitySelectPresenterInput(
       {this.appBarTitle = '',
-      this.serviceType = ServiceType.none,
-      this.order = 0,
       this.selectedCityInfo,
+      this.serviceType = ServiceType.none,
+      this.sourceRoute,
+      this.order = 0,
       this.completeHandler,
       this.dataCleared = false});
 }
@@ -30,7 +32,7 @@ abstract class CitySelectPresenter with SimpleBloc<CitySelectPresenterOutput> {
   void eventViewReady({required CitySelectPresenterInput input});
   bool eventSelectingCityInfo(Object context,
       {required CitySelectPresenterInput input});
-  Future<ShowCitySelectPageModel> eventSelectMainCities(
+  Future<CitySelectPresenterOutput> eventSelectMainCities(
       {required CitySelectPresenterInput input});
 }
 
@@ -38,27 +40,25 @@ class CitySelectPresenterImpl extends CitySelectPresenter {
   final CitySelectUseCase useCase;
   final CitySelectRouter router;
 
-  late StreamSubscription<CitySelectUseCaseOutput> _streamSubscription;
-  bool _isRefreshed = false;
-
   CitySelectPresenterImpl({required this.router})
-      : useCase = CitySelectUseCaseImpl() {
-    _streamSubscription = _addStreamListener();
-  }
+      : useCase = CitySelectUseCaseImpl();
 
   @override
-  void eventViewReady({required CitySelectPresenterInput input}) async {
-    if (_isRefreshed) {
-      await _streamSubscription.cancel();
-      _streamSubscription = _addStreamListener();
-    } else {
-      _isRefreshed = true;
-    }
-    Future.delayed(const Duration(seconds: 1), () {
-      useCase.fetchCitySelect(
-          input: CitySelectUseCaseInput(
-              cityInfo: input.selectedCityInfo!,
-              dataCleared: input.dataCleared));
+  void eventViewReady({required CitySelectPresenterInput input}) {
+    useCase
+        .fetchCitySelect(
+            input: CitySelectUseCaseInput(
+                cityInfo: input.selectedCityInfo!,
+                dataCleared: input.dataCleared))
+        .then((value) {
+      if (value is PresentModel) {
+        if (value.error == null) {
+          streamAdd(ShowCitySelectPageModel(
+              viewModel: CitySelectViewModel(value.model!)));
+        } else {
+          streamAdd(ShowCitySelectPageModel(error: value.error));
+        }
+      }
     });
   }
 
@@ -73,32 +73,32 @@ class CitySelectPresenterImpl extends CitySelectPresenter {
 
     // navigate the target as web page if exists
     if (saved) {
-      router.gotoMiscListPage(context,
-          itemInfo: input.selectedCityInfo
-              ?.toItemInfo(serviceType: input.serviceType),
-          completeHandler: input.completeHandler);
+      if (input.sourceRoute == ScreenRouteName.weeklyReport.name) {
+        router.gotoWeeklyReportPage(context,
+            itemInfo: input.selectedCityInfo
+                ?.toItemInfo(serviceType: input.serviceType),
+            completeHandler: input.completeHandler);
+      } else {
+        router.gotoMiscListPage(context,
+            itemInfo: input.selectedCityInfo
+                ?.toItemInfo(serviceType: input.serviceType),
+            completeHandler: input.completeHandler);
+      }
     }
     return saved;
   }
 
   @override
-  Future<ShowCitySelectPageModel> eventSelectMainCities(
+  Future<CitySelectPresenterOutput> eventSelectMainCities(
       {required CitySelectPresenterInput input}) async {
     final ret = await useCase.fetchMainCities(
         input: CitySelectUseCaseInput(cityInfo: CityInfo()));
-    return ShowCitySelectPageModel(viewModel: CitySelectViewModel(ret.model!));
-  }
-
-  StreamSubscription<CitySelectUseCaseOutput> _addStreamListener() {
-    return useCase.stream.listen((event) {
-      if (event is PresentModel) {
-        if (event.error == null) {
-          streamAdd(ShowCitySelectPageModel(
-              viewModel: CitySelectViewModel(event.model!)));
-        } else {
-          streamAdd(ShowCitySelectPageModel(error: event.error));
-        }
-      }
-    });
+    if (ret is PresentModel) {
+      return ShowCitySelectPageModel(
+          viewModel: CitySelectViewModel(ret.model!));
+    } else {
+      log.severe('unknown error!');
+      return ShowCitySelectPageModel(viewModel: null);
+    }
   }
 }

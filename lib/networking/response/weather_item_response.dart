@@ -1,6 +1,10 @@
 import 'package:ses_novajoj/foundation/data/user_types.dart';
 
 class WeatherItemRes extends WeatherInfo {
+  List<WeatherInfo>? _forecast;
+  double latitude = 0;
+  double longitude = 0;
+
   WeatherItemRes.fromJson(Map<String, dynamic> json, {String zip = ''}) {
     final weather = json['weather'].first;
     id = weather['id'];
@@ -30,7 +34,7 @@ class WeatherItemRes extends WeatherInfo {
   }
 
   WeatherItemRes.fromForecastJson(Map<String, dynamic> json) {
-    forecast = () {
+    _forecast = () {
       final dsList = json['list'] as List?;
       return dsList != null
           ? dsList
@@ -43,6 +47,7 @@ class WeatherItemRes extends WeatherInfo {
               .toList()
           : <WeatherInfo>[];
     }();
+    forecast = _forecast;
   }
 
   double? _toDouble(dynamic value) {

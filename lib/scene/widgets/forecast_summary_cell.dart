@@ -51,7 +51,7 @@ class _ForecastSummaryCellState extends State<ForecastSummaryCell> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              const SizedBox(width: 20),
+              const SizedBox(width: 5),
               Text(
                 '${DateUtil().getDateMdeString()} ',
                 textAlign: TextAlign.center,
@@ -66,14 +66,15 @@ class _ForecastSummaryCellState extends State<ForecastSummaryCell> {
               Container(
                   constraints:
                       BoxConstraints(minWidth: 80, maxWidth: leftSideWidth),
-                  padding: const EdgeInsets.only(right: 20.0),
+                  padding: const EdgeInsets.only(right: 5.0),
                   child: GestureDetector(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text('${_itemValue?.city?.nameDesc}',
-                            softWrap: false,
-                            overflow: TextOverflow.ellipsis,
+                            softWrap: true,
+                            overflow: TextOverflow.visible,
+                            maxLines: 2,
                             style: const TextStyle(fontSize: 24.0)),
                         _itemValue?.city?.state.isEmpty ?? false
                             ? const SizedBox()
@@ -85,7 +86,8 @@ class _ForecastSummaryCellState extends State<ForecastSummaryCell> {
                                 child: Text(
                                     '${_itemValue?.city?.state}, ${_itemValue?.city?.countryCode}',
                                     softWrap: true,
-                                    overflow: TextOverflow.clip,
+                                    overflow: TextOverflow.visible,
+                                    maxLines: 2,
                                     style: const TextStyle(
                                         inherit: false,
                                         fontSize: 10,
@@ -99,9 +101,7 @@ class _ForecastSummaryCellState extends State<ForecastSummaryCell> {
                                 fontSize: 14.0, color: Colors.black45)),
                       ],
                     ),
-                    onTap: () {
-                      widget.onCellEditing?.call(true, null);
-                    },
+                    onTap: () {},
                   )),
             ],
           ),

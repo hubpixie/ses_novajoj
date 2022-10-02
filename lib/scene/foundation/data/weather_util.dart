@@ -124,7 +124,7 @@ class WeatherUtil {
     String values = (int? id) {
       switch (id) {
         case 200:
-          return 'thunderstorm with light rain,小雨伴有雷雨，小雨で雷を伴う';
+          return 'thunderstorm with light rain,小雨伴有雷雨,小雨で雷を伴う';
         case 201:
           return 'thunderstorm with rain,中雨伴有雷雨,雨で雷を伴う';
         case 202:
@@ -142,7 +142,7 @@ class WeatherUtil {
         case 231:
           return 'thunderstorm with drizzle,细雨伴有雷,霧雨で雷を伴う';
         case 232:
-          return 'thunderstorm with heavy drizzle,绵绵细雨伴有雷，濃い霧雨で雷を伴う';
+          return 'thunderstorm with heavy drizzle,绵绵细雨伴有雷,濃い霧雨で雷を伴う';
         case 300:
           return 'light intensity drizzle,烟霞,もや';
         case 301:
@@ -174,7 +174,7 @@ class WeatherUtil {
         case 511:
           return 'freezing rain,冻雨,冷たい雨';
         case 520:
-          return 'light intensity shower rain,小阵雨，時々小雨';
+          return 'light intensity shower rain,小阵雨,時々小雨';
         case 521:
           return 'shower rain,阵雨,にわか雨';
         case 522:

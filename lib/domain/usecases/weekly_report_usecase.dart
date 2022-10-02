@@ -5,7 +5,11 @@ import 'package:ses_novajoj/foundation/data/user_types.dart';
 
 import 'weekly_report_usecase_output.dart';
 
-class WeeklyReportUseCaseInput {}
+class WeeklyReportUseCaseInput {
+  CityInfo cityInfo;
+
+  WeeklyReportUseCaseInput({required this.cityInfo});
+}
 
 abstract class WeeklyReportUseCase with SimpleBloc<WeeklyReportUseCaseOutput> {
   void fetchWeeklyReport({required WeeklyReportUseCaseInput input});
@@ -18,11 +22,12 @@ class WeeklyReportUseCaseImpl extends WeeklyReportUseCase {
   @override
   void fetchWeeklyReport({required WeeklyReportUseCaseInput input}) async {
     final result = await repository.fetchWeeklyReport(
-        input: FetchWeeklyReportRepoInput(
-            id: 9999, string: "99999" /* // TODO: dummy code*/));
+        input: FetchWeeklyReportRepoInput(cityInfo: input.cityInfo));
 
     result.when(success: (value) {
-      streamAdd(PresentModel(model: WeeklyReportUseCaseModel(null, [], [])));
+      streamAdd(PresentModel(
+          model: WeeklyReportUseCaseModel(
+              value, value.hourlyForecast, value.weeklyForecast)));
     }, failure: (error) {
       streamAdd(PresentModel(error: error));
     });

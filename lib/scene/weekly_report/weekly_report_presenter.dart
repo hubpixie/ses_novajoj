@@ -7,10 +7,13 @@ import 'weekly_report_presenter_output.dart';
 import 'weekly_report_router.dart';
 
 class WeeklyReportPresenterInput {
+  CityInfo cityInfo;
 
+  WeeklyReportPresenterInput({required this.cityInfo});
 }
 
-abstract class WeeklyReportPresenter with SimpleBloc<WeeklyReportPresenterOutput> {
+abstract class WeeklyReportPresenter
+    with SimpleBloc<WeeklyReportPresenterOutput> {
   void eventViewReady({required WeeklyReportPresenterInput input});
 }
 
@@ -34,6 +37,7 @@ class WeeklyReportPresenterImpl extends WeeklyReportPresenter {
 
   @override
   void eventViewReady({required WeeklyReportPresenterInput input}) {
-    useCase.fetchWeeklyReport(input: WeeklyReportUseCaseInput());
+    useCase.fetchWeeklyReport(
+        input: WeeklyReportUseCaseInput(cityInfo: input.cityInfo));
   }
 }
