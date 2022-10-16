@@ -10,9 +10,11 @@ enum CitySelectParamKeys { appBarTitle, itemInfo, sourceRoute }
 
 enum MiscInfoSelectParamKeys { appBarTitle, itemInfo }
 
-enum WebPageParamKeys { appBarTitle, itemInfo, menuItems, menuActions }
+enum HistorioParamKeys { appBarTitle, itemInfo, sourceRoute }
 
 enum WeeklyReportParamKeys { appBarTitle, itemInfo, menuItems, menuActions }
+
+enum WebPageParamKeys { appBarTitle, itemInfo, menuItems, menuActions }
 
 enum DetailMenuItem {
   openOriginal,

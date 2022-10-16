@@ -24,9 +24,11 @@ class MiscInfoListPresenterInput {
 abstract class MiscInfoListPresenter
     with SimpleBloc<MiscInfoListPresenterOutput> {
   void eventViewReady({required MiscInfoListPresenterInput input});
-  void eventViewWebPage(Object context,
-      {required MiscInfoListPresenterInput input});
   void eventViewReportPage(Object context,
+      {required MiscInfoListPresenterInput input});
+  void eventViewHistorioPage(Object context,
+      {required MiscInfoListPresenterInput input});
+  void eventViewWebPage(Object context,
       {required MiscInfoListPresenterInput input});
 }
 
@@ -63,6 +65,12 @@ class MiscInfoListPresenterImpl extends MiscInfoListPresenter {
 
   @override
   void eventViewWebPage(Object context,
+      {required MiscInfoListPresenterInput input}) {
+    _viewSelectPage(context, input: input);
+  }
+
+  @override
+  void eventViewHistorioPage(Object context,
       {required MiscInfoListPresenterInput input}) {
     _viewSelectPage(context, input: input);
   }
@@ -115,15 +123,15 @@ class MiscInfoListPresenterImpl extends MiscInfoListPresenter {
       router.gotoReportPage(context,
           appBarTitle: input.appBarTitle,
           itemInfo: itemInfo,
-          removeAction:
-              input.serviceType == ServiceType.weather ? removeAction : null,
+          removeAction: removeAction,
           completeHandler: input.completeHandler);
     } else {
       router.gotoWebPage(context,
           appBarTitle: input.appBarTitle,
           itemInfo: itemInfo,
-          removeAction:
-              input.serviceType == ServiceType.audio ? removeAction : null,
+          removeAction: [ServiceType.audio].contains(input.serviceType)
+              ? null
+              : removeAction,
           completeHandler: input.completeHandler);
     }
   }

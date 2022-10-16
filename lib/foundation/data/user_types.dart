@@ -17,8 +17,8 @@ enum ServiceType {
   time,
   audio,
   weather,
-  favorite,
-  history,
+  // favorite,
+  // history,
 }
 
 class Comment {
@@ -72,6 +72,21 @@ class NovaItemInfo {
       this.isNew = false,
       this.children,
       this.weatherInfo});
+}
+
+class HistorioInfo {
+  int id;
+  DateTime createdAt;
+  String category;
+  NovaItemInfo itemInfo;
+  String? htmlText;
+
+  HistorioInfo(
+      {required this.id,
+      required this.createdAt,
+      this.category = '',
+      required this.itemInfo,
+      this.htmlText});
 }
 
 class SimpleUrlInfo {

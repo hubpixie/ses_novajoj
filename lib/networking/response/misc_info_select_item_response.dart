@@ -10,7 +10,7 @@ class MiscInfoSelectItemItemRes {
     int id = json['id'];
     int order = json['order'];
     ServiceType serviceType =
-        ServiceTypeDescriot.fromString(json['service_type'] ?? 'none');
+        ServiceTypeDescript.fromString(json['service_type'] ?? 'none');
     final urlItemList = (List<dynamic>? inList) {
       return inList != null
           ? inList

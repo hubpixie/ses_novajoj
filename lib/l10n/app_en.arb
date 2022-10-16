@@ -103,6 +103,7 @@
   "infoServiceFavorites":"Favorites",
   "infoServiceHistory":"Historio",
   "infoServiceItemOther":"Other...",
+  "infoServiceItemMore":"More...",
   "infoServicelistSelectHintMessage":"Select a site name and url as Web site.",
   "infoServicelistInputHintMessage":"If there is no site selected in the above list, directly enter your own Web site name and its URL.",
   "infoServicelistInputOther":"Other",
