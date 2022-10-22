@@ -368,6 +368,7 @@ class _CitySelectPageState extends State<CitySelectPage> {
             ),
           );
         }).whenComplete(() {
+      _cityNameDesc = _itemInfo?.weatherInfo?.city?.nameDesc;
       if (_cityNameEditController.text !=
           (_itemInfo?.weatherInfo?.city?.name ?? '')) {
         _cityNameDesc = '';

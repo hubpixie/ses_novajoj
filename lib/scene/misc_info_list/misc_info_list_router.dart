@@ -17,6 +17,8 @@ abstract class MiscInfoListRouter {
       Object? itemInfo,
       Object? removeAction,
       Object? completeHandler});
+  void gotoHistorioPage(Object context,
+      {required String appBarTitle, Object? itemInfo, Object? completeHandler});
 }
 
 class MiscInfoListRouterImpl extends MiscInfoListRouter {
@@ -161,6 +163,22 @@ class MiscInfoListRouterImpl extends MiscInfoListRouter {
           WeeklyReportParamKeys.menuActions: menuActions
         }).then((value) {
       if (completeHandler is Function) {
+        completeHandler.call();
+      }
+    });
+  }
+
+  @override
+  void gotoHistorioPage(Object context,
+      {required String appBarTitle,
+      Object? itemInfo,
+      Object? completeHandler}) {
+    Navigator.pushNamed(context as BuildContext, ScreenRouteName.historio.name,
+        arguments: {
+          HistorioParamKeys.appBarTitle: appBarTitle,
+          HistorioParamKeys.itemInfo: itemInfo
+        }).then((value) {
+      if (completeHandler != null && completeHandler is Function) {
         completeHandler.call();
       }
     });

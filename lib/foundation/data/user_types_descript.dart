@@ -1,4 +1,5 @@
 import 'user_types.dart';
+import 'date_util.dart';
 import 'package:intl/intl.dart';
 
 extension SimpleUrlInfoDescript on SimpleUrlInfo {
@@ -130,7 +131,13 @@ extension CityInfoDescript on CityInfo {
   }
 }
 
-extension ServiceTypeDescriot on ServiceType {
+extension HistorioInfoDescript on HistorioInfo {
+  String get createdAtText {
+    return DateUtil().getDateString(date: createdAt, format: 'M/d (E)');
+  }
+}
+
+extension ServiceTypeDescript on ServiceType {
   static ServiceType fromString(String string) {
     return ServiceType.values.firstWhere((element) => element.name == string);
   }
@@ -140,8 +147,6 @@ extension ServiceTypeDescriot on ServiceType {
       case ServiceType.time:
       case ServiceType.audio:
       case ServiceType.weather:
-      case ServiceType.favorite:
-      case ServiceType.history:
         return toString().split(".").last;
       default:
         return '';

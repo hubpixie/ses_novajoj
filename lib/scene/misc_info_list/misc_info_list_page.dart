@@ -7,6 +7,7 @@ import 'package:ses_novajoj/scene/misc_info_list/misc_info_list_presenter.dart';
 import 'package:ses_novajoj/scene/misc_info_list/misc_info_list_presenter_output.dart';
 import 'package:ses_novajoj/scene/misc_info_list/weather_info_overlay.dart';
 import 'package:ses_novajoj/scene/widgets/info_service_cell.dart';
+import 'package:ses_novajoj/scene/widgets/historio_cell.dart';
 
 class MiscInfoListPage extends StatefulWidget {
   final MiscInfoListPresenter presenter;
@@ -197,7 +198,7 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
             input: MiscInfoListPresenterInput(
                 appBarTitle: UseL10n.of(context)?.infoServiceFavorites ?? '',
                 viewModelList: viewModelList,
-                serviceType: ServiceType.favorite,
+                serviceType: ServiceType.none,
                 itemIndex: index,
                 completeHandler: () {}));
       },
@@ -209,18 +210,29 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
       {List<MiscInfoListViewModel>? viewModelList}) {
     return InfoServiceCell(
       sectionTitle: UseL10n.of(context)?.infoServiceHistory ?? '',
-      rowTitles: const <Widget>[],
-      otherTitle: _buildTextWidget(UseL10n.of(context)?.infoServiceItemOther),
+      rowTitles: _buildRowHistorioWidgets(viewModelList!.take(5).toList()),
+      otherTitle: viewModelList.length > 5
+          ? _buildTextWidget(UseL10n.of(context)?.infoServiceItemMore)
+          : null,
+      rowHeight: 80,
       onRowSelecting: (index) {
         widget.presenter.eventViewWebPage(context,
             input: MiscInfoListPresenterInput(
                 appBarTitle: UseL10n.of(context)?.infoServiceHistory ?? '',
                 viewModelList: viewModelList,
-                serviceType: ServiceType.history,
+                serviceType: ServiceType.none,
                 itemIndex: index,
                 completeHandler: () {}));
       },
-      onOtherRowSelecting: (index) {},
+      onOtherRowSelecting: (index) {
+        widget.presenter.eventViewHistorioPage(context,
+            input: MiscInfoListPresenterInput(
+                appBarTitle: UseL10n.of(context)?.infoServiceHistory ?? '',
+                viewModelList: viewModelList,
+                serviceType: ServiceType.none,
+                itemIndex: -1,
+                completeHandler: () {}));
+      },
     );
   }
 
@@ -257,6 +269,18 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
                 ))
             .toList() ??
         [];
+  }
+
+  List<Widget> _buildRowHistorioWidgets(List<MiscInfoListViewModel>? infos) {
+    List<Widget> widgets = [];
+    infos?.asMap().forEach((idx, value) {
+      widgets.add(Expanded(
+          child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [HistorioCell(viewModel: value, index: idx)],
+      )));
+    });
+    return widgets;
   }
 
   ///
