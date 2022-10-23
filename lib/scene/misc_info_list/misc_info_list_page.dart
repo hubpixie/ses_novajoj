@@ -208,18 +208,23 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
 
   Widget _buildHistoryArea(BuildContext context,
       {List<MiscInfoListViewModel>? viewModelList}) {
+    final hisInfos = viewModelList
+        ?.where((element) =>
+            element.itemInfo.serviceType == ServiceType.none &&
+            element.hisInfo != null)
+        .toList();
     return InfoServiceCell(
       sectionTitle: UseL10n.of(context)?.infoServiceHistory ?? '',
-      rowTitles: _buildRowHistorioWidgets(viewModelList!.take(5).toList()),
-      otherTitle: viewModelList.length > 5
+      rowTitles: _buildRowHistorioWidgets(hisInfos?.take(5).toList()),
+      otherTitle: (hisInfos?.length ?? 0) > 5
           ? _buildTextWidget(UseL10n.of(context)?.infoServiceItemMore)
           : null,
-      rowHeight: 80,
+      rowHeight: 85,
       onRowSelecting: (index) {
         widget.presenter.eventViewWebPage(context,
             input: MiscInfoListPresenterInput(
                 appBarTitle: UseL10n.of(context)?.infoServiceHistory ?? '',
-                viewModelList: viewModelList,
+                viewModelList: hisInfos,
                 serviceType: ServiceType.none,
                 itemIndex: index,
                 completeHandler: () {}));
@@ -228,7 +233,7 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
         widget.presenter.eventViewHistorioPage(context,
             input: MiscInfoListPresenterInput(
                 appBarTitle: UseL10n.of(context)?.infoServiceHistory ?? '',
-                viewModelList: viewModelList,
+                viewModelList: hisInfos,
                 serviceType: ServiceType.none,
                 itemIndex: -1,
                 completeHandler: () {}));

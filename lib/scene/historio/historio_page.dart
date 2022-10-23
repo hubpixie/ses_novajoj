@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
-import 'package:ses_novajoj/domain/foundation/bloc/bloc_provider.dart';
 import 'package:ses_novajoj/scene/foundation/use_l10n.dart';
 import 'package:ses_novajoj/scene/foundation/color_def.dart';
 import 'package:ses_novajoj/scene/foundation/page/page_parameter.dart';
@@ -37,8 +36,9 @@ class _HistorioPageState extends State<HistorioPage> {
         backgroundColor: ColorDef.appBarBackColor,
         centerTitle: true,
       ),
-      body: FutureBuilder<List<HistorioInfo>>(
-          future: () {}(),
+      body: FutureBuilder<HistorioPresenterOutput>(
+          future:
+              widget.presenter.eventViewReady(input: HistorioPresenterInput()),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(
@@ -46,11 +46,12 @@ class _HistorioPageState extends State<HistorioPage> {
                       color: Colors.amber, backgroundColor: Colors.grey[850]));
             }
             final data = snapshot.data;
-            if (data != null) {
+            if (data is ShowHistorioPageModel && data.viewModelList != null) {
+              final viewModels = data.viewModelList;
               return ListView.builder(
-                  itemCount: data.length,
+                  itemCount: viewModels?.length,
                   itemBuilder: (context, index) => HistorioCell(
-                      viewModel: data[index],
+                      viewModel: viewModels![index],
                       onCellSelecting: (selIndex) {
                         /*widget.presenter.eventSelectDetail(context,
                             appBarTitle: _selectedAppBarTitle,
@@ -59,18 +60,25 @@ class _HistorioPageState extends State<HistorioPage> {
                         });*/
                       },
                       onThumbnailShowing: (thumbIndex) async {
-                        if (data[thumbIndex]
+                        if (viewModels[thumbIndex]
+                            .hisInfo
                             .itemInfo
                             .thunnailUrlString
                             .isNotEmpty) {
-                          return data[thumbIndex].itemInfo.thunnailUrlString;
+                          return viewModels[thumbIndex]
+                              .hisInfo
+                              .itemInfo
+                              .thunnailUrlString;
                         }
                         final retUrl =
                             'http://www.google.com/'; /*await widget.presenter
                             .eventFetchThumbnail(
                                 targetUrl: data.viewModelList![thumbIndex]
                                     .itemInfo.urlString);*/
-                        data[thumbIndex].itemInfo.thunnailUrlString = retUrl;
+                        viewModels[thumbIndex]
+                            .hisInfo
+                            .itemInfo
+                            .thunnailUrlString = retUrl;
                         return retUrl;
                       },
                       index: index));

@@ -1,3 +1,4 @@
+import 'package:ses_novajoj/foundation/data/date_util.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/foundation/data/user_types_descript.dart';
 import 'package:ses_novajoj/domain/usecases/misc_info_list_usecase_output.dart';
@@ -11,22 +12,15 @@ class ShowMiscInfoListPageModel extends MiscInfoListPresenterOutput {
 }
 
 class MiscInfoListViewModel {
-  late NovaItemInfo itemInfo;
+  NovaItemInfo itemInfo;
   HistorioInfo? hisInfo;
-  late String createdAtText;
+  String createdAtText;
+  String itemInfoCreatedAtText;
 
   MiscInfoListViewModel(MiscInfoListUseCaseRowModel model)
       : itemInfo = model.itemInfo,
-        createdAtText = "2022/10/1";
-
-  // FIXME:
-  MiscInfoListViewModel.dummyData({HistorioInfo? hisInfo}) {
-    itemInfo = NovaItemInfo(
-        id: 0,
-        title: "title",
-        urlString: "urlString",
-        createAt: DateTime.now());
-    hisInfo = hisInfo;
-    createdAtText = "";
-  }
+        hisInfo = model.hisInfo,
+        createdAtText = model.hisInfo?.createdAtText ?? '',
+        itemInfoCreatedAtText = DateUtil()
+            .getDateString(date: model.itemInfo.createAt, format: 'M/d (E)');
 }

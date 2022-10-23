@@ -75,18 +75,11 @@ class NovaItemInfo {
 }
 
 class HistorioInfo {
-  int id;
-  DateTime createdAt;
-  String category;
-  NovaItemInfo itemInfo;
+  late int id;
+  late DateTime createdAt;
+  late String category;
+  late NovaItemInfo itemInfo;
   String? htmlText;
-
-  HistorioInfo(
-      {required this.id,
-      required this.createdAt,
-      this.category = '',
-      required this.itemInfo,
-      this.htmlText});
 }
 
 class SimpleUrlInfo {

@@ -139,7 +139,8 @@ extension HistorioInfoDescript on HistorioInfo {
 
 extension ServiceTypeDescript on ServiceType {
   static ServiceType fromString(String string) {
-    return ServiceType.values.firstWhere((element) => element.name == string);
+    return ServiceType.values.firstWhere((element) => element.name == string,
+        orElse: () => ServiceType.none);
   }
 
   String get stringClass {
