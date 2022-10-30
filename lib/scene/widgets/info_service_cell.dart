@@ -9,7 +9,7 @@ class InfoServiceCell extends StatelessWidget {
   final String sectionTitle;
   final List<Widget> rowTitles;
   final Widget? otherTitle;
-  final double rowHeight;
+  final double Function(int index)? calcRowHeight;
   final _RowSelectingDelegate? onRowSelecting;
   final _RowStartSelectingDelegate? onRowStartSelecting;
   final _OtherRowLongPressDelegate? onRowLongPress;
@@ -20,13 +20,14 @@ class InfoServiceCell extends StatelessWidget {
       required this.sectionTitle,
       required this.rowTitles,
       this.otherTitle,
-      this.rowHeight = 40,
+      this.calcRowHeight,
       this.onRowSelecting,
       this.onRowStartSelecting,
       this.onRowLongPress,
       this.onOtherRowSelecting})
       : super(key: key);
 
+  static const double kRowHeight = 40;
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -80,7 +81,9 @@ class InfoServiceCell extends StatelessWidget {
                       onLongPress: () => onRowLongPress?.call(idx),
                       child: Container(
                           width: screenWidth - 80,
-                          height: rowHeight,
+                          height: calcRowHeight == null
+                              ? InfoServiceCell.kRowHeight
+                              : calcRowHeight!(idx),
                           alignment: Alignment.center,
                           child: element),
                     ),

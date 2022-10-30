@@ -100,14 +100,13 @@ class MiscInfoListRepositoryImpl extends MiscInfoListRepository {
       orderIndex = 0;
       for (int idx = 0; idx < miscHistorioList.length; idx++) {
         ret.add(MiscInfoListItem(
-            itemInfo: NovaItemInfo(
-              id: id,
-              urlString: 'http://',
-              title: 'Weather',
-              createAt: DateTime.now(),
-              serviceType: ServiceType.none,
-              orderIndex: orderIndex++,
-            ),
+            itemInfo: (NovaItemInfo info) {
+              final NovaItemInfo itemInfo = info;
+              itemInfo.orderIndex = orderIndex++;
+              itemInfo.id = idx;
+              itemInfo.serviceType = ServiceType.none;
+              return itemInfo;
+            }(miscHistorioList[idx].itemInfo),
             hisInfo: miscHistorioList[idx]));
       }
 

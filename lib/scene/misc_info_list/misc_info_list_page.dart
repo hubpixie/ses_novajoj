@@ -61,7 +61,7 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
                       _buildFavoriteArea(context,
                           viewModelList: data.viewModelList),
                       _buildHistoryArea(context,
-                          viewModelList: data.viewModelList)
+                          viewModelList: data.reshapedViewModelList)
                     ],
                   ));
                 } else {
@@ -219,7 +219,9 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
       otherTitle: (hisInfos?.length ?? 0) > 5
           ? _buildTextWidget(UseL10n.of(context)?.infoServiceItemMore)
           : null,
-      rowHeight: 85,
+      calcRowHeight: (index) {
+        return hisInfos![index].createdAtText.isNotEmpty ? 85 : 65;
+      },
       onRowSelecting: (index) {
         widget.presenter.eventViewWebPage(context,
             input: MiscInfoListPresenterInput(

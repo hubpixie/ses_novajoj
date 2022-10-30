@@ -9,6 +9,25 @@ class ShowMiscInfoListPageModel extends MiscInfoListPresenterOutput {
   final List<MiscInfoListViewModel>? viewModelList;
   final AppError? error;
   ShowMiscInfoListPageModel({this.viewModelList, this.error});
+
+  List<MiscInfoListViewModel>? _viewModelList;
+  List<MiscInfoListViewModel>? get reshapedViewModelList => () {
+        if (viewModelList == null) {
+          return null;
+        }
+        if (_viewModelList != null) {
+          return _viewModelList;
+        }
+        MiscInfoListViewModel? prevModel;
+        _viewModelList = [...viewModelList!];
+        for (final MiscInfoListViewModel model in _viewModelList!) {
+          if (prevModel?.createdAtText == model.createdAtText) {
+            model.createdAtText = '';
+          } else {
+            prevModel = model;
+          }
+        }
+      }();
 }
 
 class MiscInfoListViewModel {
