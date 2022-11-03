@@ -133,7 +133,7 @@ extension CityInfoDescript on CityInfo {
 
 extension HistorioInfoDescript on HistorioInfo {
   String get createdAtText {
-    return DateUtil().getDateString(date: createdAt, format: 'M/d (E)');
+    return DateUtil().getDateString(date: createdAt, format: 'yyyy/MM/dd');
   }
 }
 

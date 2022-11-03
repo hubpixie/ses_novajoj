@@ -208,6 +208,7 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
 
   Widget _buildHistoryArea(BuildContext context,
       {List<MiscInfoListViewModel>? viewModelList}) {
+    double screenWidth = MediaQuery.of(context).size.width;
     final hisInfos = viewModelList
         ?.where((element) =>
             element.itemInfo.serviceType == ServiceType.none &&
@@ -220,7 +221,15 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
           ? _buildTextWidget(UseL10n.of(context)?.infoServiceItemMore)
           : null,
       calcRowHeight: (index) {
-        return hisInfos![index].createdAtText.isNotEmpty ? 85 : 65;
+        double itemTitleHeight = _calculateItemTitleHeight(
+            context, hisInfos?[index].itemInfo.title ?? '',
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            textWidth: (screenWidth <= 320 ? 100 : screenWidth - 165));
+        double retHeight =
+            (hisInfos![index].createdAtText.isNotEmpty ? 45 : 25) +
+                itemTitleHeight;
+        return retHeight;
       },
       onRowSelecting: (index) {
         widget.presenter.eventViewWebPage(context,
@@ -284,10 +293,33 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
       widgets.add(Expanded(
           child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
-        children: [HistorioCell(viewModel: value, index: idx)],
+        children: [
+          HistorioCell(
+              viewModel: value,
+              index: idx,
+              onThumbnailShowing: (thumbIndex) async {
+                return infos[idx].itemInfo.thunnailUrlString;
+              })
+        ],
       )));
     });
     return widgets;
+  }
+
+  double _calculateItemTitleHeight(BuildContext context, String text,
+      {required double fontSize,
+      required FontWeight fontWeight,
+      required double textWidth,
+      double minTextHeight = 21.0}) {
+    final textPainter = TextPainter(textDirection: TextDirection.ltr);
+    final style = TextStyle(fontSize: fontSize, fontWeight: fontWeight);
+    textPainter.text = TextSpan(text: text, style: style);
+    textPainter.layout();
+    final lines = (textPainter.size.width / textWidth).ceil();
+    final height = lines * textPainter.size.height;
+    return height <= minTextHeight
+        ? minTextHeight
+        : textPainter.height + minTextHeight;
   }
 
   ///

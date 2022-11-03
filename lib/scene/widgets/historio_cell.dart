@@ -65,6 +65,7 @@ class HistorioCell extends StatelessWidget {
                           if (snapshot.data is String) {
                             thumbUrl = snapshot.data as String? ?? "";
                           }
+                          print('thumburl = $thumbUrl');
                           if (thumbUrl.isNotEmpty && thumbUrl != blankUrl) {
                             return Image.network(thumbUrl,
                                 errorBuilder: (context, object, stackTrace) =>
@@ -117,21 +118,5 @@ class HistorioCell extends StatelessWidget {
                         ]))
               ]),
             ])));
-  }
-
-  // ignore: unused_element
-  double _calculateAutoscaleWidth(BuildContext context, String text,
-      {required double fontSize,
-      required double screenWidth,
-      double deltaWith = 200}) {
-    final textPainter = TextPainter(textDirection: TextDirection.ltr);
-    final style = TextStyle(fontSize: fontSize);
-    textPainter.text = TextSpan(text: text, style: style);
-    textPainter.layout();
-    double maxWidth = (double screenWidth) {
-      double deltaWidth_ = screenWidth <= 320 ? 15 : 0;
-      return screenWidth - deltaWith - deltaWidth_;
-    }(screenWidth);
-    return textPainter.width >= maxWidth ? maxWidth : textPainter.width;
   }
 }
