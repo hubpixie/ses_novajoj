@@ -12,6 +12,7 @@ import 'package:ses_novajoj/scene/city_select/city_select_page_builder.dart';
 import 'package:ses_novajoj/scene/misc_info_select/misc_info_select_page_builder.dart';
 import 'package:ses_novajoj/scene/weekly_report/weekly_report_page_builder.dart';
 import 'package:ses_novajoj/scene/historio/historio_page_builder.dart';
+import 'package:ses_novajoj/scene/favorites/favorites_page_builder.dart';
 import 'package:ses_novajoj/scene/root/web_page_builder.dart';
 
 class ScreenRouteManager {
@@ -57,6 +58,9 @@ class ScreenRouteManager {
       case ScreenRouteName.historio:
         return MaterialPageRoute(
             builder: (_) => HistorioPageBuilder().page, settings: settings);
+      case ScreenRouteName.favorites:
+        return MaterialPageRoute(
+            builder: (_) => FavoritesPageBuilder().page, settings: settings);
       case ScreenRouteName.webPage:
         return MaterialPageRoute(
             builder: (_) => WebPageBuilder().page, settings: settings);

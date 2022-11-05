@@ -12,6 +12,8 @@ enum MiscInfoSelectParamKeys { appBarTitle, itemInfo }
 
 enum HistorioParamKeys { appBarTitle, itemInfos, sourceRoute }
 
+enum FavoritesParamKeys { appBarTitle, itemInfos, sourceRoute }
+
 enum WeeklyReportParamKeys { appBarTitle, itemInfo, menuItems, menuActions }
 
 enum WebPageParamKeys {

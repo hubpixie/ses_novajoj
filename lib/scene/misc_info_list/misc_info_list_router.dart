@@ -18,12 +18,22 @@ abstract class MiscInfoListRouter {
       Object? htmlText,
       Object? removeAction,
       Object? completeHandler});
+  void gotoFavoritesWebPage(Object context,
+      {required String appBarTitle,
+      Object? itemInfo,
+      Object? htmlText,
+      Object? removeAction,
+      Object? completeHandler});
   void gotoReportPage(Object context,
       {required String appBarTitle,
       Object? itemInfo,
       Object? removeAction,
       Object? completeHandler});
   void gotoHistorioPage(Object context,
+      {required String appBarTitle,
+      dynamic itemInfos,
+      Object? completeHandler});
+  void gotoFavoritesPage(Object context,
       {required String appBarTitle,
       dynamic itemInfos,
       Object? completeHandler});
@@ -142,6 +152,29 @@ class MiscInfoListRouterImpl extends MiscInfoListRouter {
   }
 
   @override
+  void gotoFavoritesWebPage(Object context,
+      {required String appBarTitle,
+      Object? itemInfo,
+      Object? htmlText,
+      Object? removeAction,
+      Object? completeHandler}) {
+    // customize menu itemsz of detail page
+    BuildContext context_ = context as BuildContext;
+    // Transfer to web page / detail page.
+    Navigator.pushNamed(context_, ScreenRouteName.webPage.name, arguments: {
+      WebPageParamKeys.appBarTitle: appBarTitle,
+      WebPageParamKeys.itemInfo: itemInfo,
+      WebPageParamKeys.htmlText: htmlText,
+      WebPageParamKeys.menuItems: null,
+      WebPageParamKeys.menuActions: null
+    }).then((value) {
+      if (completeHandler is Function) {
+        completeHandler.call();
+      }
+    });
+  }
+
+  @override
   void gotoReportPage(Object context,
       {required String appBarTitle,
       Object? itemInfo,
@@ -205,6 +238,22 @@ class MiscInfoListRouterImpl extends MiscInfoListRouter {
       dynamic itemInfos,
       Object? completeHandler}) {
     Navigator.pushNamed(context as BuildContext, ScreenRouteName.historio.name,
+        arguments: {
+          HistorioParamKeys.appBarTitle: appBarTitle,
+          HistorioParamKeys.itemInfos: itemInfos
+        }).then((value) {
+      if (completeHandler != null && completeHandler is Function) {
+        completeHandler.call();
+      }
+    });
+  }
+
+  @override
+  void gotoFavoritesPage(Object context,
+      {required String appBarTitle,
+      dynamic itemInfos,
+      Object? completeHandler}) {
+    Navigator.pushNamed(context as BuildContext, ScreenRouteName.favorites.name,
         arguments: {
           HistorioParamKeys.appBarTitle: appBarTitle,
           HistorioParamKeys.itemInfos: itemInfos

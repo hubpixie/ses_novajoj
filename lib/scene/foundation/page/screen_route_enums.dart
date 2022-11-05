@@ -15,6 +15,7 @@ enum ScreenRouteName {
   miscInfoSelect,
   weeklyReport,
   historio,
+  favorites,
   webPage,
 }
 
@@ -51,6 +52,8 @@ extension ScreenRouteNameSummary on ScreenRouteName {
         return 'weeklyReport';
       case ScreenRouteName.historio:
         return 'historio';
+      case ScreenRouteName.favorites:
+        return 'favorites';
       case ScreenRouteName.webPage:
         return 'webPage';
       default:
@@ -65,6 +68,7 @@ extension ScreenRouteNameSummary on ScreenRouteName {
 
   String? get stringClass {
     switch (this) {
+      case ScreenRouteName.splash:
       case ScreenRouteName.home:
       case ScreenRouteName.login:
       case ScreenRouteName.tabs:
@@ -77,6 +81,10 @@ extension ScreenRouteNameSummary on ScreenRouteName {
       case ScreenRouteName.bbsSelectList:
       case ScreenRouteName.citySelect:
       case ScreenRouteName.miscInfoSelect:
+      case ScreenRouteName.weeklyReport:
+      case ScreenRouteName.historio:
+      case ScreenRouteName.favorites:
+      case ScreenRouteName.webPage:
         return toString().split(".").last;
       default:
         return null;
