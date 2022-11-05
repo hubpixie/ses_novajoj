@@ -1,8 +1,4 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:ses_novajoj/foundation/data/user_types.dart';
-import 'package:ses_novajoj/domain/foundation/bloc/bloc_provider.dart';
-import 'package:ses_novajoj/scene/foundation/use_l10n.dart';
 import 'package:ses_novajoj/scene/foundation/color_def.dart';
 import 'package:ses_novajoj/scene/foundation/page/page_parameter.dart';
 import 'package:ses_novajoj/scene/historio/historio_presenter.dart';
@@ -22,7 +18,7 @@ class _HistorioPageState extends State<HistorioPage> {
 
   late String _appBarTitle;
   Map? _parameters;
-  NovaItemInfo? _itemInfo;
+  //NovaItemInfo? _itemInfo;
 
   @override
   void initState() {
@@ -31,14 +27,17 @@ class _HistorioPageState extends State<HistorioPage> {
 
   @override
   Widget build(BuildContext context) {
+    _parseRouteParameter();
+
     return Scaffold(
       appBar: AppBar(
-        //title: Text(_appBarTitle),
+        title: Text(_appBarTitle),
         backgroundColor: ColorDef.appBarBackColor,
         centerTitle: true,
       ),
-      body: FutureBuilder<List<HistorioInfo>>(
-          future: () {}(),
+      body: FutureBuilder<HistorioPresenterOutput>(
+          future: widget.presenter
+              .eventViewReady(input: HistorioPresenterInput(appBarTitle: '')),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(
@@ -46,34 +45,35 @@ class _HistorioPageState extends State<HistorioPage> {
                       color: Colors.amber, backgroundColor: Colors.grey[850]));
             }
             final data = snapshot.data;
-            if (data != null) {
+            if (data is ShowHistorioPageModel &&
+                data.reshapedViewModelList != null) {
+              final viewModels = data.reshapedViewModelList;
               return ListView.builder(
-                  itemCount: data.length,
+                  itemCount: viewModels?.length,
                   itemBuilder: (context, index) => HistorioCell(
-                      viewModel: data[index],
+                      viewModel: viewModels![index],
                       onCellSelecting: (selIndex) {
-                        /*widget.presenter.eventSelectDetail(context,
-                            appBarTitle: _selectedAppBarTitle,
-                            itemInfo: data.viewModelList![selIndex].itemInfo,
-                            completeHandler: () {
-                        });*/
+                        widget.presenter.eventViewWebPage(context,
+                            input: HistorioPresenterInput(
+                                appBarTitle: _appBarTitle,
+                                viewModel: viewModels[selIndex],
+                                completeHandler: () {}));
                       },
                       onThumbnailShowing: (thumbIndex) async {
-                        if (data[thumbIndex]
+                        return viewModels[thumbIndex]
+                            .hisInfo
                             .itemInfo
-                            .thunnailUrlString
-                            .isNotEmpty) {
-                          return data[thumbIndex].itemInfo.thunnailUrlString;
-                        }
-                        final retUrl =
-                            'http://www.google.com/'; /*await widget.presenter
-                            .eventFetchThumbnail(
-                                targetUrl: data.viewModelList![thumbIndex]
-                                    .itemInfo.urlString);*/
-                        data[thumbIndex].itemInfo.thunnailUrlString = retUrl;
-                        return retUrl;
+                            .thunnailUrlString;
                       },
-                      index: index));
+                      index: index,
+                      divider: const Divider(
+                          height: 1,
+                          thickness: 1,
+                          color: Colors.black12,
+                          indent: 2,
+                          endIndent: 2),
+                      indent: 0,
+                      endIndent: 0));
             } else {
               return const Text('No data!');
             }
@@ -90,7 +90,7 @@ class _HistorioPageState extends State<HistorioPage> {
     //
     _parameters = ModalRoute.of(context)?.settings.arguments as Map?;
     _appBarTitle = _parameters?[HistorioParamKeys.appBarTitle] as String? ?? '';
-    _itemInfo = _parameters?[HistorioParamKeys.itemInfo] as NovaItemInfo?;
+    // _itemInfo = _parameters?[HistorioParamKeys.itemInfos] as NovaItemInfo?;
 
     //
     // FA

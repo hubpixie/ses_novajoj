@@ -61,7 +61,7 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
                       _buildFavoriteArea(context,
                           viewModelList: data.viewModelList),
                       _buildHistoryArea(context,
-                          viewModelList: data.viewModelList)
+                          viewModelList: data.reshapedViewModelList)
                     ],
                   ));
                 } else {
@@ -208,30 +208,40 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
 
   Widget _buildHistoryArea(BuildContext context,
       {List<MiscInfoListViewModel>? viewModelList}) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    final hisInfos = viewModelList
+        ?.where((element) =>
+            element.itemInfo.serviceType == ServiceType.none &&
+            element.hisInfo != null)
+        .toList();
     return InfoServiceCell(
       sectionTitle: UseL10n.of(context)?.infoServiceHistory ?? '',
-      rowTitles: _buildRowHistorioWidgets(viewModelList!.take(5).toList()),
-      otherTitle: viewModelList.length > 5
+      rowTitles: _buildRowHistorioWidgets(hisInfos?.take(5).toList()),
+      otherTitle: (hisInfos?.length ?? 0) > 5
           ? _buildTextWidget(UseL10n.of(context)?.infoServiceItemMore)
           : null,
-      rowHeight: 80,
-      onRowSelecting: (index) {
-        widget.presenter.eventViewWebPage(context,
-            input: MiscInfoListPresenterInput(
-                appBarTitle: UseL10n.of(context)?.infoServiceHistory ?? '',
-                viewModelList: viewModelList,
-                serviceType: ServiceType.none,
-                itemIndex: index,
-                completeHandler: () {}));
+      calcRowHeight: (index) {
+        double itemTitleHeight = _calculateItemTitleHeight(
+            context, hisInfos?[index].itemInfo.title ?? '',
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            textWidth: (screenWidth <= 320 ? 100 : screenWidth - 165));
+        double retHeight =
+            (hisInfos![index].createdAtText.isNotEmpty ? 45 : 25) +
+                itemTitleHeight;
+        return retHeight;
       },
       onOtherRowSelecting: (index) {
         widget.presenter.eventViewHistorioPage(context,
             input: MiscInfoListPresenterInput(
                 appBarTitle: UseL10n.of(context)?.infoServiceHistory ?? '',
-                viewModelList: viewModelList,
+                viewModelList: hisInfos,
                 serviceType: ServiceType.none,
                 itemIndex: -1,
-                completeHandler: () {}));
+                completeHandler: () {
+                  widget.presenter
+                      .eventViewReady(input: MiscInfoListPresenterInput());
+                }));
       },
     );
   }
@@ -277,10 +287,41 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
       widgets.add(Expanded(
           child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
-        children: [HistorioCell(viewModel: value, index: idx)],
+        children: [
+          HistorioCell(
+              viewModel: value,
+              index: idx,
+              onCellSelecting: (index) {
+                widget.presenter.eventViewHistorioWebPage(context,
+                    input: MiscInfoListPresenterInput(
+                        appBarTitle:
+                            UseL10n.of(context)?.infoServiceHistory ?? '',
+                        viewModelList: infos,
+                        serviceType: ServiceType.none,
+                        itemIndex: index,
+                        completeHandler: () {}));
+              },
+              onThumbnailShowing: (thumbIndex) async {
+                return infos[idx].itemInfo.thunnailUrlString;
+              })
+        ],
       )));
     });
     return widgets;
+  }
+
+  double _calculateItemTitleHeight(BuildContext context, String text,
+      {required double fontSize,
+      required FontWeight fontWeight,
+      required double textWidth,
+      double minTextHeight = 21.0}) {
+    final textPainter = TextPainter(textDirection: TextDirection.ltr);
+    final style = TextStyle(fontSize: fontSize, fontWeight: fontWeight);
+    textPainter.text = TextSpan(text: text, style: style);
+    textPainter.layout();
+    final lines = (textPainter.size.width / textWidth).ceil();
+    final height = lines * textPainter.size.height;
+    return height <= minTextHeight ? minTextHeight : height;
   }
 
   ///

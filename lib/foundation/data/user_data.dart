@@ -8,6 +8,7 @@ enum _UserDataKey {
   miscMyTimes,
   miscOnlineSites,
   miscWeatherCities,
+  miscHistory
 }
 
 extension _UserDataKeyInfo on _UserDataKey {
@@ -19,6 +20,8 @@ extension _UserDataKeyInfo on _UserDataKey {
         return 'misc_online_sites';
       case _UserDataKey.miscWeatherCities:
         return 'misc_weather_cities';
+      case _UserDataKey.miscHistory:
+        return 'misc_history';
       default:
         return '';
     }
@@ -36,14 +39,15 @@ class UserData {
   /// variables for properties
   final List<SimpleUrlInfo> _miscMyTimes = [];
   final List<SimpleUrlInfo> _miscOnlineSites = [];
-  //final List<SimpleCityInfo> _miscWeatherCities = [];
   final List<CityInfo> _miscWeatherCities = [];
+  final List<String> _miscHistorioList = [];
 
   final EncryptedSharedPreferences _preferences = EncryptedSharedPreferences();
 
   List<SimpleUrlInfo> get miscMyTimes => _miscMyTimes;
   List<SimpleUrlInfo> get miscOnlineSites => _miscOnlineSites;
   List<CityInfo> get miscWeatherCities => _miscWeatherCities;
+  List<String> get miscHistorioList => _miscHistorioList;
 
   ///
   /// read all keys and their values
@@ -65,6 +69,11 @@ class UserData {
     _miscWeatherCities.clear();
     _getCityInfoList(
         key: _UserDataKey.miscWeatherCities.name, outData: _miscWeatherCities);
+
+    // _miscWeatherCities
+    _miscHistorioList.clear();
+    _getHistorioList(
+        key: _UserDataKey.miscHistory.name, outData: _miscHistorioList);
   }
 
   ///
@@ -95,29 +104,6 @@ class UserData {
   }
 
   ///
-  /// getSimpleCityInfoList
-  ///
-  /// ignore: unused_element
-  void _getSimpleCityInfoList(
-      {required String key, required List<SimpleCityInfo> outData}) async {
-    String savedValue = await _preferences.getString(key);
-    savedValue =
-        savedValue.isEmpty ? '{"$_kDefaultListValueKey":[]}' : savedValue;
-
-    final jsonData = await json.decode(savedValue);
-    final parsed = jsonData[_kDefaultListValueKey] as List?;
-    final list =
-        parsed?.map((elem) => SimpleCityInfoDescript.fromJson(elem)).toList() ??
-            [];
-    list.asMap().forEach((idx, value) {
-      outData.add(SimpleCityInfo(
-          name: value.name,
-          langCode: value.langCode,
-          countryCode: value.countryCode));
-    });
-  }
-
-  ///
   /// getCityInfoList
   ///
   void _getCityInfoList(
@@ -130,6 +116,28 @@ class UserData {
     final parsed = jsonData[_kDefaultListValueKey] as List?;
     final list =
         parsed?.map((elem) => CityInfoDescript.fromJson(elem)).toList() ?? [];
+    list.asMap().forEach((idx, value) {
+      outData.add(value);
+    });
+  }
+
+  ///
+  /// _getHistorioList
+  ///
+  void _getHistorioList(
+      {required String key, required List<String> outData}) async {
+    String savedValue = await _preferences.getString(key);
+    if (savedValue.isEmpty) {
+      return;
+    }
+    savedValue =
+        savedValue.isEmpty ? '{"$_kDefaultListValueKey":[]}' : savedValue;
+
+    Codec<String, String> codec = utf8.fuse(base64);
+    final decoded = codec.decode(savedValue);
+    final jsonData = json.decode(decoded);
+    final parsed = jsonData[_kDefaultListValueKey] as List?;
+    final list = parsed?.map((elem) => elem).toList() ?? [];
     list.asMap().forEach((idx, value) {
       outData.add(value);
     });
@@ -202,6 +210,20 @@ class UserData {
     return retVal;
   }
 
+  void insertHistorio({required String historio, String? url}) {
+    if (_miscHistorioList.contains(historio)) {
+      return;
+    } else if (url != null &&
+        _miscHistorioList
+            .firstWhere((element) => element.contains(url), orElse: () => '')
+            .isNotEmpty) {
+      return;
+    }
+    _miscHistorioList.insert(0, historio);
+    _saveHistorioList(
+        newValues: _miscHistorioList, key: _UserDataKey.miscHistory.name);
+  }
+
   ///
   /// saveSimpleUrlInfoList
   ///
@@ -220,17 +242,18 @@ class UserData {
   }
 
   ///
-  /// _saveSimpleCityInfoList
+  /// _saveHistorioList
   ///
-  // ignore: unused_element
-  void _saveSimpleCityInfoList(
-      {required List<SimpleCityInfo> newValues, required String key}) {
-    final jsonList = newValues.map((elem) => elem.toJson()).toList();
+  void _saveHistorioList(
+      {required List<String> newValues, required String key}) {
+    final jsonList = newValues;
     final Map<String, dynamic> jsonData = <String, dynamic>{};
     jsonData[_kDefaultListValueKey] = jsonList;
     final encoded = jsonEncode(jsonData);
+    Codec<String, String> codec = utf8.fuse(base64);
+    final encoded2 = codec.encode(encoded);
 
-    _preferences.setString(key, encoded).then((succeeded) {
+    _preferences.setString(key, encoded2).then((succeeded) {
       if (!succeeded) {
         log.warning('Cannot save $key info SharedPref!');
       }

@@ -133,13 +133,14 @@ extension CityInfoDescript on CityInfo {
 
 extension HistorioInfoDescript on HistorioInfo {
   String get createdAtText {
-    return DateUtil().getDateString(date: createdAt, format: 'M/d (E)');
+    return DateUtil().getDateString(date: createdAt, format: 'yyyy/MM/dd');
   }
 }
 
 extension ServiceTypeDescript on ServiceType {
   static ServiceType fromString(String string) {
-    return ServiceType.values.firstWhere((element) => element.name == string);
+    return ServiceType.values.firstWhere((element) => element.name == string,
+        orElse: () => ServiceType.none);
   }
 
   String get stringClass {

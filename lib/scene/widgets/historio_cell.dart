@@ -9,20 +9,24 @@ class HistorioCell extends StatelessWidget {
   final int index;
   final CellSelectingDelegate? onCellSelecting;
   final ThumbnameShowingDelegate? onThumbnailShowing;
-  double _screenWidth = 0;
+  final Widget? divider;
+  final double indent;
+  final double endIndent;
 
-  HistorioCell(
+  const HistorioCell(
       {Key? key,
       required this.viewModel,
       required this.index,
       this.onCellSelecting,
-      this.onThumbnailShowing})
+      this.onThumbnailShowing,
+      this.divider,
+      this.indent = 35,
+      this.endIndent = 35})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    _screenWidth = MediaQuery.of(context).size.width;
-    print('_screenWidth = $_screenWidth');
+    double screenWidth = MediaQuery.of(context).size.width;
     return InkWell(
         onTap: () {
           onCellSelecting?.call(index);
@@ -32,22 +36,22 @@ class HistorioCell extends StatelessWidget {
         child: Container(
             padding: const EdgeInsets.only(left: 2.0, right: 2.0),
             child: Column(children: [
-              /*viewModel.createdAtText.isNotEmpty
-                  ?*/
-              Container(
-                alignment: Alignment.topLeft,
-                height: 18,
-                width: MediaQuery.of(context).size.width - 100,
-                child: Text("viewModel.createdAtText"),
-              ),
-              // : const SizedBox(height: 0, width: 0),
+              viewModel.createdAtText.isNotEmpty
+                  ? Container(
+                      padding: EdgeInsets.only(left: indent),
+                      color: Colors.grey[100],
+                      alignment: Alignment.topLeft,
+                      height: 18,
+                      width: MediaQuery.of(context).size.width - 100,
+                      child: Text(viewModel.createdAtText,
+                          style: const TextStyle(fontSize: 14)),
+                    )
+                  : const SizedBox(height: 0, width: 0),
               Row(mainAxisSize: MainAxisSize.min, children: [
                 SizedBox(
-                    width: 26,
-                    child: Text('东西南北',
-                        style: TextStyle(
-                            fontSize:
-                                13)) /*Text(viewModel.hisInfo?.category ?? ''*/),
+                    width: 32,
+                    child: Text(viewModel.hisInfo?.category ?? '',
+                        style: const TextStyle(fontSize: 10))),
                 const SizedBox(width: 5),
                 Container(
                   alignment: Alignment.topCenter,
@@ -70,6 +74,7 @@ class HistorioCell extends StatelessWidget {
                           if (snapshot.data is String) {
                             thumbUrl = snapshot.data as String? ?? "";
                           }
+
                           if (thumbUrl.isNotEmpty && thumbUrl != blankUrl) {
                             return Image.network(thumbUrl,
                                 errorBuilder: (context, object, stackTrace) =>
@@ -81,12 +86,13 @@ class HistorioCell extends StatelessWidget {
                 ),
                 const SizedBox(width: 5),
                 SizedBox(
-                    width: _screenWidth <= 320 ? 100 : _screenWidth - 165,
+                    width: screenWidth <= 320
+                        ? 100
+                        : screenWidth - 95 - indent - endIndent,
                     child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                              "viewModel.hisInfo?.itemInfo.title ?? '', 1111111",
+                          Text(viewModel.hisInfo?.itemInfo.title ?? '',
                               softWrap: true,
                               style: const TextStyle(
                                   fontSize: 14.0,
@@ -98,22 +104,21 @@ class HistorioCell extends StatelessWidget {
                               children: [
                                 const SizedBox(width: 1, height: 20),
                                 Container(
-                                    width: 120,
                                     height: 16,
                                     alignment: Alignment.bottomLeft,
                                     child: Text(
-                                        "viewModel.hisInfo?.itemInfo.source ?? ''",
+                                        viewModel.hisInfo?.itemInfo.source ??
+                                            '',
                                         overflow: TextOverflow.ellipsis,
                                         style: const TextStyle(
                                             fontSize: 11.0,
                                             color: Colors.black54))),
-                                const SizedBox(width: 2),
+                                const Spacer(),
                                 Container(
                                     width: 100,
                                     height: 16,
                                     alignment: Alignment.bottomRight,
-                                    child: Text(
-                                        "10/19/1" /*viewModel.hisInfo?.createdAt.toString() ?? ''*/,
+                                    child: Text(viewModel.itemInfoCreatedAtText,
                                         style: const TextStyle(
                                             fontSize: 11.0,
                                             color: Colors.grey,
@@ -122,19 +127,7 @@ class HistorioCell extends StatelessWidget {
                               ])
                         ]))
               ]),
+              divider != null ? divider! : const SizedBox(height: 0)
             ])));
-  }
-
-  double _calculateAutoscaleWidth(BuildContext context, String text,
-      {required double fontSize, double deltaWith = 200}) {
-    final textPainter = TextPainter(textDirection: TextDirection.ltr);
-    final style = TextStyle(fontSize: fontSize);
-    textPainter.text = TextSpan(text: text, style: style);
-    textPainter.layout();
-    double maxWidth = (double screenWidth) {
-      double deltaWidth_ = screenWidth <= 320 ? 15 : 0;
-      return screenWidth - deltaWith - deltaWidth_;
-    }(_screenWidth);
-    return textPainter.width >= maxWidth ? maxWidth : textPainter.width;
   }
 }

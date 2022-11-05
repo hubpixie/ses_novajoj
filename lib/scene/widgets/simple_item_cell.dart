@@ -56,7 +56,7 @@ class SimpleItemCwll extends StatelessWidget {
                                         style: const TextStyle(
                                             fontSize: 12.0,
                                             color: Colors.pinkAccent))),
-                                const SizedBox(width: 10),
+                                const Spacer(),
                                 Text(viewModel.createAtText,
                                     style: const TextStyle(
                                         fontSize: 12.0,

@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:ses_novajoj/foundation/data/result.dart';
 import 'package:ses_novajoj/networking/api/weather_web_api.dart';
+import 'package:ses_novajoj/networking/response/historio_item_response.dart';
 import 'package:ses_novajoj/networking/response/weather_item_response.dart';
 import 'package:ses_novajoj/networking/request/weather_item_parameter.dart';
 import 'package:ses_novajoj/domain/entities/misc_info_list_item.dart';
@@ -23,8 +26,8 @@ class MiscInfoListRepositoryImpl extends MiscInfoListRepository {
   Future<Result<List<MiscInfoListItem>>> fetchMiscInfoList(
       {required FetchMiscInfoListRepoInput input}) async {
     // prepare to get pref data
-    final miscMyTimes = UserData().miscMyTimes;
-    final miscMyOnlineSites = UserData().miscOnlineSites;
+    List<SimpleUrlInfo> miscMyTimes = UserData().miscMyTimes;
+    List<SimpleUrlInfo> miscMyOnlineSites = UserData().miscOnlineSites;
     List<CityInfo> miscWeatherCities = () {
       final ret = UserData().miscWeatherCities;
       if (ret.isEmpty) {
@@ -32,6 +35,7 @@ class MiscInfoListRepositoryImpl extends MiscInfoListRepository {
       }
       return ret;
     }();
+    List<HistorioInfo> miscHistorioList = _getHistorioList();
 
     // make return value
     List<MiscInfoListItem> data = await () async {
@@ -91,8 +95,24 @@ class MiscInfoListRepositoryImpl extends MiscInfoListRepository {
           )),
         );
       }
+      // history
+      id = 0;
+      orderIndex = 0;
+      for (int idx = 0; idx < miscHistorioList.length; idx++) {
+        ret.add(MiscInfoListItem(
+            itemInfo: (NovaItemInfo info) {
+              final NovaItemInfo itemInfo = info;
+              itemInfo.orderIndex = orderIndex++;
+              itemInfo.id = idx;
+              itemInfo.serviceType = ServiceType.none;
+              return itemInfo;
+            }(miscHistorioList[idx].itemInfo),
+            hisInfo: miscHistorioList[idx]));
+      }
+
       return ret;
     }();
+
     Result<List<MiscInfoListItem>> result = Result.success(data: data);
     return result;
   }
@@ -160,5 +180,15 @@ class MiscInfoListRepositoryImpl extends MiscInfoListRepository {
           return CityInfoDescript.fromCurrentLocale(name: 'New York');
       }
     }();
+  }
+
+  List<HistorioInfo> _getHistorioList() {
+    final historioStrings = UserData().miscHistorioList;
+    List<HistorioInfo> list = historioStrings.map((elem) {
+      final jsonData = json.decode(elem);
+      HistorioItemRes itemRes = HistorioItemRes.fromJson(jsonData);
+      return itemRes;
+    }).toList();
+    return list;
   }
 }

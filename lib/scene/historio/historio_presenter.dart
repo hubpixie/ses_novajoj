@@ -1,4 +1,3 @@
-import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/domain/foundation/bloc/simple_bloc.dart';
 import 'package:ses_novajoj/domain/usecases/historio_usecase.dart';
 import 'package:ses_novajoj/domain/usecases/historio_usecase_output.dart';
@@ -7,11 +6,18 @@ import 'historio_presenter_output.dart';
 import 'historio_router.dart';
 
 class HistorioPresenterInput {
-
+  String appBarTitle;
+  HistorioViewModel? viewModel;
+  Object? completeHandler;
+  HistorioPresenterInput(
+      {required this.appBarTitle, this.viewModel, this.completeHandler});
 }
 
 abstract class HistorioPresenter with SimpleBloc<HistorioPresenterOutput> {
-  void eventViewReady({required HistorioPresenterInput input});
+  Future<HistorioPresenterOutput> eventViewReady(
+      {required HistorioPresenterInput input});
+  void eventViewWebPage(Object context,
+      {required HistorioPresenterInput input});
 }
 
 class HistorioPresenterImpl extends HistorioPresenter {
@@ -19,21 +25,31 @@ class HistorioPresenterImpl extends HistorioPresenter {
   final HistorioRouter router;
 
   HistorioPresenterImpl({required this.router})
-      : useCase = HistorioUseCaseImpl() {
-    useCase.stream.listen((event) {
-      if (event is PresentModel) {
-        if (event.error == null) {
-          streamAdd(ShowHistorioPageModel(
-              viewModel: HistorioViewModel(event.model!)));
-        } else {
-          streamAdd(ShowHistorioPageModel(error: event.error));
-        }
-      }
-    });
+      : useCase = HistorioUseCaseImpl();
+
+  @override
+  Future<HistorioPresenterOutput> eventViewReady(
+      {required HistorioPresenterInput input}) async {
+    final output = await useCase.fetchHistorio(input: HistorioUseCaseInput());
+    List<HistorioViewModel>? list;
+    if (output is PresentModel) {
+      list = output.models?.map((e) => HistorioViewModel(e)).toList();
+    }
+    return ShowHistorioPageModel(viewModelList: list, error: null);
   }
 
   @override
-  void eventViewReady({required HistorioPresenterInput input}) {
-    useCase.fetchHistorio(input: HistorioUseCaseInput());
+  void eventViewWebPage(Object context,
+      {required HistorioPresenterInput input}) {
+    _viewSelectPage(context, input: input);
+  }
+
+  void _viewSelectPage(Object context,
+      {required HistorioPresenterInput input}) {
+    router.gotoWebPage(context,
+        appBarTitle: input.appBarTitle,
+        itemInfo: input.viewModel!.hisInfo.itemInfo,
+        htmlText: input.viewModel!.hisInfo.htmlText,
+        completeHandler: input.completeHandler);
   }
 }

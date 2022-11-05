@@ -1,5 +1,10 @@
+import 'dart:convert';
+
 import 'package:ses_novajoj/foundation/data/result.dart';
+import 'package:ses_novajoj/foundation/data/user_data.dart';
+import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/networking/api/thread_nova_web_api.dart';
+import 'package:ses_novajoj/networking/response/historio_item_response.dart';
 import 'package:ses_novajoj/networking/response/thread_detalo_item_response.dart';
 import 'package:ses_novajoj/networking/request/nova_detalo_parameter.dart';
 import 'package:ses_novajoj/domain/entities/thread_nova_detail_item.dart';
@@ -28,6 +33,10 @@ class ThreadNovaDetailRepositoryImpl extends ThreadNovaDetailRepository {
       if (response != null) {
         retVal = ThreadNovaDetailItem(
             itemInfo: response.itemInfo, bodyString: response.bodyString);
+        // save historio
+        Future.delayed(const Duration(seconds: 1), () {
+          _saveHistory(detailItem: retVal);
+        });
       } else {
         assert(false, "Unresolved error: response is null");
       }
@@ -36,5 +45,24 @@ class ThreadNovaDetailRepositoryImpl extends ThreadNovaDetailRepository {
       ret = Result.failure(error: error);
     });
     return ret;
+  }
+
+  void _saveHistory({ThreadNovaDetailItem? detailItem}) {
+    if (detailItem != null) {
+      HistorioInfo historioInfo = () {
+        HistorioInfo info = HistorioInfo();
+        info.category = 'thread';
+        info.id = info.hashCode;
+        info.createdAt = DateTime.now();
+        info.htmlText = detailItem.toHtmlString();
+        info.itemInfo = detailItem.itemInfo;
+        return info;
+      }();
+      HistorioItemRes historioItemRes = HistorioItemRes.as(info: historioInfo);
+      final json = historioItemRes.toJson();
+      final encoded = jsonEncode(json);
+      UserData().insertHistorio(
+          historio: encoded, url: historioInfo.itemInfo.urlString);
+    }
   }
 }

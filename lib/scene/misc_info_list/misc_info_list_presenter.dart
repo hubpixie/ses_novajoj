@@ -26,9 +26,11 @@ abstract class MiscInfoListPresenter
   void eventViewReady({required MiscInfoListPresenterInput input});
   void eventViewReportPage(Object context,
       {required MiscInfoListPresenterInput input});
+  void eventViewWebPage(Object context,
+      {required MiscInfoListPresenterInput input});
   void eventViewHistorioPage(Object context,
       {required MiscInfoListPresenterInput input});
-  void eventViewWebPage(Object context,
+  void eventViewHistorioWebPage(Object context,
       {required MiscInfoListPresenterInput input});
 }
 
@@ -72,7 +74,20 @@ class MiscInfoListPresenterImpl extends MiscInfoListPresenter {
   @override
   void eventViewHistorioPage(Object context,
       {required MiscInfoListPresenterInput input}) {
-    _viewSelectPage(context, input: input);
+    router.gotoHistorioPage(context,
+        itemInfos: input.viewModelList,
+        appBarTitle: input.appBarTitle,
+        completeHandler: input.completeHandler);
+  }
+
+  @override
+  void eventViewHistorioWebPage(Object context,
+      {required MiscInfoListPresenterInput input}) {
+    router.gotoHistorioWebPage(context,
+        itemInfo: input.viewModelList?[input.itemIndex].itemInfo,
+        htmlText: input.viewModelList?[input.itemIndex].hisInfo?.htmlText,
+        appBarTitle: input.appBarTitle,
+        completeHandler: input.completeHandler);
   }
 
   void _viewSelectPage(Object context,
