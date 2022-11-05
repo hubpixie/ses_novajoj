@@ -9,6 +9,26 @@ class ShowHistorioPageModel extends HistorioPresenterOutput {
   final List<HistorioViewModel>? viewModelList;
   final AppError? error;
   ShowHistorioPageModel({this.viewModelList, this.error});
+
+  List<HistorioViewModel>? _viewModelList;
+  List<HistorioViewModel>? get reshapedViewModelList => () {
+        if (viewModelList == null) {
+          return null;
+        }
+        if (_viewModelList != null) {
+          return _viewModelList;
+        }
+        HistorioViewModel? prevModel;
+        _viewModelList = [...viewModelList!];
+        for (final HistorioViewModel model in _viewModelList!) {
+          if (prevModel?.createdAtText == model.createdAtText) {
+            model.createdAtText = '';
+          } else {
+            prevModel = model;
+          }
+        }
+        return _viewModelList;
+      }();
 }
 
 class HistorioViewModel {

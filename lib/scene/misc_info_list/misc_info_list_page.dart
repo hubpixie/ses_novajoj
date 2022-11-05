@@ -231,15 +231,6 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
                 itemTitleHeight;
         return retHeight;
       },
-      onRowSelecting: (index) {
-        widget.presenter.eventViewWebPage(context,
-            input: MiscInfoListPresenterInput(
-                appBarTitle: UseL10n.of(context)?.infoServiceHistory ?? '',
-                viewModelList: hisInfos,
-                serviceType: ServiceType.none,
-                itemIndex: index,
-                completeHandler: () {}));
-      },
       onOtherRowSelecting: (index) {
         widget.presenter.eventViewHistorioPage(context,
             input: MiscInfoListPresenterInput(
@@ -247,7 +238,10 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
                 viewModelList: hisInfos,
                 serviceType: ServiceType.none,
                 itemIndex: -1,
-                completeHandler: () {}));
+                completeHandler: () {
+                  widget.presenter
+                      .eventViewReady(input: MiscInfoListPresenterInput());
+                }));
       },
     );
   }
@@ -297,6 +291,16 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
           HistorioCell(
               viewModel: value,
               index: idx,
+              onCellSelecting: (index) {
+                widget.presenter.eventViewHistorioWebPage(context,
+                    input: MiscInfoListPresenterInput(
+                        appBarTitle:
+                            UseL10n.of(context)?.infoServiceHistory ?? '',
+                        viewModelList: infos,
+                        serviceType: ServiceType.none,
+                        itemIndex: index,
+                        completeHandler: () {}));
+              },
               onThumbnailShowing: (thumbIndex) async {
                 return infos[idx].itemInfo.thunnailUrlString;
               })
@@ -317,9 +321,7 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
     textPainter.layout();
     final lines = (textPainter.size.width / textWidth).ceil();
     final height = lines * textPainter.size.height;
-    return height <= minTextHeight
-        ? minTextHeight
-        : textPainter.height + minTextHeight;
+    return height <= minTextHeight ? minTextHeight : height;
   }
 
   ///

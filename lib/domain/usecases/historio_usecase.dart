@@ -1,7 +1,6 @@
 import 'package:ses_novajoj/domain/foundation/bloc/simple_bloc.dart';
 import 'package:ses_novajoj/domain/repositories/historio_repository.dart';
 import 'package:ses_novajoj/data/repositories/historio_repository.dart';
-import 'package:ses_novajoj/foundation/data/user_types.dart';
 
 import 'historio_usecase_output.dart';
 

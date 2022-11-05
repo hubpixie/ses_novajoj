@@ -34,7 +34,9 @@ class BbsNovaDetailRepositoryImpl extends BbsNovaDetailRepository {
         retVal = BbsNovaDetailItem(
             itemInfo: response.itemInfo, bodyString: response.bodyString);
         // save historio
-        _saveHistory(detailItem: retVal);
+        Future.delayed(const Duration(seconds: 1), () {
+          _saveHistory(detailItem: retVal);
+        });
       } else {
         assert(false, "Unresolved error: response is null");
       }
@@ -52,13 +54,15 @@ class BbsNovaDetailRepositoryImpl extends BbsNovaDetailRepository {
         info.category = 'bbs';
         info.id = info.hashCode;
         info.createdAt = DateTime.now();
+        info.htmlText = detailItem.toHtmlString();
         info.itemInfo = detailItem.itemInfo;
         return info;
       }();
       HistorioItemRes historioItemRes = HistorioItemRes.as(info: historioInfo);
       final json = historioItemRes.toJson();
       final encoded = jsonEncode(json);
-      UserData().insertHistorio(historio: encoded);
+      UserData().insertHistorio(
+          historio: encoded, url: historioInfo.itemInfo.urlString);
     }
   }
 }

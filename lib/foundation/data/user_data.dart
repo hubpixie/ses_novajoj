@@ -210,8 +210,13 @@ class UserData {
     return retVal;
   }
 
-  void insertHistorio({required String historio}) {
+  void insertHistorio({required String historio, String? url}) {
     if (_miscHistorioList.contains(historio)) {
+      return;
+    } else if (url != null &&
+        _miscHistorioList
+            .firstWhere((element) => element.contains(url), orElse: () => '')
+            .isNotEmpty) {
       return;
     }
     _miscHistorioList.insert(0, historio);

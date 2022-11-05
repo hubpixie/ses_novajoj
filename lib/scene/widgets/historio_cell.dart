@@ -9,13 +9,19 @@ class HistorioCell extends StatelessWidget {
   final int index;
   final CellSelectingDelegate? onCellSelecting;
   final ThumbnameShowingDelegate? onThumbnailShowing;
+  final Widget? divider;
+  final double indent;
+  final double endIndent;
 
   const HistorioCell(
       {Key? key,
       required this.viewModel,
       required this.index,
       this.onCellSelecting,
-      this.onThumbnailShowing})
+      this.onThumbnailShowing,
+      this.divider,
+      this.indent = 35,
+      this.endIndent = 35})
       : super(key: key);
 
   @override
@@ -32,17 +38,20 @@ class HistorioCell extends StatelessWidget {
             child: Column(children: [
               viewModel.createdAtText.isNotEmpty
                   ? Container(
+                      padding: EdgeInsets.only(left: indent),
+                      color: Colors.grey[100],
                       alignment: Alignment.topLeft,
                       height: 18,
                       width: MediaQuery.of(context).size.width - 100,
-                      child: Text(viewModel.createdAtText),
+                      child: Text(viewModel.createdAtText,
+                          style: const TextStyle(fontSize: 14)),
                     )
                   : const SizedBox(height: 0, width: 0),
               Row(mainAxisSize: MainAxisSize.min, children: [
                 SizedBox(
-                    width: 26,
+                    width: 32,
                     child: Text(viewModel.hisInfo?.category ?? '',
-                        style: const TextStyle(fontSize: 13))),
+                        style: const TextStyle(fontSize: 10))),
                 const SizedBox(width: 5),
                 Container(
                   alignment: Alignment.topCenter,
@@ -65,7 +74,7 @@ class HistorioCell extends StatelessWidget {
                           if (snapshot.data is String) {
                             thumbUrl = snapshot.data as String? ?? "";
                           }
-                          print('thumburl = $thumbUrl');
+
                           if (thumbUrl.isNotEmpty && thumbUrl != blankUrl) {
                             return Image.network(thumbUrl,
                                 errorBuilder: (context, object, stackTrace) =>
@@ -77,7 +86,9 @@ class HistorioCell extends StatelessWidget {
                 ),
                 const SizedBox(width: 5),
                 SizedBox(
-                    width: screenWidth <= 320 ? 100 : screenWidth - 165,
+                    width: screenWidth <= 320
+                        ? 100
+                        : screenWidth - 95 - indent - endIndent,
                     child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -93,7 +104,6 @@ class HistorioCell extends StatelessWidget {
                               children: [
                                 const SizedBox(width: 1, height: 20),
                                 Container(
-                                    width: 120,
                                     height: 16,
                                     alignment: Alignment.bottomLeft,
                                     child: Text(
@@ -103,7 +113,7 @@ class HistorioCell extends StatelessWidget {
                                         style: const TextStyle(
                                             fontSize: 11.0,
                                             color: Colors.black54))),
-                                const SizedBox(width: 2),
+                                const Spacer(),
                                 Container(
                                     width: 100,
                                     height: 16,
@@ -117,6 +127,7 @@ class HistorioCell extends StatelessWidget {
                               ])
                         ]))
               ]),
+              divider != null ? divider! : const SizedBox(height: 0)
             ])));
   }
 }

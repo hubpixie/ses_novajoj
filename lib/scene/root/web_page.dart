@@ -57,7 +57,9 @@ class _WebPageState extends State<WebPage> {
               menuActions: _detailItem?.menuActions),
         ),
         body: _detailPage.buildContentArea(context,
-            detailItem: _detailItem, imageZommingEnabled: false));
+            detailItem: _detailItem,
+            imageZommingEnabled:
+                (_detailItem?.htmlText.isNotEmpty ?? false) ? true : false));
   }
 
   void _parseRouteParameter() {
@@ -70,14 +72,13 @@ class _WebPageState extends State<WebPage> {
       _appBarTitle =
           _parameters?[WebPageParamKeys.appBarTitle] as String? ?? '';
       _itemInfo = _parameters?[WebPageParamKeys.itemInfo] as NovaItemInfo?;
-
       //
       // WebPageDetailItem
       //
       if (_itemInfo != null) {
         _detailItem = WebPageDetailItem(
             itemInfo: _itemInfo!,
-            htmlText: '',
+            htmlText: _parameters?[WebPageParamKeys.htmlText] ?? '',
             menuItems: _parameters?[WebPageParamKeys.menuItems],
             menuActions: _parameters?[WebPageParamKeys.menuActions]);
       }

@@ -27,6 +27,7 @@ class ShowMiscInfoListPageModel extends MiscInfoListPresenterOutput {
             prevModel = model;
           }
         }
+        return _viewModelList;
       }();
 }
 
