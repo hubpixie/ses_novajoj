@@ -1,12 +1,11 @@
 import 'package:ses_novajoj/foundation/data/user_types.dart';
-import 'package:ses_novajoj/foundation/data/date_util.dart';
 
-class FavoritesItem {
-  int id;
-  String string;
-
-  FavoritesItem({
-    required this.id,
-    required this.string,
-  });
+class FavoritesItem extends HistorioInfo {
+  FavoritesItem.copy({required HistorioInfo from}) {
+    id = from.id;
+    createdAt = from.createdAt;
+    category = from.category;
+    itemInfo = from.itemInfo;
+    htmlText = from.htmlText;
+  }
 }

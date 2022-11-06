@@ -1,12 +1,8 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:ses_novajoj/foundation/data/user_types.dart';
-import 'package:ses_novajoj/scene/foundation/use_l10n.dart';
 import 'package:ses_novajoj/scene/foundation/page/page_parameter.dart';
 import 'package:ses_novajoj/scene/favorites/favorites_presenter.dart';
 import 'package:ses_novajoj/scene/favorites/favorites_presenter_output.dart';
 import 'package:ses_novajoj/scene/foundation/color_def.dart';
-import 'package:ses_novajoj/scene/foundation/page/page_parameter.dart';
 import 'package:ses_novajoj/scene/widgets/historio_cell.dart';
 
 class FavoritesPage extends StatefulWidget {
@@ -26,46 +22,8 @@ class _FavoritesPageState extends State<FavoritesPage> {
   @override
   void initState() {
     super.initState();
-    // TODO: Initialize your variables.
-    widget.presenter.eventViewReady(input: FavoritesPresenterInput());
   }
 
-  @override
-  Widget build(BuildContext context) {
-    _parseRouteParameter();
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(_appBarTitle),
-        backgroundColor: ColorDef.appBarBackColor,
-        centerTitle: true,
-      ),
-      body: StreamBuilder<FavoritesPresenterOutput>(
-          stream: widget.presenter.stream,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(
-                  child: CircularProgressIndicator(
-                      color: Colors.amber, backgroundColor: Colors.grey[850]));
-            }
-            final data = snapshot.data;
-            if (data is ShowFavoritesPageModel) {
-              if (data.error == null) {
-                return Column(
-                  children: [Text("${data.viewModel}")],
-                );
-              } else {
-                return Text("${data.error}");
-              }
-            } else {
-              assert(false, "unknown event $data");
-              return Container(color: Colors.red);
-            }
-          }),
-    );
-  }
-
-  /*
   @override
   Widget build(BuildContext context) {
     _parseRouteParameter();
@@ -78,7 +36,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
       ),
       body: FutureBuilder<FavoritesPresenterOutput>(
           future: widget.presenter
-              .eventViewReady(input: HistorioPresenterInput(appBarTitle: '')),
+              .eventViewReady(input: FavoritesPresenterInput(appBarTitle: '')),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(
@@ -86,7 +44,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
                       color: Colors.amber, backgroundColor: Colors.grey[850]));
             }
             final data = snapshot.data;
-            if (data is ShowHistorioPageModel &&
+            if (data is ShowFavoritesPageModel &&
                 data.reshapedViewModelList != null) {
               final viewModels = data.reshapedViewModelList;
               return ListView.builder(
@@ -95,14 +53,14 @@ class _FavoritesPageState extends State<FavoritesPage> {
                       viewModel: viewModels![index],
                       onCellSelecting: (selIndex) {
                         widget.presenter.eventViewWebPage(context,
-                            input: HistorioPresenterInput(
+                            input: FavoritesPresenterInput(
                                 appBarTitle: _appBarTitle,
                                 viewModel: viewModels[selIndex],
                                 completeHandler: () {}));
                       },
                       onThumbnailShowing: (thumbIndex) async {
                         return viewModels[thumbIndex]
-                            .hisInfo
+                            .bookmark
                             .itemInfo
                             .thunnailUrlString;
                       },
@@ -121,7 +79,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
           }),
     );
   }
-*/
+
   void _parseRouteParameter() {
     if (!_pageLoadIsFirst) {
       return;
@@ -130,8 +88,9 @@ class _FavoritesPageState extends State<FavoritesPage> {
     // get page paratmers via ModalRoute
     //
     _parameters = ModalRoute.of(context)?.settings.arguments as Map?;
-    _appBarTitle = _parameters?[HistorioParamKeys.appBarTitle] as String? ?? '';
-    // _itemInfo = _parameters?[HistorioParamKeys.itemInfos] as NovaItemInfo?;
+    _appBarTitle =
+        _parameters?[FavoritesParamKeys.appBarTitle] as String? ?? '';
+    // _itemInfo = _parameters?[FavoritesParamKeys.itemInfos] as NovaItemInfo?;
 
     //
     // FA

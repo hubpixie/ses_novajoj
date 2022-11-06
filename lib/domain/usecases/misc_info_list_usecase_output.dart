@@ -12,7 +12,9 @@ class PresentModel extends MiscInfoListUseCaseOutput {
 class MiscInfoListUseCaseRowModel {
   NovaItemInfo itemInfo;
   HistorioInfo? hisInfo;
+  HistorioInfo? bookmark;
   MiscInfoListUseCaseRowModel(MiscInfoListItem entity)
       : itemInfo = entity.itemInfo,
-        hisInfo = entity.hisInfo;
+        hisInfo = entity.hisInfo,
+        bookmark = entity.bookmark;
 }

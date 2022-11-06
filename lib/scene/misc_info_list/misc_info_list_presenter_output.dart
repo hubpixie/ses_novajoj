@@ -34,13 +34,24 @@ class ShowMiscInfoListPageModel extends MiscInfoListPresenterOutput {
 class MiscInfoListViewModel {
   NovaItemInfo itemInfo;
   HistorioInfo? hisInfo;
+  HistorioInfo? bookmark;
   String createdAtText;
   String itemInfoCreatedAtText;
 
   MiscInfoListViewModel(MiscInfoListUseCaseRowModel model)
       : itemInfo = model.itemInfo,
         hisInfo = model.hisInfo,
-        createdAtText = model.hisInfo?.createdAtText ?? '',
-        itemInfoCreatedAtText = DateUtil()
-            .getDateString(date: model.itemInfo.createAt, format: 'M/d (E)');
+        bookmark = model.bookmark,
+        createdAtText = model.hisInfo != null
+            ? (model.hisInfo?.createdAtText ?? '')
+            : (model.bookmark != null
+                ? (model.bookmark?.createdAtText ?? '')
+                : ''),
+        itemInfoCreatedAtText = model.hisInfo != null
+            ? (DateUtil().getDateString(
+                date: model.hisInfo?.itemInfo.createAt, format: 'M/d (E)'))
+            : (model.bookmark != null
+                ? (DateUtil().getDateString(
+                    date: model.bookmark?.itemInfo.createAt, format: 'M/d (E)'))
+                : '');
 }

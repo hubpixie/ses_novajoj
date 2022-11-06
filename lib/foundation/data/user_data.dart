@@ -8,7 +8,8 @@ enum _UserDataKey {
   miscMyTimes,
   miscOnlineSites,
   miscWeatherCities,
-  miscHistory
+  miscHistory,
+  miscFavorites,
 }
 
 extension _UserDataKeyInfo on _UserDataKey {
@@ -22,6 +23,8 @@ extension _UserDataKeyInfo on _UserDataKey {
         return 'misc_weather_cities';
       case _UserDataKey.miscHistory:
         return 'misc_history';
+      case _UserDataKey.miscFavorites:
+        return 'misc_favorites';
       default:
         return '';
     }
@@ -41,6 +44,7 @@ class UserData {
   final List<SimpleUrlInfo> _miscOnlineSites = [];
   final List<CityInfo> _miscWeatherCities = [];
   final List<String> _miscHistorioList = [];
+  final List<String> _miscFavoritesList = [];
 
   final EncryptedSharedPreferences _preferences = EncryptedSharedPreferences();
 
@@ -48,6 +52,7 @@ class UserData {
   List<SimpleUrlInfo> get miscOnlineSites => _miscOnlineSites;
   List<CityInfo> get miscWeatherCities => _miscWeatherCities;
   List<String> get miscHistorioList => _miscHistorioList;
+  List<String> get miscFavoritesList => _miscFavoritesList;
 
   ///
   /// read all keys and their values
@@ -70,10 +75,15 @@ class UserData {
     _getCityInfoList(
         key: _UserDataKey.miscWeatherCities.name, outData: _miscWeatherCities);
 
-    // _miscWeatherCities
+    // _miscHistorioList
     _miscHistorioList.clear();
     _getHistorioList(
         key: _UserDataKey.miscHistory.name, outData: _miscHistorioList);
+
+    // _miscFavoritesList
+    _miscFavoritesList.clear();
+    _getHistorioList(
+        key: _UserDataKey.miscFavorites.name, outData: _miscFavoritesList);
   }
 
   ///
@@ -208,6 +218,20 @@ class UserData {
         break;
     }
     return retVal;
+  }
+
+  void insertBookmark({required String favorite, String? url}) {
+    if (_miscFavoritesList.contains(favorite)) {
+      return;
+    } else if (url != null &&
+        _miscFavoritesList
+            .firstWhere((element) => element.contains(url), orElse: () => '')
+            .isNotEmpty) {
+      return;
+    }
+    _miscFavoritesList.insert(0, favorite);
+    _saveHistorioList(
+        newValues: _miscFavoritesList, key: _UserDataKey.miscFavorites.name);
   }
 
   void insertHistorio({required String historio, String? url}) {

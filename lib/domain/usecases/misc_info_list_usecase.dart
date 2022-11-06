@@ -2,7 +2,6 @@ import 'package:ses_novajoj/domain/entities/misc_info_list_item.dart';
 import 'package:ses_novajoj/domain/foundation/bloc/simple_bloc.dart';
 import 'package:ses_novajoj/domain/repositories/misc_info_list_repository.dart';
 import 'package:ses_novajoj/data/repositories/misc_info_list_repository.dart';
-//import 'package:ses_novajoj/foundation/data/user_types.dart';
 
 import 'misc_info_list_usecase_output.dart';
 

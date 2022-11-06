@@ -36,6 +36,7 @@ class MiscInfoListRepositoryImpl extends MiscInfoListRepository {
       return ret;
     }();
     List<HistorioInfo> miscHistorioList = _getHistorioList();
+    List<HistorioInfo> miscBookmarkList = _getBookmarkList();
 
     // make return value
     List<MiscInfoListItem> data = await () async {
@@ -95,6 +96,7 @@ class MiscInfoListRepositoryImpl extends MiscInfoListRepository {
           )),
         );
       }
+
       // history
       id = 0;
       orderIndex = 0;
@@ -108,6 +110,21 @@ class MiscInfoListRepositoryImpl extends MiscInfoListRepository {
               return itemInfo;
             }(miscHistorioList[idx].itemInfo),
             hisInfo: miscHistorioList[idx]));
+      }
+
+      // favorites
+      id = 0;
+      orderIndex = 0;
+      for (int idx = 0; idx < miscBookmarkList.length; idx++) {
+        ret.add(MiscInfoListItem(
+            itemInfo: (NovaItemInfo info) {
+              final NovaItemInfo itemInfo = info;
+              itemInfo.orderIndex = orderIndex++;
+              itemInfo.id = idx;
+              itemInfo.serviceType = ServiceType.none;
+              return itemInfo;
+            }(miscBookmarkList[idx].itemInfo),
+            bookmark: miscBookmarkList[idx]));
       }
 
       return ret;
@@ -185,6 +202,16 @@ class MiscInfoListRepositoryImpl extends MiscInfoListRepository {
   List<HistorioInfo> _getHistorioList() {
     final historioStrings = UserData().miscHistorioList;
     List<HistorioInfo> list = historioStrings.map((elem) {
+      final jsonData = json.decode(elem);
+      HistorioItemRes itemRes = HistorioItemRes.fromJson(jsonData);
+      return itemRes;
+    }).toList();
+    return list;
+  }
+
+  List<HistorioInfo> _getBookmarkList() {
+    final bookmarkStrings = UserData().miscFavoritesList;
+    List<HistorioInfo> list = bookmarkStrings.map((elem) {
       final jsonData = json.decode(elem);
       HistorioItemRes itemRes = HistorioItemRes.fromJson(jsonData);
       return itemRes;
