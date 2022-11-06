@@ -59,7 +59,7 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
                       _buildWeatherArea(context,
                           viewModelList: data.viewModelList),
                       _buildFavoriteArea(context,
-                          viewModelList: data.viewModelList),
+                          viewModelList: data.reshapedViewModelList),
                       _buildHistoryArea(context,
                           viewModelList: data.reshapedViewModelList)
                     ],
@@ -189,20 +189,41 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
 
   Widget _buildFavoriteArea(BuildContext context,
       {List<MiscInfoListViewModel>? viewModelList}) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    final hisInfos = viewModelList
+        ?.where((element) =>
+            element.itemInfo.serviceType == ServiceType.none &&
+            element.hisInfo != null) // TODO: DUMMY
+        .toList();
     return InfoServiceCell(
       sectionTitle: UseL10n.of(context)?.infoServiceFavorites ?? '',
-      rowTitles: const <Widget>[],
-      otherTitle: _buildTextWidget(UseL10n.of(context)?.infoServiceItemOther),
-      onRowSelecting: (index) {
-        widget.presenter.eventViewWebPage(context,
+      rowTitles: _buildRowFavoritesWidgets(hisInfos?.take(5).toList()),
+      otherTitle: (hisInfos?.length ?? 0) > 5
+          ? _buildTextWidget(UseL10n.of(context)?.infoServiceItemMore)
+          : null,
+      calcRowHeight: (index) {
+        double itemTitleHeight = _calculateItemTitleHeight(
+            context, hisInfos?[index].itemInfo.title ?? '',
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            textWidth: (screenWidth <= 320 ? 100 : screenWidth - 165));
+        double retHeight =
+            (hisInfos![index].createdAtText.isNotEmpty ? 45 : 25) +
+                itemTitleHeight;
+        return retHeight;
+      },
+      onOtherRowSelecting: (index) {
+        widget.presenter.eventViewFavoritesPage(context,
             input: MiscInfoListPresenterInput(
                 appBarTitle: UseL10n.of(context)?.infoServiceFavorites ?? '',
-                viewModelList: viewModelList,
+                viewModelList: hisInfos,
                 serviceType: ServiceType.none,
-                itemIndex: index,
-                completeHandler: () {}));
+                itemIndex: -1,
+                completeHandler: () {
+                  widget.presenter
+                      .eventViewReady(input: MiscInfoListPresenterInput());
+                }));
       },
-      onOtherRowSelecting: (index) {},
     );
   }
 
@@ -279,6 +300,35 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
                 ))
             .toList() ??
         [];
+  }
+
+  List<Widget> _buildRowFavoritesWidgets(List<MiscInfoListViewModel>? infos) {
+    List<Widget> widgets = [];
+    infos?.asMap().forEach((idx, value) {
+      widgets.add(Expanded(
+          child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          HistorioCell(
+              viewModel: value,
+              index: idx,
+              onCellSelecting: (index) {
+                widget.presenter.eventViewFavoritesWebPage(context,
+                    input: MiscInfoListPresenterInput(
+                        appBarTitle:
+                            UseL10n.of(context)?.infoServiceFavorites ?? '',
+                        viewModelList: infos,
+                        serviceType: ServiceType.none,
+                        itemIndex: index,
+                        completeHandler: () {}));
+              },
+              onThumbnailShowing: (thumbIndex) async {
+                return infos[idx].itemInfo.thunnailUrlString;
+              })
+        ],
+      )));
+    });
+    return widgets;
   }
 
   List<Widget> _buildRowHistorioWidgets(List<MiscInfoListViewModel>? infos) {
