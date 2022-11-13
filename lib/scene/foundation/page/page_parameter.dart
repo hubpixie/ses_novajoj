@@ -26,6 +26,7 @@ enum WebPageParamKeys {
 
 enum DetailMenuItem {
   openOriginal,
+  favorite,
   readComments,
   changeSettings,
   removeSettings

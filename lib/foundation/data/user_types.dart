@@ -51,6 +51,7 @@ class NovaItemInfo {
   int reads;
   bool isRead;
   bool isNew;
+  bool isFavorite;
   List<NovaItemInfo>? children;
   WeatherInfo? weatherInfo;
 
@@ -70,6 +71,7 @@ class NovaItemInfo {
       this.reads = 0,
       this.isRead = false,
       this.isNew = false,
+      this.isFavorite = false,
       this.children,
       this.weatherInfo});
 }

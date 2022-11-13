@@ -7,13 +7,15 @@ import 'bbs_nova_detail_usecase_output.dart';
 
 class BbsNovaDetailUseCaseInput {
   NovaItemInfo itemInfo;
+  String? htmlText;
 
-  BbsNovaDetailUseCaseInput({required this.itemInfo});
+  BbsNovaDetailUseCaseInput({required this.itemInfo, this.htmlText});
 }
 
 abstract class BbsNovaDetailUseCase
     with SimpleBloc<BbsNovaDetailUseCaseOutput> {
   void fetchBbsNovaDetail({required BbsNovaDetailUseCaseInput input});
+  bool saveBookmark({required BbsNovaDetailUseCaseInput input});
 }
 
 class BbsNovaDetailUseCaseImpl extends BbsNovaDetailUseCase {
@@ -33,5 +35,14 @@ class BbsNovaDetailUseCaseImpl extends BbsNovaDetailUseCase {
     }, failure: (error) {
       streamAdd(PresentModel(error: error));
     });
+  }
+
+  @override
+  bool saveBookmark({required BbsNovaDetailUseCaseInput input}) {
+    return repository.saveBookmark(
+        input: FetchBbsNovaDetailRepoInput(
+            itemInfo: input.itemInfo,
+            docType: NovaDocType.detail,
+            htmlText: input.htmlText));
   }
 }

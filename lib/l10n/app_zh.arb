@@ -70,6 +70,8 @@
     "bbsMenuList":"分类选读",           
     "bbsSelectListForYou":"为您推选",
     "bbsSelectListLatest":"最新",
+    "detailPageMenuAddBookmark":"收藏",
+    "detailPageMenuRemoveBookmark":"不收藏",
     "detailPageMenuOpenOriginalPage":"打开原页面",
     "detailPageMenuChangeMiscInfoSettings":"变更此设置",
     "detailPageMenuRemoveMiscInfoSettings":"删除此设置",

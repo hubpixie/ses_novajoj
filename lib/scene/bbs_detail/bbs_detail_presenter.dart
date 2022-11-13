@@ -8,11 +8,13 @@ import 'bbs_detail_router.dart';
 
 class BbsDetailPresenterInput {
   NovaItemInfo itemInfo;
-  BbsDetailPresenterInput({required this.itemInfo});
+  String? htmlText;
+  BbsDetailPresenterInput({required this.itemInfo, this.htmlText});
 }
 
 abstract class BbsDetailPresenter with SimpleBloc<BbsDetailPresenterOutput> {
   void eventViewReady({required BbsDetailPresenterInput input});
+  bool eventSaveBookmark({required BbsDetailPresenterInput input});
 }
 
 class BbsDetailPresenterImpl extends BbsDetailPresenter {
@@ -37,5 +39,12 @@ class BbsDetailPresenterImpl extends BbsDetailPresenter {
   void eventViewReady({required BbsDetailPresenterInput input}) {
     useCase.fetchBbsNovaDetail(
         input: BbsNovaDetailUseCaseInput(itemInfo: input.itemInfo));
+  }
+
+  @override
+  bool eventSaveBookmark({required BbsDetailPresenterInput input}) {
+    return useCase.saveBookmark(
+        input: BbsNovaDetailUseCaseInput(
+            itemInfo: input.itemInfo, htmlText: input.htmlText));
   }
 }

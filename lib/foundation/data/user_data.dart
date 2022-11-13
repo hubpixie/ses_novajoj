@@ -220,20 +220,6 @@ class UserData {
     return retVal;
   }
 
-  void insertBookmark({required String favorite, String? url}) {
-    if (_miscFavoritesList.contains(favorite)) {
-      return;
-    } else if (url != null &&
-        _miscFavoritesList
-            .firstWhere((element) => element.contains(url), orElse: () => '')
-            .isNotEmpty) {
-      return;
-    }
-    _miscFavoritesList.insert(0, favorite);
-    _saveHistorioList(
-        newValues: _miscFavoritesList, key: _UserDataKey.miscFavorites.name);
-  }
-
   void insertHistorio({required String historio, String? url}) {
     if (_miscHistorioList.contains(historio)) {
       return;
@@ -246,6 +232,29 @@ class UserData {
     _miscHistorioList.insert(0, historio);
     _saveHistorioList(
         newValues: _miscHistorioList, key: _UserDataKey.miscHistory.name);
+  }
+
+  void saveFavorites(
+      {required String bookmark, bool bookmarkIsOn = false, String? url}) {
+    int foundIndex = -1;
+    if (url != null) {
+      foundIndex =
+          _miscFavoritesList.indexWhere((element) => element.contains(url));
+    }
+    if (foundIndex >= 0) {
+      _miscFavoritesList.removeAt(foundIndex);
+    }
+    // save bookmark if isOn = true
+    if (bookmarkIsOn) {
+      if (_miscFavoritesList.isEmpty) {
+        _miscFavoritesList.add(bookmark);
+      } else {
+        _miscFavoritesList.insert(0, bookmark);
+      }
+    }
+
+    _saveHistorioList(
+        newValues: _miscFavoritesList, key: _UserDataKey.miscFavorites.name);
   }
 
   ///

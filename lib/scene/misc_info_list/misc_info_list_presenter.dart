@@ -106,9 +106,10 @@ class MiscInfoListPresenterImpl extends MiscInfoListPresenter {
   @override
   void eventViewFavoritesWebPage(Object context,
       {required MiscInfoListPresenterInput input}) {
+    print("aa=${input.viewModelList?[input.itemIndex].bookmark?.htmlText}");
     router.gotoFavoritesWebPage(context,
         itemInfo: input.viewModelList?[input.itemIndex].itemInfo,
-        htmlText: input.viewModelList?[input.itemIndex].hisInfo?.htmlText,
+        htmlText: input.viewModelList?[input.itemIndex].bookmark?.htmlText,
         appBarTitle: input.appBarTitle,
         completeHandler: input.completeHandler);
   }

@@ -4,8 +4,6 @@ import 'package:ses_novajoj/scene/widgets/ext_web_view.dart';
 import 'package:ses_novajoj/scene/widgets/confirm_dialog.dart';
 import 'package:ses_novajoj/scene/foundation/page/page_parameter.dart';
 
-// enum DetailMenuItem { openOriginal, readComments, miscInfoSelect }
-
 class DetailPage {
   Widget buildContentArea(BuildContext context,
       {dynamic detailItem, bool imageZommingEnabled = true}) {
@@ -20,8 +18,12 @@ class DetailPage {
       List<DetailMenuItem>? menuItems,
       List<void Function()?>? menuActions,
       dynamic afterAction}) {
-    final menuItems_ =
-        menuItems ?? [DetailMenuItem.openOriginal, DetailMenuItem.readComments];
+    final menuItems_ = menuItems ??
+        [
+          DetailMenuItem.openOriginal,
+          DetailMenuItem.favorite,
+          DetailMenuItem.readComments
+        ];
     return <Widget>[
       PopupMenuButton(
           // add icon, by default "3 dot" icon
@@ -38,6 +40,16 @@ class DetailPage {
                 value: DetailMenuItem.openOriginal,
                 child: Text(
                     UseL10n.of(context)?.detailPageMenuOpenOriginalPage ?? ''),
+              ),
+            );
+          } else if (element == DetailMenuItem.favorite && action != null) {
+            retMenus.add(
+              PopupMenuItem<DetailMenuItem>(
+                value: DetailMenuItem.favorite,
+                child: !(itemInfo?.isFavorite ?? false)
+                    ? Text(UseL10n.of(context)?.detailPageMenuAddBookmark ?? '')
+                    : Text(UseL10n.of(context)?.detailPageMenuRemoveBookmark ??
+                        ''),
               ),
             );
           } else if (element == DetailMenuItem.readComments && action != null) {
@@ -80,6 +92,12 @@ class DetailPage {
             return;
           }
           ExtWebView.openBrowser(context, url: itemInfo?.urlString);
+          return;
+        } else if (value == DetailMenuItem.favorite) {
+          if (action != null) {
+            action.call();
+            return;
+          }
           return;
         } else if (value == DetailMenuItem.changeSettings) {
           if (action is Function({dynamic afterAction})) {

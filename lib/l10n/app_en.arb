@@ -70,6 +70,8 @@
   "bbsMenuList":"BBS Menu",
   "bbsSelectListForYou":"For You",
   "bbsSelectListLatest":"Latest",
+  "detailPageMenuAddBookmark":"Add Bookmark",
+  "detailPageMenuRemoveBookmark":"Remove Bookmark",
   "detailPageMenuOpenOriginalPage":"Open Original Page",
   "detailPageMenuChangeMiscInfoSettings":"Change Settings",
   "detailPageMenuRemoveMiscInfoSettings":"Remove Settings",

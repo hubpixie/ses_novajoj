@@ -45,6 +45,7 @@ extension NovaItemInfoRes on NovaItemInfo {
       itemInfo.commentUrlString = data['comment_url_string'];
       itemInfo.commentCount = data['comment_count'];
       itemInfo.reads = data['reads'];
+      itemInfo.isFavorite = data['is_favorite'] ?? false;
       itemInfo.isRead = data['is_read'];
       itemInfo.isNew = data['is_new'];
     }
@@ -67,6 +68,7 @@ extension NovaItemInfoRes on NovaItemInfo {
     data['comment_url_string'] = commentUrlString;
     data['comment_count'] = commentCount;
     data['reads'] = reads;
+    data['is_favorite'] = isFavorite;
     data['is_read'] = isRead;
     data['is_new'] = isNew;
     return data;
