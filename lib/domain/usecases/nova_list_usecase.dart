@@ -12,20 +12,20 @@ class NewsListUseCase with SimpleBloc<NovaListUseCaseOutput> {
 
   static final List<FetchNewsListRepoInput> _inputUrlData = [
     FetchNewsListRepoInput(
-        targetUrl: "https://www.6parknews.com/newspark/index.php",
+        targetUrl: "https://news.6park.com/newspark/index.php",
         docType: NovaDocType.list),
     FetchNewsListRepoInput(
-        targetUrl: "https://www.6parknews.com/newspark/index.php?act=longview",
+        targetUrl: "https://news.6park.com/newspark/index.php?act=longview",
         docType: NovaDocType.list),
     FetchNewsListRepoInput(
-        targetUrl: "https://www.6parknews.com/newspark/index.php?act=gold",
+        targetUrl: "https://news.6park.com/newspark/index.php?act=gold",
         docType: NovaDocType.list),
     FetchNewsListRepoInput(
-        targetUrl: "https://www.6parknews.com/newspark/index.php?act=hotview",
+        targetUrl: "https://news.6park.com/newspark/index.php?act=hotview",
         docType: NovaDocType.table),
     FetchNewsListRepoInput(
         targetUrl:
-            "https://www.6parknews.com/newspark/index.php?app=news&act=hotreply",
+            "https://news.6park.com/newspark/index.php?app=news&act=hotreply",
         docType: NovaDocType.table),
   ];
 

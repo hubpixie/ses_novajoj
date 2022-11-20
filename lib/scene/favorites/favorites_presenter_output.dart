@@ -33,12 +33,13 @@ class ShowFavoritesPageModel extends FavoritesPresenterOutput {
 
 class FavoritesViewModel {
   HistorioInfo bookmark;
+  HistorioInfo? hisInfo;
   String createdAtText;
   String itemInfoCreatedAtText;
 
   FavoritesViewModel(FavoritesUseCaseModel model)
       : bookmark = model.bookmark,
-        createdAtText = model.bookmark.createdAtText,
+        createdAtText = '', //model.bookmark.createdAtText,
         itemInfoCreatedAtText = DateUtil().getDateString(
             date: model.bookmark.itemInfo.createAt, format: 'M/d (E)');
 }

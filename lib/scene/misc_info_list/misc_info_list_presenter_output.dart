@@ -42,11 +42,8 @@ class MiscInfoListViewModel {
       : itemInfo = model.itemInfo,
         hisInfo = model.hisInfo,
         bookmark = model.bookmark,
-        createdAtText = model.hisInfo != null
-            ? (model.hisInfo?.createdAtText ?? '')
-            : (model.bookmark != null
-                ? (model.bookmark?.createdAtText ?? '')
-                : ''),
+        createdAtText =
+            model.hisInfo != null ? (model.hisInfo?.createdAtText ?? '') : '',
         itemInfoCreatedAtText = model.hisInfo != null
             ? (DateUtil().getDateString(
                 date: model.hisInfo?.itemInfo.createAt, format: 'M/d (E)'))

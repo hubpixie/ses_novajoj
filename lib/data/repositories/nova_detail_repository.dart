@@ -47,7 +47,18 @@ class NovaDetailRepositoryImpl extends NovaDetailRepository {
     return ret;
   }
 
-  void _saveHistory({NovaDetailItem? detailItem}) {
+  @override
+  bool saveBookmark({required FetchNewsDetailRepoInput input}) {
+    NovaItemInfo itemInfo = input.itemInfo;
+    itemInfo.isFavorite = !itemInfo.isFavorite;
+    _saveHistory(
+        detailItem: NovaDetailItem(
+            itemInfo: itemInfo, bodyString: input.htmlText ?? ''),
+        isBookmark: true);
+    return true;
+  }
+
+  void _saveHistory({NovaDetailItem? detailItem, bool isBookmark = false}) {
     if (detailItem != null) {
       HistorioInfo historioInfo = () {
         HistorioInfo info = HistorioInfo();
@@ -61,8 +72,16 @@ class NovaDetailRepositoryImpl extends NovaDetailRepository {
       HistorioItemRes historioItemRes = HistorioItemRes.as(info: historioInfo);
       final json = historioItemRes.toJson();
       final encoded = jsonEncode(json);
-      UserData().insertHistorio(
-          historio: encoded, url: historioInfo.itemInfo.urlString);
+
+      if (isBookmark) {
+        UserData().saveFavorites(
+            bookmark: encoded,
+            bookmarkIsOn: detailItem.itemInfo.isFavorite,
+            url: historioInfo.itemInfo.urlString);
+      } else {
+        UserData().insertHistorio(
+            historio: encoded, url: historioInfo.itemInfo.urlString);
+      }
     }
   }
 }

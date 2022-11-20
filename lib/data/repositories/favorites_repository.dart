@@ -15,7 +15,7 @@ class FavoritesRepositoryImpl extends FavoritesRepository {
   @override
   Future<Result<List<FavoritesItem>>> fetchFavorites(
       {required FetchFavoritesRepoInput input}) async {
-    final historioStrings = UserData().miscHistorioList;
+    final historioStrings = UserData().miscFavoritesList;
     final list = historioStrings.map((elem) {
       final jsonData = json.decode(elem);
       HistorioItemRes itemRes = HistorioItemRes.fromJson(jsonData);
