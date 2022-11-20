@@ -32,7 +32,16 @@ class NovaDetailRepositoryImpl extends NovaDetailRepository {
     result.when(success: (response) {
       if (response != null) {
         retVal = NovaDetailItem(
-            itemInfo: response.itemInfo, bodyString: response.bodyString);
+            itemInfo: () {
+              NovaItemInfo info = response.itemInfo;
+              final fnd = UserData()
+                  .miscFavoritesList
+                  .indexWhere((elem) => elem.contains(info.urlString));
+              info.isFavorite = fnd >= 0;
+              return info;
+            }(),
+            bodyString: response.bodyString);
+
         // save historio
         Future.delayed(const Duration(seconds: 1), () {
           _saveHistory(detailItem: retVal);

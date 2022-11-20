@@ -7,13 +7,15 @@ import 'thread_nova_detail_usecase_output.dart';
 
 class ThreadNovaDetailUseCaseInput {
   NovaItemInfo itemInfo;
+  String? htmlText;
 
-  ThreadNovaDetailUseCaseInput({required this.itemInfo});
+  ThreadNovaDetailUseCaseInput({required this.itemInfo, this.htmlText});
 }
 
 abstract class ThreadNovaDetailUseCase
     with SimpleBloc<ThreadNovaDetailUseCaseOutput> {
   void fetchThreadNovaDetail({required ThreadNovaDetailUseCaseInput input});
+  bool saveBookmark({required ThreadNovaDetailUseCaseInput input});
 }
 
 class ThreadNovaDetailUseCaseImpl extends ThreadNovaDetailUseCase {
@@ -34,5 +36,14 @@ class ThreadNovaDetailUseCaseImpl extends ThreadNovaDetailUseCase {
     }, failure: (error) {
       streamAdd(PresentModel(error: error));
     });
+  }
+
+  @override
+  bool saveBookmark({required ThreadNovaDetailUseCaseInput input}) {
+    return repository.saveBookmark(
+        input: FetchThreadNovaDetailRepoInput(
+            itemInfo: input.itemInfo,
+            docType: NovaDocType.detail,
+            htmlText: input.htmlText));
   }
 }

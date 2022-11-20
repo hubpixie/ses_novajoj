@@ -5,12 +5,14 @@ import 'package:ses_novajoj/foundation/data/result.dart';
 class FetchThreadNovaDetailRepoInput {
   NovaItemInfo itemInfo;
   NovaDocType docType;
+  String? htmlText;
 
   FetchThreadNovaDetailRepoInput(
-      {required this.itemInfo, required this.docType});
+      {required this.itemInfo, required this.docType, this.htmlText});
 }
 
 abstract class ThreadNovaDetailRepository {
   Future<Result<ThreadNovaDetailItem>> fetchThreadNovaDetail(
       {required FetchThreadNovaDetailRepoInput input});
+  bool saveBookmark({required FetchThreadNovaDetailRepoInput input});
 }

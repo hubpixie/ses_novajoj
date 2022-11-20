@@ -32,7 +32,16 @@ class ThreadNovaDetailRepositoryImpl extends ThreadNovaDetailRepository {
     result.when(success: (response) {
       if (response != null) {
         retVal = ThreadNovaDetailItem(
-            itemInfo: response.itemInfo, bodyString: response.bodyString);
+            itemInfo: () {
+              NovaItemInfo info = response.itemInfo;
+              final fnd = UserData()
+                  .miscFavoritesList
+                  .indexWhere((elem) => elem.contains(info.urlString));
+              info.isFavorite = fnd >= 0;
+              return info;
+            }(),
+            bodyString: response.bodyString);
+
         // save historio
         Future.delayed(const Duration(seconds: 1), () {
           _saveHistory(detailItem: retVal);
@@ -47,7 +56,19 @@ class ThreadNovaDetailRepositoryImpl extends ThreadNovaDetailRepository {
     return ret;
   }
 
-  void _saveHistory({ThreadNovaDetailItem? detailItem}) {
+  @override
+  bool saveBookmark({required FetchThreadNovaDetailRepoInput input}) {
+    NovaItemInfo itemInfo = input.itemInfo;
+    itemInfo.isFavorite = !itemInfo.isFavorite;
+    _saveHistory(
+        detailItem: ThreadNovaDetailItem(
+            itemInfo: itemInfo, bodyString: input.htmlText ?? ''),
+        isBookmark: true);
+    return true;
+  }
+
+  void _saveHistory(
+      {ThreadNovaDetailItem? detailItem, bool isBookmark = false}) {
     if (detailItem != null) {
       HistorioInfo historioInfo = () {
         HistorioInfo info = HistorioInfo();

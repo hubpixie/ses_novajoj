@@ -255,8 +255,8 @@ class MiscInfoListRouterImpl extends MiscInfoListRouter {
       Object? completeHandler}) {
     Navigator.pushNamed(context as BuildContext, ScreenRouteName.favorites.name,
         arguments: {
-          HistorioParamKeys.appBarTitle: appBarTitle,
-          HistorioParamKeys.itemInfos: itemInfos
+          FavoritesParamKeys.appBarTitle: appBarTitle,
+          FavoritesParamKeys.itemInfos: itemInfos
         }).then((value) {
       if (completeHandler != null && completeHandler is Function) {
         completeHandler.call();

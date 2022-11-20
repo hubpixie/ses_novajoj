@@ -39,7 +39,7 @@ class FavoritesViewModel {
 
   FavoritesViewModel(FavoritesUseCaseModel model)
       : bookmark = model.bookmark,
-        createdAtText = '', //model.bookmark.createdAtText,
+        createdAtText = '',
         itemInfoCreatedAtText = DateUtil().getDateString(
             date: model.bookmark.itemInfo.createAt, format: 'M/d (E)');
 }
