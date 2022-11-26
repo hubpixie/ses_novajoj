@@ -5,14 +5,27 @@ import 'package:ses_novajoj/foundation/data/user_types.dart';
 
 import 'nova_detail_usecase_output.dart';
 
-class NewsDetailUseCase with SimpleBloc<NovaDetailUseCaseOutput> {
-  final NovaDetailRepositoryImpl repository;
-  NewsDetailUseCase() : repository = NovaDetailRepositoryImpl();
+class NewsDetailUseCaseInput {
+  NovaItemInfo itemInfo;
+  String? htmlText;
 
-  void fetchNewsDetail({required NovaItemInfo info}) async {
+  NewsDetailUseCaseInput({required this.itemInfo, this.htmlText});
+}
+
+abstract class NewsDetailUseCase with SimpleBloc<NovaDetailUseCaseOutput> {
+  void fetchNewsDetail({required NewsDetailUseCaseInput input});
+  bool saveBookmark({required NewsDetailUseCaseInput input});
+}
+
+class NewsDetailUseCaseImpl extends NewsDetailUseCase {
+  final NovaDetailRepositoryImpl repository;
+  NewsDetailUseCaseImpl() : repository = NovaDetailRepositoryImpl();
+
+  @override
+  void fetchNewsDetail({required NewsDetailUseCaseInput input}) async {
     final result = await repository.fetchNewsDetail(
         input: FetchNewsDetailRepoInput(
-            itemInfo: info, docType: NovaDocType.detail));
+            itemInfo: input.itemInfo, docType: NovaDocType.detail));
 
     result.when(success: (value) {
       streamAdd(PresentModel(
@@ -20,5 +33,14 @@ class NewsDetailUseCase with SimpleBloc<NovaDetailUseCaseOutput> {
     }, failure: (error) {
       streamAdd(PresentModel(error: error));
     });
+  }
+
+  @override
+  bool saveBookmark({required NewsDetailUseCaseInput input}) {
+    return repository.saveBookmark(
+        input: FetchNewsDetailRepoInput(
+            itemInfo: input.itemInfo,
+            docType: NovaDocType.detail,
+            htmlText: input.htmlText));
   }
 }

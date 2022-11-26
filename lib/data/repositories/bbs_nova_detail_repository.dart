@@ -32,7 +32,15 @@ class BbsNovaDetailRepositoryImpl extends BbsNovaDetailRepository {
     result.when(success: (response) {
       if (response != null) {
         retVal = BbsNovaDetailItem(
-            itemInfo: response.itemInfo, bodyString: response.bodyString);
+            itemInfo: () {
+              NovaItemInfo info = response.itemInfo;
+              final fnd = UserData()
+                  .miscFavoritesList
+                  .indexWhere((elem) => elem.contains(info.urlString));
+              info.isFavorite = fnd >= 0;
+              return info;
+            }(),
+            bodyString: response.bodyString);
         // save historio
         Future.delayed(const Duration(seconds: 1), () {
           _saveHistory(detailItem: retVal);
@@ -47,7 +55,18 @@ class BbsNovaDetailRepositoryImpl extends BbsNovaDetailRepository {
     return ret;
   }
 
-  void _saveHistory({BbsNovaDetailItem? detailItem}) {
+  @override
+  bool saveBookmark({required FetchBbsNovaDetailRepoInput input}) {
+    NovaItemInfo itemInfo = input.itemInfo;
+    itemInfo.isFavorite = !itemInfo.isFavorite;
+    _saveHistory(
+        detailItem: BbsNovaDetailItem(
+            itemInfo: itemInfo, bodyString: input.htmlText ?? ''),
+        isBookmark: true);
+    return true;
+  }
+
+  void _saveHistory({BbsNovaDetailItem? detailItem, bool isBookmark = false}) {
     if (detailItem != null) {
       HistorioInfo historioInfo = () {
         HistorioInfo info = HistorioInfo();
@@ -61,8 +80,19 @@ class BbsNovaDetailRepositoryImpl extends BbsNovaDetailRepository {
       HistorioItemRes historioItemRes = HistorioItemRes.as(info: historioInfo);
       final json = historioItemRes.toJson();
       final encoded = jsonEncode(json);
-      UserData().insertHistorio(
-          historio: encoded, url: historioInfo.itemInfo.urlString);
+
+      if (isBookmark) {
+        UserData().saveFavorites(
+            bookmark: encoded,
+            bookmarkIsOn: detailItem.itemInfo.isFavorite,
+            url: historioInfo.itemInfo.urlString,
+            htmlText: historioInfo.htmlText);
+      } else {
+        UserData().insertHistorio(
+            historio: encoded,
+            url: historioInfo.itemInfo.urlString,
+            htmlText: historioInfo.htmlText);
+      }
     }
   }
 }

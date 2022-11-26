@@ -190,25 +190,25 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
   Widget _buildFavoriteArea(BuildContext context,
       {List<MiscInfoListViewModel>? viewModelList}) {
     double screenWidth = MediaQuery.of(context).size.width;
-    final hisInfos = viewModelList
+    final bookmarks = viewModelList
         ?.where((element) =>
             element.itemInfo.serviceType == ServiceType.none &&
-            element.hisInfo != null) // TODO: DUMMY
+            element.bookmark != null)
         .toList();
     return InfoServiceCell(
       sectionTitle: UseL10n.of(context)?.infoServiceFavorites ?? '',
-      rowTitles: _buildRowFavoritesWidgets(hisInfos?.take(5).toList()),
-      otherTitle: (hisInfos?.length ?? 0) > 5
+      rowTitles: _buildRowFavoritesWidgets(bookmarks?.take(5).toList()),
+      otherTitle: (bookmarks?.length ?? 0) > 5
           ? _buildTextWidget(UseL10n.of(context)?.infoServiceItemMore)
           : null,
       calcRowHeight: (index) {
         double itemTitleHeight = _calculateItemTitleHeight(
-            context, hisInfos?[index].itemInfo.title ?? '',
+            context, bookmarks?[index].itemInfo.title ?? '',
             fontSize: 14,
             fontWeight: FontWeight.bold,
             textWidth: (screenWidth <= 320 ? 100 : screenWidth - 165));
         double retHeight =
-            (hisInfos![index].createdAtText.isNotEmpty ? 45 : 25) +
+            (bookmarks![index].createdAtText.isNotEmpty ? 45 : 25) +
                 itemTitleHeight;
         return retHeight;
       },
@@ -216,7 +216,7 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
         widget.presenter.eventViewFavoritesPage(context,
             input: MiscInfoListPresenterInput(
                 appBarTitle: UseL10n.of(context)?.infoServiceFavorites ?? '',
-                viewModelList: hisInfos,
+                viewModelList: bookmarks,
                 serviceType: ServiceType.none,
                 itemIndex: -1,
                 completeHandler: () {

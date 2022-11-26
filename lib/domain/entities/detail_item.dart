@@ -138,6 +138,9 @@ class DetailItem {
   });
 
   String toHtmlString() {
+    if (bodyString.contains('</html>')) {
+      return bodyString;
+    }
     String html = _kHtmlTemplateString.replaceAll(r'{{title}}', itemInfo.title);
     html = html.replaceAll(r'{{itemSource}}', itemInfo.source);
     if (itemInfo.reads > 0) {

@@ -27,6 +27,7 @@ class HistorioCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
+    final hisInfo = viewModel.hisInfo ?? viewModel.bookmark;
     return InkWell(
         onTap: () {
           onCellSelecting?.call(index);
@@ -50,7 +51,7 @@ class HistorioCell extends StatelessWidget {
               Row(mainAxisSize: MainAxisSize.min, children: [
                 SizedBox(
                     width: 32,
-                    child: Text(viewModel.hisInfo?.category ?? '',
+                    child: Text(hisInfo?.category ?? '',
                         style: const TextStyle(fontSize: 10))),
                 const SizedBox(width: 5),
                 Container(
@@ -63,7 +64,7 @@ class HistorioCell extends StatelessWidget {
                           String thumbUrl =
                               await onThumbnailShowing?.call(index) ?? '';
                           return thumbUrl;
-                        }(viewModel.hisInfo?.itemInfo.urlString ?? ''),
+                        }(hisInfo?.itemInfo.urlString ?? ''),
                         builder: (context, snapshot) {
                           String blankUrl =
                               "assets/images/icon_top_cell_blank.png";
@@ -92,7 +93,7 @@ class HistorioCell extends StatelessWidget {
                     child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(viewModel.hisInfo?.itemInfo.title ?? '',
+                          Text(hisInfo?.itemInfo.title ?? '',
                               softWrap: true,
                               style: const TextStyle(
                                   fontSize: 14.0,
@@ -106,9 +107,7 @@ class HistorioCell extends StatelessWidget {
                                 Container(
                                     height: 16,
                                     alignment: Alignment.bottomLeft,
-                                    child: Text(
-                                        viewModel.hisInfo?.itemInfo.source ??
-                                            '',
+                                    child: Text(hisInfo?.itemInfo.source ?? '',
                                         overflow: TextOverflow.ellipsis,
                                         style: const TextStyle(
                                             fontSize: 11.0,

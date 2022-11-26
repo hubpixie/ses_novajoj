@@ -15,7 +15,7 @@ class HistorioItemRes extends HistorioInfo {
     id = json['id'];
     category = json['category'];
     createdAt = DateTime.parse(json['created_at']);
-    htmlText = detaloItemRes.bodyString;
+    htmlText = '--'; //detaloItemRes.bodyString;
     itemInfo = detaloItemRes.itemInfo;
   }
 
@@ -27,7 +27,7 @@ class HistorioItemRes extends HistorioInfo {
     data['id'] = id;
     data['category'] = category;
     data['created_at'] = createdAt.toString();
-    data['html_text'] = htmlText;
+    data['html_text'] = '--';
     data['nova_item_info'] = detaloItemResData['nova_item_info'];
     return data;
   }

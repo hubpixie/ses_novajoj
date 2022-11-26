@@ -86,10 +86,12 @@ class MiscInfoListPresenterImpl extends MiscInfoListPresenter {
 
   @override
   void eventViewHistorioWebPage(Object context,
-      {required MiscInfoListPresenterInput input}) {
+      {required MiscInfoListPresenterInput input}) async {
     router.gotoHistorioWebPage(context,
         itemInfo: input.viewModelList?[input.itemIndex].itemInfo,
-        htmlText: input.viewModelList?[input.itemIndex].hisInfo?.htmlText,
+        htmlText: await UserData().readHistorioData(
+            url:
+                input.viewModelList?[input.itemIndex].itemInfo.urlString ?? ''),
         appBarTitle: input.appBarTitle,
         completeHandler: input.completeHandler);
   }
@@ -105,10 +107,12 @@ class MiscInfoListPresenterImpl extends MiscInfoListPresenter {
 
   @override
   void eventViewFavoritesWebPage(Object context,
-      {required MiscInfoListPresenterInput input}) {
+      {required MiscInfoListPresenterInput input}) async {
     router.gotoFavoritesWebPage(context,
         itemInfo: input.viewModelList?[input.itemIndex].itemInfo,
-        htmlText: input.viewModelList?[input.itemIndex].hisInfo?.htmlText,
+        htmlText: await UserData().readFavoriteData(
+            url:
+                input.viewModelList?[input.itemIndex].itemInfo.urlString ?? ''),
         appBarTitle: input.appBarTitle,
         completeHandler: input.completeHandler);
   }

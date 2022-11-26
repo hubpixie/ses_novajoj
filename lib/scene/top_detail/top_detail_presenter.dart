@@ -6,9 +6,17 @@ import 'top_detail_presenter_output.dart';
 
 import 'top_detail_router.dart';
 
+class TopDetailPresenterInput {
+  NovaItemInfo itemInfo;
+
+  String? htmlText;
+  TopDetailPresenterInput({required this.itemInfo, this.htmlText});
+}
+
 abstract class TopDetailPresenter with SimpleBloc<TopDetailPresenterOutput> {
   bool get isProcessing;
-  void eventViewReady(NovaItemInfo itemInfo);
+  void eventViewReady({required TopDetailPresenterInput input});
+  bool eventSaveBookmark({required TopDetailPresenterInput input});
 }
 
 class TopDetailPresenterImpl extends TopDetailPresenter {
@@ -18,7 +26,7 @@ class TopDetailPresenterImpl extends TopDetailPresenter {
   bool _isProcessing = true;
 
   TopDetailPresenterImpl({required this.router})
-      : useCase = NewsDetailUseCase() {
+      : useCase = NewsDetailUseCaseImpl() {
     useCase.stream.listen((event) {
       if (event is PresentModel) {
         if (event.error == null) {
@@ -36,7 +44,15 @@ class TopDetailPresenterImpl extends TopDetailPresenter {
   bool get isProcessing => _isProcessing;
 
   @override
-  void eventViewReady(NovaItemInfo itemInfo) {
-    useCase.fetchNewsDetail(info: itemInfo);
+  void eventViewReady({required TopDetailPresenterInput input}) {
+    useCase.fetchNewsDetail(
+        input: NewsDetailUseCaseInput(itemInfo: input.itemInfo));
+  }
+
+  @override
+  bool eventSaveBookmark({required TopDetailPresenterInput input}) {
+    return useCase.saveBookmark(
+        input: NewsDetailUseCaseInput(
+            itemInfo: input.itemInfo, htmlText: input.htmlText));
   }
 }

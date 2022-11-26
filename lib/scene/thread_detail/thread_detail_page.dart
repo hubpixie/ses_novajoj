@@ -27,11 +27,13 @@ class _ThreadDetailPageState extends State<ThreadDetailPage> {
   late DetailPage _detailPage;
   Map? _parameters;
   NovaItemInfo? _itemInfo;
+  String? _htmlText;
 
   @override
   void initState() {
     super.initState();
     _detailPage = DetailPage();
+    _htmlText = '';
   }
 
   @override
@@ -43,8 +45,21 @@ class _ThreadDetailPageState extends State<ThreadDetailPage> {
         title: Text(_appBarTitle),
         backgroundColor: const Color(0xFF1B80F3),
         centerTitle: true,
-        actions:
-            _detailPage.buildAppBarActionArea(context, itemInfo: _itemInfo),
+        actions: _detailPage
+            .buildAppBarActionArea(context, itemInfo: _itemInfo, menuItems: [
+          DetailMenuItem.openOriginal,
+          DetailMenuItem.favorite
+        ], menuActions: [
+          null,
+          () {
+            if (_htmlText == null || _htmlText!.isEmpty) {
+              return;
+            }
+            widget.presenter.eventSaveBookmark(
+                input: ThreadDetailPresenterInput(
+                    itemInfo: _itemInfo!, htmlText: _htmlText!));
+          }
+        ]),
       ),
       body: BlocProvider<ThreadDetailPresenter>(
         bloc: widget.presenter,
@@ -60,6 +75,8 @@ class _ThreadDetailPageState extends State<ThreadDetailPage> {
               final data = snapshot.data;
               if (data is ShowThreadDetailPageModel) {
                 if (data.error == null) {
+                  _htmlText = data.viewModel?.htmlText;
+                  _itemInfo = data.viewModel?.itemInfo;
                   return Column(children: [
                     _detailPage.buildContentArea(context,
                         detailItem: data.viewModel)

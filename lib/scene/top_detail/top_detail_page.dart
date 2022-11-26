@@ -27,11 +27,13 @@ class _TopDetailPageState extends State<TopDetailPage> {
   late DetailPage _detailPage;
   Map? _parameters;
   NovaItemInfo? _itemInfo;
+  String? _htmlText;
 
   @override
   void initState() {
     super.initState();
     _detailPage = DetailPage();
+    _htmlText = '';
   }
 
   @override
@@ -43,8 +45,21 @@ class _TopDetailPageState extends State<TopDetailPage> {
         title: Text(_appBarTitle),
         backgroundColor: const Color(0xFF1B80F3),
         centerTitle: true,
-        actions:
-            _detailPage.buildAppBarActionArea(context, itemInfo: _itemInfo),
+        actions: _detailPage
+            .buildAppBarActionArea(context, itemInfo: _itemInfo, menuItems: [
+          DetailMenuItem.openOriginal,
+          DetailMenuItem.favorite
+        ], menuActions: [
+          null,
+          () {
+            if (_htmlText == null || _htmlText!.isEmpty) {
+              return;
+            }
+            widget.presenter.eventSaveBookmark(
+                input: TopDetailPresenterInput(
+                    itemInfo: _itemInfo!, htmlText: _htmlText!));
+          }
+        ]),
       ),
       body: BlocProvider<TopDetailPresenter>(
         bloc: widget.presenter,
@@ -60,6 +75,8 @@ class _TopDetailPageState extends State<TopDetailPage> {
               final data = snapshot.data;
               if (data is ShowNovaDetailPageModel) {
                 if (data.error == null) {
+                  _htmlText = data.viewModel?.htmlText;
+                  _itemInfo = data.viewModel?.itemInfo;
                   return Column(
                     children: [
                       _detailPage.buildContentArea(context,
@@ -118,7 +135,8 @@ class _TopDetailPageState extends State<TopDetailPage> {
 
   void _loadData() {
     if (_itemInfo != null) {
-      widget.presenter.eventViewReady(_itemInfo!);
+      widget.presenter
+          .eventViewReady(input: TopDetailPresenterInput(itemInfo: _itemInfo!));
     } else {
       log.warning('top_detail_page: parameter is error!');
     }

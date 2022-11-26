@@ -1,6 +1,7 @@
 import 'package:ses_novajoj/domain/foundation/bloc/simple_bloc.dart';
 import 'package:ses_novajoj/domain/usecases/historio_usecase.dart';
 import 'package:ses_novajoj/domain/usecases/historio_usecase_output.dart';
+import 'package:ses_novajoj/foundation/data/user_data.dart';
 import 'historio_presenter_output.dart';
 
 import 'historio_router.dart';
@@ -45,11 +46,12 @@ class HistorioPresenterImpl extends HistorioPresenter {
   }
 
   void _viewSelectPage(Object context,
-      {required HistorioPresenterInput input}) {
+      {required HistorioPresenterInput input}) async {
     router.gotoWebPage(context,
         appBarTitle: input.appBarTitle,
         itemInfo: input.viewModel!.hisInfo.itemInfo,
-        htmlText: input.viewModel!.hisInfo.htmlText,
+        htmlText: await UserData().readHistorioData(
+            url: input.viewModel?.hisInfo.itemInfo.urlString ?? ''),
         completeHandler: input.completeHandler);
   }
 }
