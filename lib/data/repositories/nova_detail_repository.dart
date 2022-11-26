@@ -86,10 +86,13 @@ class NovaDetailRepositoryImpl extends NovaDetailRepository {
         UserData().saveFavorites(
             bookmark: encoded,
             bookmarkIsOn: detailItem.itemInfo.isFavorite,
-            url: historioInfo.itemInfo.urlString);
+            url: historioInfo.itemInfo.urlString,
+            htmlText: historioInfo.htmlText);
       } else {
         UserData().insertHistorio(
-            historio: encoded, url: historioInfo.itemInfo.urlString);
+            historio: encoded,
+            url: historioInfo.itemInfo.urlString,
+            htmlText: historioInfo.htmlText);
       }
     }
   }

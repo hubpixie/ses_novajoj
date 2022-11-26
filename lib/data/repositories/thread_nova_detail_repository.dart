@@ -82,8 +82,19 @@ class ThreadNovaDetailRepositoryImpl extends ThreadNovaDetailRepository {
       HistorioItemRes historioItemRes = HistorioItemRes.as(info: historioInfo);
       final json = historioItemRes.toJson();
       final encoded = jsonEncode(json);
-      UserData().insertHistorio(
-          historio: encoded, url: historioInfo.itemInfo.urlString);
+
+      if (isBookmark) {
+        UserData().saveFavorites(
+            bookmark: encoded,
+            bookmarkIsOn: detailItem.itemInfo.isFavorite,
+            url: historioInfo.itemInfo.urlString,
+            htmlText: historioInfo.htmlText);
+      } else {
+        UserData().insertHistorio(
+            historio: encoded,
+            url: historioInfo.itemInfo.urlString,
+            htmlText: historioInfo.htmlText);
+      }
     }
   }
 }

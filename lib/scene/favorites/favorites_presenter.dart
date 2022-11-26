@@ -1,6 +1,7 @@
 import 'package:ses_novajoj/domain/foundation/bloc/simple_bloc.dart';
 import 'package:ses_novajoj/domain/usecases/favorites_usecase.dart';
 import 'package:ses_novajoj/domain/usecases/favorites_usecase_output.dart';
+import 'package:ses_novajoj/foundation/data/user_data.dart';
 import 'favorites_presenter_output.dart';
 
 import 'favorites_router.dart';
@@ -45,11 +46,12 @@ class FavoritesPresenterImpl extends FavoritesPresenter {
   }
 
   void _viewSelectPage(Object context,
-      {required FavoritesPresenterInput input}) {
+      {required FavoritesPresenterInput input}) async {
     router.gotoWebPage(context,
         appBarTitle: input.appBarTitle,
         itemInfo: input.viewModel!.bookmark.itemInfo,
-        htmlText: input.viewModel!.bookmark.htmlText,
+        htmlText: await UserData().readFavoriteData(
+            url: input.viewModel?.bookmark.itemInfo.urlString ?? ''),
         completeHandler: input.completeHandler);
   }
 }

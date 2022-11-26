@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:encrypted_shared_preferences/encrypted_shared_preferences.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:ses_novajoj/foundation/log_util.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/foundation/data/user_types_descript.dart';
@@ -220,7 +222,11 @@ class UserData {
     return retVal;
   }
 
-  void insertHistorio({required String historio, String? url}) {
+  ///
+  /// insertHistorio
+  ///
+  void insertHistorio(
+      {required String historio, String? url, String? htmlText}) {
     if (_miscHistorioList.contains(historio)) {
       return;
     } else if (url != null &&
@@ -229,13 +235,65 @@ class UserData {
             .isNotEmpty) {
       return;
     }
+
+    // save file
+    _getDataPath(key: _UserDataKey.miscHistory.name).then((path) {
+      // encode
+      Codec<String, String> codec = utf8.fuse(base64);
+      final encoded = codec.encode(htmlText ?? '');
+      // save
+      File file = File('$path/${url.hashCode}');
+      file.writeAsBytes(encoded.codeUnits);
+    });
+
+    // save list
     _miscHistorioList.insert(0, historio);
     _saveHistorioList(
         newValues: _miscHistorioList, key: _UserDataKey.miscHistory.name);
   }
 
+  ///
+  /// readHistorioData
+  ///
+  Future<String> readHistorioData({required String url}) async {
+    String path = await _getDataPath(key: _UserDataKey.miscHistory.name);
+    String filename = '$path/${url.hashCode}';
+    File file = File(filename);
+    if (await file.exists()) {
+      final str = file.readAsStringSync();
+
+      // decode
+      Codec<String, String> codec = utf8.fuse(base64);
+      return codec.decode(str);
+    }
+    return '';
+  }
+
+  ///
+  /// readFavoriteData
+  ///
+  Future<String> readFavoriteData({required String url}) async {
+    String path = await _getDataPath(key: _UserDataKey.miscFavorites.name);
+    String filename = '$path/${url.hashCode}';
+    File file = File(filename);
+    if (await file.exists()) {
+      final str = file.readAsStringSync();
+
+      // decode
+      Codec<String, String> codec = utf8.fuse(base64);
+      return codec.decode(str);
+    }
+    return '';
+  }
+
+  ///
+  /// saveFavorites
+  ///
   void saveFavorites(
-      {required String bookmark, bool bookmarkIsOn = false, String? url}) {
+      {required String bookmark,
+      bool bookmarkIsOn = false,
+      String? url,
+      String? htmlText}) {
     int foundIndex = -1;
     if (url != null) {
       foundIndex =
@@ -243,6 +301,11 @@ class UserData {
     }
     if (foundIndex >= 0) {
       _miscFavoritesList.removeAt(foundIndex);
+      // delete file
+      _getDataPath(key: _UserDataKey.miscFavorites.name).then((path) {
+        File file = File('$path/${url.hashCode}');
+        file.delete();
+      });
     }
     // save bookmark if isOn = true
     if (bookmarkIsOn) {
@@ -253,6 +316,17 @@ class UserData {
       }
     }
 
+    // save file
+    _getDataPath(key: _UserDataKey.miscFavorites.name).then((path) {
+      // encode
+      Codec<String, String> codec = utf8.fuse(base64);
+      final encoded = codec.encode(htmlText ?? '');
+      // save
+      File file = File('$path/${url.hashCode}');
+      file.writeAsBytes(encoded.codeUnits);
+    });
+
+    // save list
     _saveHistorioList(
         newValues: _miscFavoritesList, key: _UserDataKey.miscFavorites.name);
   }
@@ -308,5 +382,18 @@ class UserData {
         log.warning('Cannot save $key info SharedPref!');
       }
     });
+  }
+
+  ///
+  /// _saveCityInfoList
+  ///
+  Future<String> _getDataPath({required String key}) async {
+    final tempDic = await getApplicationDocumentsDirectory();
+    final filePathName = '${tempDic.path}/$key';
+    Directory dir = Directory(filePathName);
+    if (!(await dir.exists())) {
+      await dir.create(recursive: true);
+    }
+    return filePathName;
   }
 }
