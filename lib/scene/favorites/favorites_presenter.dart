@@ -47,11 +47,18 @@ class FavoritesPresenterImpl extends FavoritesPresenter {
 
   void _viewSelectPage(Object context,
       {required FavoritesPresenterInput input}) async {
+    // remove selected favorite
+    final itemInfo = input.viewModel?.bookmark.itemInfo;
+    void removeAction() {
+      UserData().saveFavorites(bookmark: '', url: itemInfo?.urlString ?? '');
+    }
+
     router.gotoWebPage(context,
         appBarTitle: input.appBarTitle,
-        itemInfo: input.viewModel!.bookmark.itemInfo,
-        htmlText: await UserData().readFavoriteData(
-            url: input.viewModel?.bookmark.itemInfo.urlString ?? ''),
+        itemInfo: itemInfo,
+        htmlText:
+            await UserData().readFavoriteData(url: itemInfo?.urlString ?? ''),
+        removeAction: removeAction,
         completeHandler: input.completeHandler);
   }
 }

@@ -56,7 +56,10 @@ class _FavoritesPageState extends State<FavoritesPage> {
                             input: FavoritesPresenterInput(
                                 appBarTitle: _appBarTitle,
                                 viewModel: viewModels[selIndex],
-                                completeHandler: () {}));
+                                completeHandler: () {
+                                  // reload if need
+                                  setState(() {});
+                                }));
                       },
                       onThumbnailShowing: (thumbIndex) async {
                         return viewModels[thumbIndex]

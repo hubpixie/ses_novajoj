@@ -195,6 +195,9 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
             element.itemInfo.serviceType == ServiceType.none &&
             element.bookmark != null)
         .toList();
+    if ((bookmarks ?? []).isEmpty) {
+      return const SizedBox(height: 0);
+    }
     return InfoServiceCell(
       sectionTitle: UseL10n.of(context)?.infoServiceFavorites ?? '',
       rowTitles: _buildRowFavoritesWidgets(bookmarks?.take(5).toList()),
@@ -235,6 +238,9 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
             element.itemInfo.serviceType == ServiceType.none &&
             element.hisInfo != null)
         .toList();
+    if ((hisInfos ?? []).isEmpty) {
+      return const SizedBox(height: 0);
+    }
     return InfoServiceCell(
       sectionTitle: UseL10n.of(context)?.infoServiceHistory ?? '',
       rowTitles: _buildRowHistorioWidgets(hisInfos?.take(5).toList()),
@@ -320,7 +326,10 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
                         viewModelList: infos,
                         serviceType: ServiceType.none,
                         itemIndex: index,
-                        completeHandler: () {}));
+                        completeHandler: () {
+                          widget.presenter.eventViewReady(
+                              input: MiscInfoListPresenterInput());
+                        }));
               },
               onThumbnailShowing: (thumbIndex) async {
                 return infos[idx].itemInfo.thunnailUrlString;
@@ -349,7 +358,10 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
                         viewModelList: infos,
                         serviceType: ServiceType.none,
                         itemIndex: index,
-                        completeHandler: () {}));
+                        completeHandler: () {
+                          widget.presenter.eventViewReady(
+                              input: MiscInfoListPresenterInput());
+                        }));
               },
               onThumbnailShowing: (thumbIndex) async {
                 return infos[idx].itemInfo.thunnailUrlString;

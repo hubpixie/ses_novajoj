@@ -87,11 +87,18 @@ class MiscInfoListPresenterImpl extends MiscInfoListPresenter {
   @override
   void eventViewHistorioWebPage(Object context,
       {required MiscInfoListPresenterInput input}) async {
+    // remove selected favorite if need
+    final itemInfo = input.viewModelList?[input.itemIndex].itemInfo;
+    void removeAction() {
+      // remove selected favorite
+      UserData().removeHistorio(url: itemInfo?.urlString ?? '');
+    }
+
     router.gotoHistorioWebPage(context,
-        itemInfo: input.viewModelList?[input.itemIndex].itemInfo,
-        htmlText: await UserData().readHistorioData(
-            url:
-                input.viewModelList?[input.itemIndex].itemInfo.urlString ?? ''),
+        itemInfo: itemInfo,
+        htmlText:
+            await UserData().readHistorioData(url: itemInfo?.urlString ?? ''),
+        removeAction: removeAction,
         appBarTitle: input.appBarTitle,
         completeHandler: input.completeHandler);
   }
@@ -108,11 +115,18 @@ class MiscInfoListPresenterImpl extends MiscInfoListPresenter {
   @override
   void eventViewFavoritesWebPage(Object context,
       {required MiscInfoListPresenterInput input}) async {
+    // remove selected favorite if need
+    final itemInfo = input.viewModelList?[input.itemIndex].itemInfo;
+    void removeAction() {
+      // remove selected favorite
+      UserData().saveFavorites(bookmark: '', url: itemInfo?.urlString);
+    }
+
     router.gotoFavoritesWebPage(context,
-        itemInfo: input.viewModelList?[input.itemIndex].itemInfo,
-        htmlText: await UserData().readFavoriteData(
-            url:
-                input.viewModelList?[input.itemIndex].itemInfo.urlString ?? ''),
+        itemInfo: itemInfo,
+        htmlText:
+            await UserData().readFavoriteData(url: itemInfo?.urlString ?? ''),
+        removeAction: removeAction,
         appBarTitle: input.appBarTitle,
         completeHandler: input.completeHandler);
   }

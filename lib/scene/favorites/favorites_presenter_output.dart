@@ -1,6 +1,5 @@
 import 'package:ses_novajoj/foundation/data/date_util.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
-import 'package:ses_novajoj/foundation/data/user_types_descript.dart';
 import 'package:ses_novajoj/domain/usecases/favorites_usecase_output.dart';
 
 abstract class FavoritesPresenterOutput {}

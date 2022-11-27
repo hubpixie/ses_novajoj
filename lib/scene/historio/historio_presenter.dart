@@ -47,11 +47,18 @@ class HistorioPresenterImpl extends HistorioPresenter {
 
   void _viewSelectPage(Object context,
       {required HistorioPresenterInput input}) async {
+    // remove selected historio
+    final itemInfo = input.viewModel?.hisInfo.itemInfo;
+    void removeAction() {
+      UserData().removeHistorio(url: itemInfo?.urlString ?? '');
+    }
+
     router.gotoWebPage(context,
         appBarTitle: input.appBarTitle,
-        itemInfo: input.viewModel!.hisInfo.itemInfo,
-        htmlText: await UserData().readHistorioData(
-            url: input.viewModel?.hisInfo.itemInfo.urlString ?? ''),
+        itemInfo: itemInfo,
+        htmlText:
+            await UserData().readHistorioData(url: itemInfo?.urlString ?? ''),
+        removeAction: removeAction,
         completeHandler: input.completeHandler);
   }
 }
