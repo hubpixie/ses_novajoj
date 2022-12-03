@@ -8,6 +8,7 @@ abstract class HistorioRouter {
       Object? itemInfo,
       Object? htmlText,
       Object? removeAction,
+      Object? changeFavoriteAction,
       Object? completeHandler});
 }
 
@@ -20,12 +21,21 @@ class HistorioRouterImpl extends HistorioRouter {
       Object? itemInfo,
       Object? htmlText,
       Object? removeAction,
+      Object? changeFavoriteAction,
       Object? completeHandler}) {
     // customize menu itemsz of detail page
     BuildContext context_ = context as BuildContext;
 
     final menuActions = [
       null,
+      changeFavoriteAction == null
+          ? null
+          : () {
+              Navigator.of(context_).pop();
+              if (changeFavoriteAction is Function) {
+                changeFavoriteAction.call();
+              }
+            },
       removeAction == null
           ? null
           : () {
@@ -43,7 +53,8 @@ class HistorioRouterImpl extends HistorioRouter {
       WebPageParamKeys.htmlText: htmlText,
       WebPageParamKeys.menuItems: [
         DetailMenuItem.openOriginal,
-        DetailMenuItem.removeFavoriteOnly
+        DetailMenuItem.favorite,
+        DetailMenuItem.removeSettings
       ],
       WebPageParamKeys.menuActions: menuActions
     }).then((value) {
