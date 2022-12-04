@@ -1,6 +1,10 @@
+import 'package:ses_novajoj/data/repositories/favorites_repository.dart';
+import 'package:ses_novajoj/data/repositories/historio_repository.dart';
 import 'package:ses_novajoj/domain/foundation/bloc/simple_bloc.dart';
 import 'package:ses_novajoj/domain/repositories/bbs_nova_detail_repository.dart';
 import 'package:ses_novajoj/data/repositories/bbs_nova_detail_repository.dart';
+import 'package:ses_novajoj/domain/repositories/favorites_repository.dart';
+import 'package:ses_novajoj/domain/repositories/historio_repository.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
 
 import 'bbs_nova_detail_usecase_output.dart';
@@ -19,8 +23,13 @@ abstract class BbsNovaDetailUseCase
 }
 
 class BbsNovaDetailUseCaseImpl extends BbsNovaDetailUseCase {
-  final BbsNovaDetailRepositoryImpl repository;
-  BbsNovaDetailUseCaseImpl() : repository = BbsNovaDetailRepositoryImpl();
+  final BbsNovaDetailRepository repository;
+  final FavoritesRepository favoriteRepository;
+  final HistorioRepository historioRepository;
+  BbsNovaDetailUseCaseImpl()
+      : repository = BbsNovaDetailRepositoryImpl(),
+        favoriteRepository = FavoritesRepositoryImpl(),
+        historioRepository = HistorioRepositoryImpl();
 
   @override
   void fetchBbsNovaDetail({required BbsNovaDetailUseCaseInput input}) async {
@@ -29,9 +38,13 @@ class BbsNovaDetailUseCaseImpl extends BbsNovaDetailUseCase {
             itemInfo: input.itemInfo, docType: NovaDocType.detail));
 
     result.when(success: (value) {
+      // set result
       streamAdd(PresentModel(
           model:
               BbsNovaDetailUseCaseModel(value.itemInfo, value.toHtmlString())));
+      // save history
+      historioRepository.saveNovaDetailHistory(
+          input: FetchHistorioRepoInput(detailItem: value, category: 'bbs'));
     }, failure: (error) {
       streamAdd(PresentModel(error: error));
     });
@@ -39,10 +52,15 @@ class BbsNovaDetailUseCaseImpl extends BbsNovaDetailUseCase {
 
   @override
   bool saveBookmark({required BbsNovaDetailUseCaseInput input}) {
-    return repository.saveBookmark(
-        input: FetchBbsNovaDetailRepoInput(
-            itemInfo: input.itemInfo,
-            docType: NovaDocType.detail,
-            htmlText: input.htmlText));
+    HistorioInfo bookmark = HistorioInfo();
+    {
+      bookmark.id = bookmark.hashCode;
+      bookmark.category = "bbs";
+      bookmark.itemInfo = input.itemInfo;
+      bookmark.htmlText = input.htmlText;
+      bookmark.createdAt = DateTime.now();
+    }
+    return favoriteRepository.saveBookmark(
+        input: FetchFavoritesRepoInput(bookmark: bookmark));
   }
 }

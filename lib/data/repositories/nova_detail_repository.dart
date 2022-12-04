@@ -1,10 +1,7 @@
-import 'dart:convert';
-
 import 'package:ses_novajoj/foundation/data/result.dart';
 import 'package:ses_novajoj/foundation/data/user_data.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/networking/api/nova_web_api.dart';
-import 'package:ses_novajoj/networking/response/historio_item_response.dart';
 import 'package:ses_novajoj/networking/response/nova_detalo_item_response.dart';
 import 'package:ses_novajoj/networking/request/nova_detalo_parameter.dart';
 import 'package:ses_novajoj/domain/entities/nova_detail_item.dart';
@@ -41,11 +38,6 @@ class NovaDetailRepositoryImpl extends NovaDetailRepository {
               return info;
             }(),
             bodyString: response.bodyString);
-
-        // save historio
-        Future.delayed(const Duration(seconds: 1), () {
-          _saveHistory(detailItem: retVal);
-        });
       } else {
         assert(false, "Unresolved error: response is null");
       }
@@ -54,46 +46,5 @@ class NovaDetailRepositoryImpl extends NovaDetailRepository {
       ret = Result.failure(error: error);
     });
     return ret;
-  }
-
-  @override
-  bool saveBookmark({required FetchNewsDetailRepoInput input}) {
-    NovaItemInfo itemInfo = input.itemInfo;
-    itemInfo.isFavorite = !itemInfo.isFavorite;
-    _saveHistory(
-        detailItem: NovaDetailItem(
-            itemInfo: itemInfo, bodyString: input.htmlText ?? ''),
-        isBookmark: true);
-    return true;
-  }
-
-  void _saveHistory({NovaDetailItem? detailItem, bool isBookmark = false}) {
-    if (detailItem != null) {
-      HistorioInfo historioInfo = () {
-        HistorioInfo info = HistorioInfo();
-        info.category = 'news';
-        info.id = info.hashCode;
-        info.createdAt = DateTime.now();
-        info.htmlText = detailItem.toHtmlString();
-        info.itemInfo = detailItem.itemInfo;
-        return info;
-      }();
-      HistorioItemRes historioItemRes = HistorioItemRes.as(info: historioInfo);
-      final json = historioItemRes.toJson();
-      final encoded = jsonEncode(json);
-
-      if (isBookmark) {
-        UserData().saveFavorites(
-            bookmark: encoded,
-            bookmarkIsOn: detailItem.itemInfo.isFavorite,
-            url: historioInfo.itemInfo.urlString,
-            htmlText: historioInfo.htmlText);
-      } else {
-        UserData().insertHistorio(
-            historio: encoded,
-            url: historioInfo.itemInfo.urlString,
-            htmlText: historioInfo.htmlText);
-      }
-    }
   }
 }

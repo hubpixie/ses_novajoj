@@ -3,6 +3,7 @@ import 'package:ses_novajoj/foundation/data/result.dart';
 import 'package:ses_novajoj/domain/entities/historio_item.dart';
 import 'package:ses_novajoj/domain/repositories/historio_repository.dart';
 import 'package:ses_novajoj/foundation/data/user_data.dart';
+import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/networking/response/historio_item_response.dart';
 
 class HistorioRepositoryImpl extends HistorioRepository {
@@ -41,5 +42,28 @@ class HistorioRepositoryImpl extends HistorioRepository {
     }).toList();
     Result<List<HistorioItem>> result = Result.success(data: list);
     return result;
+  }
+
+  @override
+  void saveNovaDetailHistory({required FetchHistorioRepoInput input}) {
+    if (input.detailItem != null) {
+      HistorioInfo historioInfo = () {
+        HistorioInfo info = HistorioInfo();
+        info.category = input.category ?? '';
+        info.id = info.hashCode;
+        info.createdAt = DateTime.now();
+        info.htmlText = input.detailItem!.toHtmlString();
+        info.itemInfo = input.detailItem!.itemInfo;
+        return info;
+      }();
+      HistorioItemRes historioItemRes = HistorioItemRes.as(info: historioInfo);
+      final json = historioItemRes.toJson();
+      final encoded = jsonEncode(json);
+
+      UserData().insertHistorio(
+          historio: encoded,
+          url: historioInfo.itemInfo.urlString,
+          htmlText: historioInfo.htmlText);
+    }
   }
 }
