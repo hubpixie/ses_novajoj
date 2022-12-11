@@ -17,6 +17,7 @@ abstract class MiscInfoListRouter {
       Object? itemInfo,
       Object? htmlText,
       Object? removeAction,
+      Object? changeFavoriteAction,
       Object? completeHandler});
   void gotoFavoritesWebPage(Object context,
       {required String appBarTitle,
@@ -131,11 +132,20 @@ class MiscInfoListRouterImpl extends MiscInfoListRouter {
       Object? itemInfo,
       Object? htmlText,
       Object? removeAction,
+      Object? changeFavoriteAction,
       Object? completeHandler}) {
     // customize menu itemsz of detail page
     BuildContext context_ = context as BuildContext;
     final menuActions = [
       null,
+      changeFavoriteAction == null
+          ? null
+          : () {
+              Navigator.of(context_).pop();
+              if (changeFavoriteAction is Function) {
+                changeFavoriteAction.call();
+              }
+            },
       removeAction == null
           ? null
           : () {
@@ -153,6 +163,7 @@ class MiscInfoListRouterImpl extends MiscInfoListRouter {
       WebPageParamKeys.htmlText: htmlText,
       WebPageParamKeys.menuItems: [
         DetailMenuItem.openOriginal,
+        DetailMenuItem.favorite,
         DetailMenuItem.removeSettings
       ],
       WebPageParamKeys.menuActions: menuActions
