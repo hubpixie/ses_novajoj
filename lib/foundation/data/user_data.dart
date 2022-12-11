@@ -253,6 +253,29 @@ class UserData {
   }
 
   ///
+  /// removeHistorio
+  ///
+  void removeHistorio({required String url}) {
+    int foundIndex = -1;
+    if (url.isNotEmpty) {
+      foundIndex =
+          _miscHistorioList.indexWhere((element) => element.contains(url));
+    }
+    if (foundIndex >= 0) {
+      _miscHistorioList.removeAt(foundIndex);
+      // delete file
+      _getDataPath(key: _UserDataKey.miscHistory.name).then((path) {
+        File file = File('$path/${url.hashCode}');
+        file.delete();
+      });
+    }
+
+    // save list
+    _saveHistorioList(
+        newValues: _miscHistorioList, key: _UserDataKey.miscHistory.name);
+  }
+
+  ///
   /// readHistorioData
   ///
   Future<String> readHistorioData({required String url}) async {
@@ -317,14 +340,16 @@ class UserData {
     }
 
     // save file
-    _getDataPath(key: _UserDataKey.miscFavorites.name).then((path) {
-      // encode
-      Codec<String, String> codec = utf8.fuse(base64);
-      final encoded = codec.encode(htmlText ?? '');
-      // save
-      File file = File('$path/${url.hashCode}');
-      file.writeAsBytes(encoded.codeUnits);
-    });
+    if ((htmlText ?? '').isNotEmpty) {
+      _getDataPath(key: _UserDataKey.miscFavorites.name).then((path) {
+        // encode
+        Codec<String, String> codec = utf8.fuse(base64);
+        final encoded = codec.encode(htmlText ?? '');
+        // save
+        File file = File('$path/${url.hashCode}');
+        file.writeAsBytes(encoded.codeUnits);
+      });
+    }
 
     // save list
     _saveHistorioList(

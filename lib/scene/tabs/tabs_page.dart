@@ -1,6 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:ses_novajoj/l10n/l10n.dart';
-import 'package:ses_novajoj/foundation/log_util.dart';
 import 'package:ses_novajoj/scene/tabs/tabs_presenter.dart';
 import 'package:ses_novajoj/scene/top_list/top_list_page_builder.dart';
 import 'package:ses_novajoj/scene/bbs_main/bbs_main_page_builder.dart';
@@ -17,6 +19,8 @@ class TabsPage extends StatefulWidget {
 }
 
 class _TabsPageState extends State<TabsPage> with WidgetsBindingObserver {
+  static const MethodChannel _channel = MethodChannel('move_to_background');
+
   int _selectedIndex = 0;
   late final List<String> _tabTitles = [
     L10n.of(context)?.tabBarNameHome ?? '',
@@ -55,8 +59,16 @@ class _TabsPageState extends State<TabsPage> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     return WillPopScope(
         onWillPop: () async {
-          log.info('The user tries to pop()');
-          return false;
+          if (Platform.isAndroid) {
+            if (Navigator.of(context).canPop()) {
+              _channel.invokeMethod('moveTaskToBack');
+              return Future.value(false);
+            } else {
+              return Future.value(false);
+            }
+          } else {
+            return Future.value(true);
+          }
         },
         child: Scaffold(
           body: IndexedStack(

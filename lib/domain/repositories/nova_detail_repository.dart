@@ -14,5 +14,4 @@ class FetchNewsDetailRepoInput {
 abstract class NovaDetailRepository {
   Future<Result<NovaDetailItem>> fetchNewsDetail(
       {required FetchNewsDetailRepoInput input});
-  bool saveBookmark({required FetchNewsDetailRepoInput input});
 }

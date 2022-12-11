@@ -14,5 +14,4 @@ class FetchThreadNovaDetailRepoInput {
 abstract class ThreadNovaDetailRepository {
   Future<Result<ThreadNovaDetailItem>> fetchThreadNovaDetail(
       {required FetchThreadNovaDetailRepoInput input});
-  bool saveBookmark({required FetchThreadNovaDetailRepoInput input});
 }

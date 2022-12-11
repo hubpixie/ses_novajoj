@@ -57,7 +57,9 @@ class _HistorioPageState extends State<HistorioPage> {
                             input: HistorioPresenterInput(
                                 appBarTitle: _appBarTitle,
                                 viewModel: viewModels[selIndex],
-                                completeHandler: () {}));
+                                completeHandler: () {
+                                  setState(() {});
+                                }));
                       },
                       onThumbnailShowing: (thumbIndex) async {
                         return viewModels[thumbIndex]

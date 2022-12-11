@@ -1,3 +1,7 @@
+import 'package:ses_novajoj/data/repositories/favorites_repository.dart';
+import 'package:ses_novajoj/data/repositories/historio_repository.dart';
+import 'package:ses_novajoj/domain/repositories/favorites_repository.dart';
+import 'package:ses_novajoj/domain/repositories/historio_repository.dart';
 import 'package:ses_novajoj/domain/repositories/nova_detail_repository.dart';
 import 'package:ses_novajoj/domain/foundation/bloc/simple_bloc.dart';
 import 'package:ses_novajoj/data/repositories/nova_detail_repository.dart';
@@ -19,7 +23,13 @@ abstract class NewsDetailUseCase with SimpleBloc<NovaDetailUseCaseOutput> {
 
 class NewsDetailUseCaseImpl extends NewsDetailUseCase {
   final NovaDetailRepositoryImpl repository;
-  NewsDetailUseCaseImpl() : repository = NovaDetailRepositoryImpl();
+  final FavoritesRepository favoriteRepository;
+  final HistorioRepository historioRepository;
+
+  NewsDetailUseCaseImpl()
+      : repository = NovaDetailRepositoryImpl(),
+        favoriteRepository = FavoritesRepositoryImpl(),
+        historioRepository = HistorioRepositoryImpl();
 
   @override
   void fetchNewsDetail({required NewsDetailUseCaseInput input}) async {
@@ -28,8 +38,12 @@ class NewsDetailUseCaseImpl extends NewsDetailUseCase {
             itemInfo: input.itemInfo, docType: NovaDocType.detail));
 
     result.when(success: (value) {
+      // set result
       streamAdd(PresentModel(
           model: NovaDetailUseCaseModel(value.itemInfo, value.toHtmlString())));
+      // save history
+      historioRepository.saveNovaDetailHistory(
+          input: FetchHistorioRepoInput(detailItem: value, category: 'news'));
     }, failure: (error) {
       streamAdd(PresentModel(error: error));
     });
@@ -37,10 +51,15 @@ class NewsDetailUseCaseImpl extends NewsDetailUseCase {
 
   @override
   bool saveBookmark({required NewsDetailUseCaseInput input}) {
-    return repository.saveBookmark(
-        input: FetchNewsDetailRepoInput(
-            itemInfo: input.itemInfo,
-            docType: NovaDocType.detail,
-            htmlText: input.htmlText));
+    HistorioInfo bookmark = HistorioInfo();
+    {
+      bookmark.id = bookmark.hashCode;
+      bookmark.category = "news";
+      bookmark.itemInfo = input.itemInfo;
+      bookmark.htmlText = input.htmlText;
+      bookmark.createdAt = DateTime.now();
+    }
+    return favoriteRepository.saveBookmark(
+        input: FetchFavoritesRepoInput(bookmark: bookmark));
   }
 }

@@ -1,7 +1,9 @@
 import 'package:ses_novajoj/domain/foundation/bloc/simple_bloc.dart';
+import 'package:ses_novajoj/domain/usecases/favorites_usecase.dart';
 import 'package:ses_novajoj/domain/usecases/historio_usecase.dart';
 import 'package:ses_novajoj/domain/usecases/historio_usecase_output.dart';
 import 'package:ses_novajoj/foundation/data/user_data.dart';
+import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'historio_presenter_output.dart';
 
 import 'historio_router.dart';
@@ -23,10 +25,12 @@ abstract class HistorioPresenter with SimpleBloc<HistorioPresenterOutput> {
 
 class HistorioPresenterImpl extends HistorioPresenter {
   final HistorioUseCase useCase;
+  final FavoritesUseCase favoriteUseCase;
   final HistorioRouter router;
 
   HistorioPresenterImpl({required this.router})
-      : useCase = HistorioUseCaseImpl();
+      : useCase = HistorioUseCaseImpl(),
+        favoriteUseCase = FavoritesUseCaseImpl();
 
   @override
   Future<HistorioPresenterOutput> eventViewReady(
@@ -47,11 +51,31 @@ class HistorioPresenterImpl extends HistorioPresenter {
 
   void _viewSelectPage(Object context,
       {required HistorioPresenterInput input}) async {
+    // remove selected historio
+    final itemInfo = input.viewModel?.hisInfo.itemInfo;
+    final htmlText =
+        await UserData().readHistorioData(url: itemInfo?.urlString ?? '');
+    HistorioInfo? bookmark = input.viewModel?.hisInfo;
+    bookmark?.htmlText = htmlText;
+    void changeFavoriteAction() {
+      favoriteUseCase.saveBookmark(
+          input: FavoritesUseCaseInput(bookmark: bookmark));
+    }
+
+    void removeAction() {
+      UserData().saveFavorites(
+          bookmark: '',
+          bookmarkIsOn: itemInfo?.isFavorite ?? false,
+          url: itemInfo?.urlString ?? '');
+    }
+
     router.gotoWebPage(context,
         appBarTitle: input.appBarTitle,
-        itemInfo: input.viewModel!.hisInfo.itemInfo,
-        htmlText: await UserData().readHistorioData(
-            url: input.viewModel?.hisInfo.itemInfo.urlString ?? ''),
+        itemInfo: itemInfo,
+        htmlText: htmlText,
+        changeFavoriteAction:
+            itemInfo?.isFavorite == false ? changeFavoriteAction : null,
+        removeAction: removeAction,
         completeHandler: input.completeHandler);
   }
 }
