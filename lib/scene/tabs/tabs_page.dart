@@ -15,7 +15,7 @@ class TabsPage extends StatefulWidget {
   const TabsPage({Key? key, required this.presenter}) : super(key: key);
 
   @override
-  _TabsPageState createState() => _TabsPageState();
+  State<TabsPage> createState() => _TabsPageState();
 }
 
 class _TabsPageState extends State<TabsPage> with WidgetsBindingObserver {

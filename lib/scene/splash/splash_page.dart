@@ -7,7 +7,7 @@ class SplashPage extends StatefulWidget {
   const SplashPage({Key? key, required this.presenter}) : super(key: key);
 
   @override
-  _SplashPageState createState() => _SplashPageState();
+  State<SplashPage> createState() => _SplashPageState();
 }
 
 class _SplashPageState extends State<SplashPage> {

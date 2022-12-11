@@ -14,7 +14,7 @@ class BbsSelectListPage extends StatefulWidget {
       : super(key: key);
 
   @override
-  _BbsSelectListPageState createState() => _BbsSelectListPageState();
+  State<BbsSelectListPage> createState() => _BbsSelectListPageState();
 }
 
 class _BbsSelectListPageState extends State<BbsSelectListPage> {

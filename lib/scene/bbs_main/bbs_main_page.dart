@@ -11,7 +11,7 @@ class BbsMainPage extends StatefulWidget {
   const BbsMainPage({Key? key, required this.presenter}) : super(key: key);
 
   @override
-  _BbsMainPageState createState() => _BbsMainPageState();
+  State<BbsMainPage> createState() => _BbsMainPageState();
 }
 
 class _BbsMainPageState extends State<BbsMainPage> {

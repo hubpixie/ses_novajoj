@@ -20,7 +20,7 @@ class ThreadSubPage extends StatefulWidget {
       : super(key: key);
 
   @override
-  _ThreadSubPageState createState() => _ThreadSubPageState();
+  State<ThreadSubPage> createState() => _ThreadSubPageState();
 }
 
 class _ThreadSubPageState extends State<ThreadSubPage>

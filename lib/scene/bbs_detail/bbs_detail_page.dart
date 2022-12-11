@@ -17,7 +17,7 @@ class BbsDetailPage extends StatefulWidget {
   const BbsDetailPage({Key? key, required this.presenter}) : super(key: key);
 
   @override
-  _BbsDetailPageState createState() => _BbsDetailPageState();
+  State<BbsDetailPage> createState() => _BbsDetailPageState();
 }
 
 class _BbsDetailPageState extends State<BbsDetailPage> {

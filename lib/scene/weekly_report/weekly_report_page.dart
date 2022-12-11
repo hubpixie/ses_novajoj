@@ -30,7 +30,7 @@ class WeeklyReportPage extends StatefulWidget {
   final WeeklyReportPresenter presenter;
   const WeeklyReportPage({Key? key, required this.presenter}) : super(key: key);
   @override
-  _WeeklyReportPageState createState() => _WeeklyReportPageState();
+  State<WeeklyReportPage> createState() => _WeeklyReportPageState();
 }
 
 class _WeeklyReportPageState extends State<WeeklyReportPage> {

@@ -14,7 +14,7 @@ class LocalListPage extends StatefulWidget {
   const LocalListPage({Key? key, required this.presenter}) : super(key: key);
 
   @override
-  _LocalListPageState createState() => _LocalListPageState();
+  State<LocalListPage> createState() => _LocalListPageState();
 }
 
 enum _MenuItemValueKey { key, text }

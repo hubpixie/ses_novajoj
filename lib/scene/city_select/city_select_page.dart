@@ -15,7 +15,7 @@ class CitySelectPage extends StatefulWidget {
   const CitySelectPage({Key? key, required this.presenter}) : super(key: key);
 
   @override
-  _CitySelectPageState createState() => _CitySelectPageState();
+  State<CitySelectPage> createState() => _CitySelectPageState();
 }
 
 class _CitySelectPageState extends State<CitySelectPage> {

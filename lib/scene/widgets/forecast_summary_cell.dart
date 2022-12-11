@@ -4,20 +4,20 @@ import 'package:ses_novajoj/foundation/data/date_util.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/scene/foundation/data/weather_util.dart';
 
-typedef _CellEditingDelegate = void Function(
+typedef CellEditingDelegate = void Function(
     bool cityChanged, dynamic temprtUnit);
 
 class ForecastSummaryCell extends StatefulWidget {
   final WeatherInfo? itemValue;
   final TemperatureUnit? temprtUnit;
-  final _CellEditingDelegate? onCellEditing;
+  final CellEditingDelegate? onCellEditing;
 
   const ForecastSummaryCell(
       {Key? key, this.itemValue, this.temprtUnit, this.onCellEditing})
       : super(key: key);
 
   @override
-  _ForecastSummaryCellState createState() => _ForecastSummaryCellState();
+  State<ForecastSummaryCell> createState() => _ForecastSummaryCellState();
 }
 
 class _ForecastSummaryCellState extends State<ForecastSummaryCell> {

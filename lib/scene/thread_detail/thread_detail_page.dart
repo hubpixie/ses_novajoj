@@ -17,7 +17,7 @@ class ThreadDetailPage extends StatefulWidget {
   const ThreadDetailPage({Key? key, required this.presenter}) : super(key: key);
 
   @override
-  _ThreadDetailPageState createState() => _ThreadDetailPageState();
+  State<ThreadDetailPage> createState() => _ThreadDetailPageState();
 }
 
 class _ThreadDetailPageState extends State<ThreadDetailPage> {

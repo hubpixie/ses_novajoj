@@ -14,7 +14,7 @@ class MiscInfoListPage extends StatefulWidget {
   const MiscInfoListPage({Key? key, required this.presenter}) : super(key: key);
 
   @override
-  _MiscInfoListPageState createState() => _MiscInfoListPageState();
+  State<MiscInfoListPage> createState() => _MiscInfoListPageState();
 }
 
 class _MiscInfoListPageState extends State<MiscInfoListPage> {

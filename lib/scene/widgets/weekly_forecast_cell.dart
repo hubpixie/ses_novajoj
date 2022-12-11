@@ -12,7 +12,7 @@ class WeeklyForecastCell extends StatefulWidget {
       : super(key: key);
 
   @override
-  _WeeklyForecastCellState createState() => _WeeklyForecastCellState();
+  State<WeeklyForecastCell> createState() => _WeeklyForecastCellState();
 }
 
 class _WeeklyForecastCellState extends State<WeeklyForecastCell> {

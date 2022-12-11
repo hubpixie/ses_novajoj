@@ -16,7 +16,7 @@ class MiscInfoSelectPage extends StatefulWidget {
       : super(key: key);
 
   @override
-  _MiscInfoSelectPageState createState() => _MiscInfoSelectPageState();
+  State<MiscInfoSelectPage> createState() => _MiscInfoSelectPageState();
 }
 
 class _MiscInfoSelectPageState extends State<MiscInfoSelectPage> {

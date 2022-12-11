@@ -10,7 +10,7 @@ class HistorioPage extends StatefulWidget {
   const HistorioPage({Key? key, required this.presenter}) : super(key: key);
 
   @override
-  _HistorioPageState createState() => _HistorioPageState();
+  State<HistorioPage> createState() => _HistorioPageState();
 }
 
 class _HistorioPageState extends State<HistorioPage> {

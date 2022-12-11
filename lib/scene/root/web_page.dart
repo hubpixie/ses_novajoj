@@ -23,7 +23,7 @@ class WebPage extends StatefulWidget {
   const WebPage({Key? key}) : super(key: key);
 
   @override
-  _WebPageState createState() => _WebPageState();
+  State<WebPage> createState() => _WebPageState();
 }
 
 class _WebPageState extends State<WebPage> {

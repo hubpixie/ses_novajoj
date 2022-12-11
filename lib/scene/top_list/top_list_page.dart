@@ -14,7 +14,7 @@ class TopListPage extends StatefulWidget {
   const TopListPage({Key? key, required this.presenter}) : super(key: key);
 
   @override
-  _TopListPageState createState() => _TopListPageState();
+  State<TopListPage> createState() => _TopListPageState();
 }
 
 class _TopListPageState extends State<TopListPage> {

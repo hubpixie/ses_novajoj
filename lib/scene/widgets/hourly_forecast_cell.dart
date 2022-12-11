@@ -12,7 +12,7 @@ class HourlyForecastCell extends StatefulWidget {
       : super(key: key);
 
   @override
-  _HourlyForecastCellState createState() => _HourlyForecastCellState();
+  State<HourlyForecastCell> createState() => _HourlyForecastCellState();
 }
 
 class _HourlyForecastCellState extends State<HourlyForecastCell> {

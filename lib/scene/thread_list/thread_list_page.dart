@@ -8,7 +8,7 @@ class ThreadListPage extends StatefulWidget {
   const ThreadListPage({Key? key, required this.presenters}) : super(key: key);
 
   @override
-  _ThreadListPageState createState() => _ThreadListPageState();
+  State<ThreadListPage> createState() => _ThreadListPageState();
 }
 
 class _ThreadListPageState extends State<ThreadListPage> {
