@@ -19,7 +19,8 @@ class TabsPage extends StatefulWidget {
 }
 
 class _TabsPageState extends State<TabsPage> with WidgetsBindingObserver {
-  static const MethodChannel _channel = MethodChannel('move_to_background');
+  static const MethodChannel _channel =
+      MethodChannel('com.pixie.sesNovajoj/app_helper');
 
   int _selectedIndex = 0;
   late final List<String> _tabTitles = [
@@ -61,7 +62,7 @@ class _TabsPageState extends State<TabsPage> with WidgetsBindingObserver {
         onWillPop: () async {
           if (Platform.isAndroid) {
             if (Navigator.of(context).canPop()) {
-              _channel.invokeMethod('moveTaskToBack');
+              _channel.invokeMethod('sendToBackground');
               return Future.value(false);
             } else {
               return Future.value(false);

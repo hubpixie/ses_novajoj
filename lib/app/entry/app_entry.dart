@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -15,21 +16,30 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Intl.defaultLocale = '${_kLocale.languageCode}-${_kLocale.countryCode}';
-    return MaterialApp(
-      title: 'First News',
-      locale: _kLocale,
-      localizationsDelegates: L10n.localizationsDelegates,
-      supportedLocales: L10n.supportedLocales,
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.teal,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      onGenerateRoute: ScreenRouteManager.generateRoute,
-      navigatorObservers:
-          kIsWeb ? [] : <NavigatorObserver>[FirebaseUtil().observer],
-      home: SplashPageBuilder().page,
-    );
+    return FutureBuilder(
+        future: kIsWeb ? Future.value(null) : Firebase.initializeApp(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+                child: CircularProgressIndicator(
+                    color: Colors.amber, backgroundColor: Colors.grey[850]));
+          }
+          return MaterialApp(
+            title: 'First News',
+            locale: _kLocale,
+            localizationsDelegates: L10n.localizationsDelegates,
+            supportedLocales: L10n.supportedLocales,
+            debugShowCheckedModeBanner: false,
+            theme: ThemeData(
+              primarySwatch: Colors.teal,
+              visualDensity: VisualDensity.adaptivePlatformDensity,
+            ),
+            onGenerateRoute: ScreenRouteManager.generateRoute,
+            navigatorObservers:
+                kIsWeb ? [] : <NavigatorObserver>[FirebaseUtil().observer],
+            home: SplashPageBuilder().page,
+          );
+        });
   }
 
   static void run() {

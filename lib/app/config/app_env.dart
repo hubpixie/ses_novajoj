@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
 
 enum Flavor {
   web,
@@ -9,19 +8,19 @@ enum Flavor {
 }
 
 class AppEnv {
-  static Flavor? _flavor;
+  static Flavor? flavor;
 
   static void configure(Flavor flavor) async {
     WidgetsFlutterBinding.ensureInitialized();
-    if (flavor != Flavor.web) {
-      await Firebase.initializeApp();
-    }
+    // if (flavor != Flavor.web) {
+    //   await Firebase.initializeApp();
+    // }
 
-    _flavor = flavor;
+    AppEnv.flavor = flavor;
   }
 
   static String getString() {
-    switch (_flavor) {
+    switch (AppEnv.flavor) {
       case Flavor.web:
         return "WEB";
       case Flavor.develop:
