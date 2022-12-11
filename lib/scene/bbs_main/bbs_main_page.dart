@@ -39,8 +39,8 @@ class _BbsMainPageState extends State<BbsMainPage> {
             leading: const SizedBox(width: 0),
             centerTitle: false,
             bottom: PreferredSize(
-                child: _buildAppBarTabArea(context),
-                preferredSize: const Size.fromHeight(0.0)),
+                preferredSize: const Size.fromHeight(0.0),
+                child: _buildAppBarTabArea(context)),
             titleSpacing: 0,
             leadingWidth: 10,
           ),

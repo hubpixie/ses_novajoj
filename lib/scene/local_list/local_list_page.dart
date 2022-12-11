@@ -195,7 +195,6 @@ class _LocalListPageState extends State<LocalListPage> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: <Widget>[
             MenuButton<Map>(
-              child: scrollChildButton,
               items: items,
               topDivider: true,
               scrollPhysics: const AlwaysScrollableScrollPhysics(),
@@ -228,6 +227,7 @@ class _LocalListPageState extends State<LocalListPage> {
                   )),
               onMenuButtonToggle: (bool isToggle) {},
               popupHeight: 250,
+              child: scrollChildButton,
             ),
             //const SizedBox(width: 10),
             SizedBox(

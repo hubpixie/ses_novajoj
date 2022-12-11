@@ -201,13 +201,13 @@ class _BbsSelectListPageState extends State<BbsSelectListPage> {
                       ),
                     ])
                   ]),
+              iconColor: Colors.black54,
+              textColor: Colors.black45,
               children: <Widget>[
                 _buildLatestRowTile(context,
                     itemInfo: dataList[row].itemInfo.children!.first,
                     isSub: true),
               ],
-              iconColor: Colors.black54,
-              textColor: Colors.black45,
             ),
     );
   }

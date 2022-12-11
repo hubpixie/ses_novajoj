@@ -33,11 +33,11 @@ class _SplashPageState extends State<SplashPage> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: ClipRRect(
+              borderRadius: BorderRadius.circular(8.0),
               child: Image.asset(
                 'assets/images/ses_splash.png',
                 fit: BoxFit.fill,
               ),
-              borderRadius: BorderRadius.circular(8.0),
             ),
           ),
           Align(
