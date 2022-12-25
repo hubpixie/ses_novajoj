@@ -3,6 +3,7 @@ import 'package:menu_button/menu_button.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/domain/foundation/bloc/bloc_provider.dart';
 import 'package:ses_novajoj/foundation/firebase_util.dart';
+import 'package:ses_novajoj/scene/foundation/color_def.dart';
 import 'package:ses_novajoj/scene/foundation/use_l10n.dart';
 import 'package:ses_novajoj/scene/local_list/local_list_presenter.dart';
 import 'package:ses_novajoj/scene/local_list/local_list_presenter_output.dart';
@@ -34,7 +35,8 @@ class _LocalListPageState extends State<LocalListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1B80F3),
+        backgroundColor: ColorDef.appBarBackColor2,
+        foregroundColor: ColorDef.appBarTitleColor,
         automaticallyImplyLeading: false,
         leading: const SizedBox(width: 0),
         title: _buildAppBarMenuArea(context),
@@ -159,7 +161,7 @@ class _LocalListPageState extends State<LocalListPage> {
       width: 100,
       height: 35,
       child: Container(
-        color: const Color(0xFF1B80F3),
+        color: ColorDef.appBarBackColor2,
         padding: const EdgeInsets.only(left: 12, right: 8),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -169,7 +171,7 @@ class _LocalListPageState extends State<LocalListPage> {
                 _selectedMenuItemText ?? "",
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.w600),
+                    color: Colors.black54, fontWeight: FontWeight.w600),
               ),
             ),
             const SizedBox(width: 5),
@@ -180,7 +182,7 @@ class _LocalListPageState extends State<LocalListPage> {
                 fit: BoxFit.fill,
                 child: Icon(
                   Icons.arrow_drop_down,
-                  color: Colors.white,
+                  color: ColorDef.appBarTitleColor,
                 ),
               ),
             ),
@@ -199,7 +201,7 @@ class _LocalListPageState extends State<LocalListPage> {
               topDivider: true,
               scrollPhysics: const AlwaysScrollableScrollPhysics(),
               itemBuilder: (Map value) => Container(
-                color: Colors.grey[200],
+                color: ColorDef.appBarBackColor2,
                 height: 40,
                 alignment: Alignment.center,
                 padding:
@@ -207,6 +209,7 @@ class _LocalListPageState extends State<LocalListPage> {
                 child: Text(value[_MenuItemValueKey.text]),
               ),
               toggledChild: Container(
+                color: Colors.blueAccent,
                 child: scrollChildButton,
               ),
               divider: Container(
@@ -237,7 +240,9 @@ class _LocalListPageState extends State<LocalListPage> {
                     padding: const EdgeInsets.only(left: 5),
                     onPressed: null,
                     icon: Text(UseL10n.of(context)?.localListAppBarTitle ?? "",
-                        style: const TextStyle(fontWeight: FontWeight.bold)))),
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: ColorDef.appBarTitleColor)))),
           ],
         ));
   }
@@ -249,7 +254,7 @@ class _LocalListPageState extends State<LocalListPage> {
           height: 45,
           child: IconButton(
               padding: const EdgeInsets.all(0.0),
-              color: Colors.white,
+              color: ColorDef.appBarTitleColor,
               onPressed: () {
                 // reload data
                 _loadData(isReloaded: true);

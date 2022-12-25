@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/domain/foundation/bloc/bloc_provider.dart';
+import 'package:ses_novajoj/scene/foundation/color_def.dart';
 import 'package:ses_novajoj/scene/foundation/use_l10n.dart';
 import 'package:ses_novajoj/scene/foundation/data/weather_util.dart';
 import 'package:ses_novajoj/scene/misc_info_list/misc_info_list_presenter.dart';
@@ -31,7 +32,8 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(UseL10n.of(context)?.infoServiceTop ?? ''),
-        backgroundColor: const Color(0xFF1B80F3),
+        backgroundColor: ColorDef.appBarBackColor2,
+        foregroundColor: ColorDef.appBarTitleColor,
         automaticallyImplyLeading: false,
         centerTitle: true,
       ),

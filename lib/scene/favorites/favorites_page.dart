@@ -32,6 +32,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
       appBar: AppBar(
         title: Text(_appBarTitle),
         backgroundColor: ColorDef.appBarBackColor,
+        foregroundColor: ColorDef.appBarTitleColor,
         centerTitle: true,
       ),
       body: FutureBuilder<FavoritesPresenterOutput>(

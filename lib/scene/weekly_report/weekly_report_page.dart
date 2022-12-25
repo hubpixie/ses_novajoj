@@ -58,7 +58,8 @@ class _WeeklyReportPageState extends State<WeeklyReportPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(_appBarTitle),
-        backgroundColor: ColorDef.appBarBackColor,
+        backgroundColor: ColorDef.appBarBackColor2,
+        foregroundColor: ColorDef.appBarTitleColor,
         centerTitle: true,
         actions: _detailPage.buildAppBarActionArea(context,
             itemInfo: _itemInfo,

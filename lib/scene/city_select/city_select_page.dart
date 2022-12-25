@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/foundation/firebase_util.dart';
 import 'package:ses_novajoj/foundation/log_util.dart';
+import 'package:ses_novajoj/scene/foundation/color_def.dart';
 //import 'package:ses_novajoj/domain/foundation/bloc/bloc_provider.dart';
 import 'package:ses_novajoj/scene/foundation/use_l10n.dart';
 import 'package:ses_novajoj/scene/foundation/page/page_parameter.dart';
@@ -56,7 +57,8 @@ class _CitySelectPageState extends State<CitySelectPage> {
     return Scaffold(
         appBar: AppBar(
           title: Text(UseL10n.of(context)?.infoServiceWeatherSelectCity ?? ''),
-          backgroundColor: const Color(0xFF1B80F3),
+          backgroundColor: ColorDef.appBarBackColor2,
+          foregroundColor: ColorDef.appBarTitleColor,
           centerTitle: true,
         ),
         resizeToAvoidBottomInset: true,

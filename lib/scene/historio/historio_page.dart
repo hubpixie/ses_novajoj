@@ -33,6 +33,7 @@ class _HistorioPageState extends State<HistorioPage> {
       appBar: AppBar(
         title: Text(_appBarTitle),
         backgroundColor: ColorDef.appBarBackColor,
+        foregroundColor: ColorDef.appBarTitleColor,
         centerTitle: true,
       ),
       body: FutureBuilder<HistorioPresenterOutput>(
