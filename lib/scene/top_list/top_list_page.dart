@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:bubble_tab_indicator/bubble_tab_indicator.dart';
 import 'package:ses_novajoj/scene/foundation/color_def.dart';
@@ -18,6 +19,7 @@ class _TopListPageState extends State<TopListPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   int _selectedTitleIndex = 0;
+  late StreamController<bool> _reloadedController;
 
   late final List<String> _appBarTitleList = [
     UseL10n.of(context)?.appBarFullNameLatest ?? '',
@@ -40,6 +42,8 @@ class _TopListPageState extends State<TopListPage>
         _selectedTitleIndex = _tabController.index;
       });
     });
+    _reloadedController = StreamController<bool>.broadcast();
+
     // send viewEvent
     FirebaseUtil().sendViewEvent(route: AnalyticsRoute.topList);
     super.initState();
@@ -47,7 +51,8 @@ class _TopListPageState extends State<TopListPage>
 
   @override
   void dispose() {
-    //_tabController.removeListener(() {});
+    _tabController.removeListener(() {});
+    _reloadedController.close();
     super.dispose();
   }
 
@@ -66,6 +71,7 @@ class _TopListPageState extends State<TopListPage>
         centerTitle: true,
         titleSpacing: 0,
         leadingWidth: 10,
+        actions: _buildAppBarActionArea(context),
       ),
       body: DefaultTabController(
         length: _tabNames.length,
@@ -84,11 +90,7 @@ class _TopListPageState extends State<TopListPage>
                 child: TabBar(
                   controller: _tabController,
                   isScrollable: true,
-                  onTap: (value) {
-                    // setState(() {
-                    //   _selectedTitleIndex = value;
-                    // });
-                  },
+                  onTap: (value) {},
                   labelColor: Colors.yellowAccent,
                   unselectedLabelColor: Colors.black54,
                   tabs: _tabNames.map((name) => Tab(text: name)).toList(),
@@ -126,6 +128,7 @@ class _TopListPageState extends State<TopListPage>
           return retStr;
         }(),
         appBarTitle: value,
+        reloadedController: _reloadedController,
       ));
     });
 
@@ -133,5 +136,23 @@ class _TopListPageState extends State<TopListPage>
       controller: _tabController,
       children: pages,
     );
+  }
+
+  List<Widget> _buildAppBarActionArea(BuildContext context) {
+    return <Widget>[
+      SizedBox(
+          width: 45,
+          height: 45,
+          child: IconButton(
+              padding: const EdgeInsets.all(0.0),
+              onPressed: () {
+                _reloadedController.add(true);
+              },
+              icon: const Icon(Icons.refresh_rounded))),
+      SizedBox(
+        width: MediaQuery.of(context).size.width <= 375 ? 0 : 25,
+        height: 50,
+      )
+    ];
   }
 }

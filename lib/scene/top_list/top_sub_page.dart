@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/domain/foundation/bloc/bloc_provider.dart';
@@ -12,13 +13,15 @@ class TopSubPage extends StatefulWidget {
   final int tabIndex;
   final String prefixTitle;
   final String appBarTitle;
+  final StreamController<bool> reloadedController;
 
   const TopSubPage(
       {Key? key,
       required this.presenter,
       required this.tabIndex,
       this.prefixTitle = "",
-      this.appBarTitle = ""})
+      this.appBarTitle = "",
+      required this.reloadedController})
       : super(key: key);
 
   @override
@@ -32,6 +35,11 @@ class _TopSubPageState extends State<TopSubPage>
 
   @override
   void initState() {
+    widget.reloadedController.stream.listen((event) {
+      if (event) {
+        _loadData();
+      }
+    });
     _loadData();
     super.initState();
   }
@@ -39,7 +47,6 @@ class _TopSubPageState extends State<TopSubPage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-
     return BlocProvider<TopListPresenter>(
       bloc: widget.presenter,
       child: StreamBuilder<TopListPresenterOutput>(
