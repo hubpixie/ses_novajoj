@@ -42,7 +42,6 @@ dependencies:
   freezed_annotation: ^2.2.0
   html: ^0.15.1
   http:
-  menu_button: ^1.4.2+1
   country_icons: ^2.0.2
   connectivity_plus: ^2.3.9
   cached_network_image: ^3.2.1

@@ -57,10 +57,12 @@ class _WeeklyForecastCellState extends State<WeeklyForecastCell> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
-        Text('${weeklyValue?.getDataFormattedString()}'),
         SizedBox(
-          width: 60,
-          height: 60,
+            width: 70, child: Text('${weeklyValue?.getDataFormattedString()}')),
+        Container(
+          alignment: Alignment.center,
+          width: 50,
+          height: 50,
           child: Icon(
             weeklyValue?.getIconData(),
             color: Colors.black45,
