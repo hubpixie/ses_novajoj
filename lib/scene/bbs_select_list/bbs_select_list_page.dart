@@ -3,6 +3,7 @@ import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/foundation/log_util.dart';
 import 'package:ses_novajoj/foundation/firebase_util.dart';
 import 'package:ses_novajoj/domain/foundation/bloc/bloc_provider.dart';
+import 'package:ses_novajoj/scene/foundation/color_def.dart';
 import 'package:ses_novajoj/scene/foundation/use_l10n.dart';
 import 'package:ses_novajoj/scene/foundation/page/page_parameter.dart';
 import 'package:ses_novajoj/scene/bbs_select_list/bbs_select_list_presenter.dart';
@@ -14,7 +15,7 @@ class BbsSelectListPage extends StatefulWidget {
       : super(key: key);
 
   @override
-  _BbsSelectListPageState createState() => _BbsSelectListPageState();
+  State<BbsSelectListPage> createState() => _BbsSelectListPageState();
 }
 
 class _BbsSelectListPageState extends State<BbsSelectListPage> {
@@ -35,7 +36,8 @@ class _BbsSelectListPageState extends State<BbsSelectListPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(_appBarTitle),
-        backgroundColor: const Color(0xFF1B80F3),
+        backgroundColor: ColorDef.appBarBackColor2,
+        foregroundColor: ColorDef.appBarTitleColor,
         centerTitle: true,
       ),
       body: BlocProvider<BbsSelectListPresenter>(
@@ -201,13 +203,13 @@ class _BbsSelectListPageState extends State<BbsSelectListPage> {
                       ),
                     ])
                   ]),
+              iconColor: Colors.black54,
+              textColor: Colors.black45,
               children: <Widget>[
                 _buildLatestRowTile(context,
                     itemInfo: dataList[row].itemInfo.children!.first,
                     isSub: true),
               ],
-              iconColor: Colors.black54,
-              textColor: Colors.black45,
             ),
     );
   }

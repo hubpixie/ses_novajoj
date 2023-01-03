@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/domain/foundation/bloc/bloc_provider.dart';
+import 'package:ses_novajoj/scene/foundation/color_def.dart';
 import 'package:ses_novajoj/scene/foundation/use_l10n.dart';
 import 'package:ses_novajoj/scene/foundation/data/weather_util.dart';
 import 'package:ses_novajoj/scene/misc_info_list/misc_info_list_presenter.dart';
@@ -14,7 +15,7 @@ class MiscInfoListPage extends StatefulWidget {
   const MiscInfoListPage({Key? key, required this.presenter}) : super(key: key);
 
   @override
-  _MiscInfoListPageState createState() => _MiscInfoListPageState();
+  State<MiscInfoListPage> createState() => _MiscInfoListPageState();
 }
 
 class _MiscInfoListPageState extends State<MiscInfoListPage> {
@@ -30,8 +31,10 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(UseL10n.of(context)?.infoServiceTop ?? ''),
-        backgroundColor: const Color(0xFF1B80F3),
+        title: Text(UseL10n.of(context)?.infoServiceTop ?? '',
+            style: const TextStyle(color: Colors.black87)),
+        backgroundColor: ColorDef.appBarBackColor2,
+        foregroundColor: ColorDef.appBarTitleColor,
         automaticallyImplyLeading: false,
         centerTitle: true,
       ),
@@ -379,7 +382,7 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
       double minTextHeight = 21.0}) {
     final textPainter = TextPainter(textDirection: TextDirection.ltr);
     final style = TextStyle(fontSize: fontSize, fontWeight: fontWeight);
-    textPainter.text = TextSpan(text: text, style: style);
+    textPainter.text = TextSpan(text: text.runes.string, style: style);
     textPainter.layout();
     final lines = (textPainter.size.width / textWidth).ceil();
     final height = lines * textPainter.size.height;

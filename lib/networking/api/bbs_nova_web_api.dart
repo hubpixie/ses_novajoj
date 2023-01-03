@@ -193,9 +193,8 @@ class BbsNovaWebApi extends BaseNovaWebApi {
     if (aLink.innerHtml.isNotEmpty) {
       title = () {
         String retStr = '${index + 1} ';
-        retStr += '☉[' +
-            StringUtil().substring(aLink.innerHtml, start: '>[', end: ']<') +
-            ']'; //item_source type
+        retStr +=
+            '☉[${StringUtil().substring(aLink.innerHtml, start: '>[', end: ']<')}]'; //item_source type
         retStr += StringUtil()
             .substring(aLink.innerHtml, start: '', end: ' <span')
             .replaceAll(RegExp(r'^[0-9]*[0-9]{1} +'), '');

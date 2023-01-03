@@ -140,10 +140,10 @@ class NovaListCell extends StatelessWidget {
   }
 
   double _calculateAutoscaleWidth(BuildContext context, String text,
-      {required double fontSize, double deltaWith = 240}) {
+      {required double fontSize, double deltaWith = 260}) {
     final textPainter = TextPainter(textDirection: TextDirection.ltr);
     final style = TextStyle(fontSize: fontSize);
-    textPainter.text = TextSpan(text: text, style: style);
+    textPainter.text = TextSpan(text: text.runes.string, style: style);
     textPainter.layout();
     double maxWidth = (double screenWidth) {
       double deltaWidth_ = screenWidth <= 320 ? 15 : 0;

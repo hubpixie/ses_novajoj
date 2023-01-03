@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ses_novajoj/scene/foundation/color_def.dart';
 import 'package:ses_novajoj/scene/thread_list/thread_sub_page.dart';
 import 'package:ses_novajoj/scene/foundation/use_l10n.dart';
 import 'package:ses_novajoj/scene/thread_list/thread_list_presenter.dart';
@@ -8,7 +9,7 @@ class ThreadListPage extends StatefulWidget {
   const ThreadListPage({Key? key, required this.presenters}) : super(key: key);
 
   @override
-  _ThreadListPageState createState() => _ThreadListPageState();
+  State<ThreadListPage> createState() => _ThreadListPageState();
 }
 
 class _ThreadListPageState extends State<ThreadListPage> {
@@ -27,13 +28,14 @@ class _ThreadListPageState extends State<ThreadListPage> {
       length: _tabNames.length,
       child: Scaffold(
           appBar: AppBar(
-            backgroundColor: const Color(0xFF1B80F3),
+            backgroundColor: ColorDef.appBarBackColor2,
+            foregroundColor: ColorDef.appBarTitleColor,
             automaticallyImplyLeading: false,
             leading: const SizedBox(width: 0),
             centerTitle: false,
             bottom: PreferredSize(
-                child: _buildAppBarTabArea(context),
-                preferredSize: const Size.fromHeight(0.0)),
+                preferredSize: const Size.fromHeight(0.0),
+                child: _buildAppBarTabArea(context)),
             titleSpacing: 0,
             leadingWidth: 10,
           ),
@@ -75,8 +77,9 @@ class _ThreadListPageState extends State<ThreadListPage> {
 
     return TabBar(
         isScrollable: true,
-        unselectedLabelColor: Colors.white.withOpacity(0.6),
-        indicatorColor: Colors.white,
+        unselectedLabelColor: ColorDef.tabLabelColor.withOpacity(0.6),
+        indicatorColor: ColorDef.tabLabelColor.withOpacity(0.4),
+        labelColor: ColorDef.tabLabelColor,
         tabs: tabs);
   }
 

@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:firebase_analytics/observer.dart';
+// import 'package:firebase_analytics/observer.dart';
 
 /// アナリティクスイベント
 enum AnalyticsEvent {
@@ -70,7 +70,7 @@ extension AnalyticsRouteInfo on AnalyticsRoute {
 class FirebaseUtil {
   factory FirebaseUtil() {
     if (_instanceEnbled) {
-      _instance._analytics = FirebaseAnalytics();
+      _instance._analytics = FirebaseAnalytics.instance;
       _instance._observer =
           FirebaseAnalyticsObserver(analytics: _instance._analytics);
       _instanceEnbled = false;

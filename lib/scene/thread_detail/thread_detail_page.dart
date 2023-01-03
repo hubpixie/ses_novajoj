@@ -3,6 +3,7 @@ import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/foundation/log_util.dart';
 import 'package:ses_novajoj/foundation/firebase_util.dart';
 import 'package:ses_novajoj/domain/foundation/bloc/bloc_provider.dart';
+import 'package:ses_novajoj/scene/foundation/color_def.dart';
 import 'package:ses_novajoj/scene/foundation/page/screen_route_enums.dart';
 import 'package:ses_novajoj/scene/foundation/use_l10n.dart';
 import 'package:ses_novajoj/scene/foundation/page/page_parameter.dart';
@@ -17,7 +18,7 @@ class ThreadDetailPage extends StatefulWidget {
   const ThreadDetailPage({Key? key, required this.presenter}) : super(key: key);
 
   @override
-  _ThreadDetailPageState createState() => _ThreadDetailPageState();
+  State<ThreadDetailPage> createState() => _ThreadDetailPageState();
 }
 
 class _ThreadDetailPageState extends State<ThreadDetailPage> {
@@ -43,7 +44,8 @@ class _ThreadDetailPageState extends State<ThreadDetailPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(_appBarTitle),
-        backgroundColor: const Color(0xFF1B80F3),
+        backgroundColor: ColorDef.appBarBackColor2,
+        foregroundColor: ColorDef.appBarTitleColor,
         centerTitle: true,
         actions: _detailPage
             .buildAppBarActionArea(context, itemInfo: _itemInfo, menuItems: [

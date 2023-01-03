@@ -100,7 +100,8 @@ class DetailItem {
 <!-- Body Text -->
       {{body}}
 <!-- Author -->
-        <div style="text-align:right;">(&nbsp;{{author}}&nbsp;)</div>
+        <div style="text-align:right">{{author}}</div>
+        <div style="height:20px;">&nbsp;</div>
       <div>
         <div class="OUTBRAIN" data-src="DROP_PERMALINK_HERE" data-widget-id="AR_1"></div> <script type="text/javascript" async="async" src="//widgets.outbrain.com/outbrain.js"></script>
       </div>
@@ -152,7 +153,8 @@ class DetailItem {
         r'{{createAt}}',
         DateUtil()
             .getDateString(date: itemInfo.createAt, format: 'yyyy-MM-dd H:mm'));
-    html = html.replaceAll(r'{{author}}', itemInfo.author);
+    html = html.replaceAll(r'{{author}}',
+        itemInfo.author.isEmpty ? ' ' : "( ${itemInfo.author} )");
     html = html.replaceAll(r'{{body}}', bodyString);
     return html;
   }

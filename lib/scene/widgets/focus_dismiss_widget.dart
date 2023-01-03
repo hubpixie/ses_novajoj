@@ -1,14 +1,14 @@
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
-typedef _ViewEndEditingDelegate = void Function(bool);
+typedef ViewEndEditingDelegate = void Function(bool);
 
 class FocusDismiss extends StatelessWidget {
   const FocusDismiss({Key? key, required this.child, this.onEndEditing})
       : super(key: key);
 
   final Widget child;
-  final _ViewEndEditingDelegate? onEndEditing;
+  final ViewEndEditingDelegate? onEndEditing;
 
   @override
   Widget build(BuildContext context) {

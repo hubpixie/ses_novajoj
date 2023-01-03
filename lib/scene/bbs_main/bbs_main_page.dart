@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ses_novajoj/scene/foundation/color_def.dart';
 import 'package:ses_novajoj/scene/foundation/use_l10n.dart';
 import 'package:ses_novajoj/scene/bbs_guide/bbs_guide_page_builder.dart';
 import 'package:ses_novajoj/scene/bbs_guide/bbs_guide_page.dart';
@@ -11,7 +12,7 @@ class BbsMainPage extends StatefulWidget {
   const BbsMainPage({Key? key, required this.presenter}) : super(key: key);
 
   @override
-  _BbsMainPageState createState() => _BbsMainPageState();
+  State<BbsMainPage> createState() => _BbsMainPageState();
 }
 
 class _BbsMainPageState extends State<BbsMainPage> {
@@ -34,13 +35,14 @@ class _BbsMainPageState extends State<BbsMainPage> {
       length: _tabNames.length,
       child: Scaffold(
           appBar: AppBar(
-            backgroundColor: const Color(0xFF1B80F3),
+            backgroundColor: ColorDef.appBarBackColor2,
+            foregroundColor: ColorDef.appBarTitleColor,
             automaticallyImplyLeading: false,
             leading: const SizedBox(width: 0),
             centerTitle: false,
             bottom: PreferredSize(
-                child: _buildAppBarTabArea(context),
-                preferredSize: const Size.fromHeight(0.0)),
+                preferredSize: const Size.fromHeight(0.0),
+                child: _buildAppBarTabArea(context)),
             titleSpacing: 0,
             leadingWidth: 10,
           ),
@@ -83,8 +85,9 @@ class _BbsMainPageState extends State<BbsMainPage> {
     }
     return TabBar(
       isScrollable: true,
-      unselectedLabelColor: Colors.white.withOpacity(0.6),
-      indicatorColor: Colors.white,
+      unselectedLabelColor: ColorDef.tabLabelColor.withOpacity(0.6),
+      indicatorColor: ColorDef.tabLabelColor.withOpacity(0.4),
+      labelColor: ColorDef.tabLabelColor,
       tabs: tabs,
       onTap: (tabIndex) {},
     );

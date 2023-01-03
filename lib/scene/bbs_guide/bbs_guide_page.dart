@@ -28,7 +28,7 @@ class BbsGuidePage extends StatefulWidget {
       : super(key: key);
 
   @override
-  _BbsGuidePageState createState() => _BbsGuidePageState();
+  State<BbsGuidePage> createState() => _BbsGuidePageState();
 }
 
 class _BbsGuidePageState extends State<BbsGuidePage>

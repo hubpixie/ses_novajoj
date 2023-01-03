@@ -44,13 +44,14 @@ class DateUtil {
     return retStr.replaceAll(weekDayStrInfo.first, weekDayStrInfo.last);
   }
 
-  String getDateMMDDStringWithTimestamp({int? timestamp, int timezone = 0}) {
+  String getDateYYYYMMDDStringWithTimestamp(
+      {int? timestamp, int timezone = 0}) {
     if (timestamp == null) return '';
     DateTime datetime = DateTime.fromMillisecondsSinceEpoch(
         (timestamp + timezone) * 1000,
         isUtc: true);
 
-    final formatter = DateFormat('MM/dd');
+    final formatter = DateFormat('yyyy/MM/dd');
     return formatter.format(datetime); // DateからString
   }
 

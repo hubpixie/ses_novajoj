@@ -10,7 +10,7 @@ class HistorioPage extends StatefulWidget {
   const HistorioPage({Key? key, required this.presenter}) : super(key: key);
 
   @override
-  _HistorioPageState createState() => _HistorioPageState();
+  State<HistorioPage> createState() => _HistorioPageState();
 }
 
 class _HistorioPageState extends State<HistorioPage> {
@@ -33,6 +33,7 @@ class _HistorioPageState extends State<HistorioPage> {
       appBar: AppBar(
         title: Text(_appBarTitle),
         backgroundColor: ColorDef.appBarBackColor,
+        foregroundColor: ColorDef.appBarTitleColor,
         centerTitle: true,
       ),
       body: FutureBuilder<HistorioPresenterOutput>(

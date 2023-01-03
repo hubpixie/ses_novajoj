@@ -5,14 +5,14 @@ import 'package:ses_novajoj/foundation/data/date_util.dart';
 import 'package:ses_novajoj/scene/foundation/data/weather_util.dart';
 import 'package:ses_novajoj/scene/foundation/use_l10n.dart';
 
-typedef _CellEditingDelegate = void Function(dynamic temprtUnit);
-typedef _ShowForecastDelegate = void Function();
+typedef CellEditingDelegate = void Function(dynamic temprtUnit);
+typedef ShowForecastDelegate = void Function();
 
 class WeatherInfoOverlay extends StatefulWidget {
   final WeatherInfo? itemValue;
   final TemperatureUnit temprtUnit;
-  final _CellEditingDelegate? onCellEditing;
-  final _ShowForecastDelegate? onPresentWeeklyForecast;
+  final CellEditingDelegate? onCellEditing;
+  final ShowForecastDelegate? onPresentWeeklyForecast;
 
   const WeatherInfoOverlay(
       {Key? key,

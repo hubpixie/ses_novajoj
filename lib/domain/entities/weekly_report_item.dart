@@ -75,13 +75,13 @@ class WeeklyReportItem extends WeatherInfo {
 
       if (data.isNotEmpty) {
         List<String> addedKeys = [];
-        String lastDateKey = DateUtil().getDateMMDDStringWithTimestamp(
+        String lastDateKey = DateUtil().getDateYYYYMMDDStringWithTimestamp(
             timestamp: data.last.time,
             timezone: todayWeather.city?.timezone ?? 0);
 
         // decides the day keys for weekly report
         for (int i = 1; i <= 7; i++) {
-          String dateKey = DateUtil().getDateMMDDStringWithTimestamp(
+          String dateKey = DateUtil().getDateYYYYMMDDStringWithTimestamp(
               timestamp: (todayWeather.time ?? 0) + i * 24 * 3600,
               timezone: todayWeather.city?.timezone ?? 0);
           if (dateKey.compareTo(lastDateKey) > 0) break;
@@ -93,7 +93,7 @@ class WeeklyReportItem extends WeatherInfo {
         // get temperature's data during min day ~ max day
         for (int i = 0; i < addedKeys.length; i++) {
           final subData = data.where((element) {
-            String dateKey = DateUtil().getDateMMDDStringWithTimestamp(
+            String dateKey = DateUtil().getDateYYYYMMDDStringWithTimestamp(
                 timestamp: element.time,
                 timezone: todayWeather.city?.timezone ?? 0);
             return dateKey == addedKeys[i];

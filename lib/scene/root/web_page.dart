@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 //import 'package:ses_novajoj/foundation/log_util.dart';
 //import 'package:ses_novajoj/foundation/firebase_util.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
+import 'package:ses_novajoj/scene/foundation/color_def.dart';
 import 'package:ses_novajoj/scene/foundation/page/page_parameter.dart';
 //import 'package:ses_novajoj/scene/foundation/page/screen_route_enums.dart';
 import 'package:ses_novajoj/scene/root/detail_page.dart';
@@ -23,7 +24,7 @@ class WebPage extends StatefulWidget {
   const WebPage({Key? key}) : super(key: key);
 
   @override
-  _WebPageState createState() => _WebPageState();
+  State<WebPage> createState() => _WebPageState();
 }
 
 class _WebPageState extends State<WebPage> {
@@ -48,7 +49,8 @@ class _WebPageState extends State<WebPage> {
     return Scaffold(
         appBar: AppBar(
           title: Text(_appBarTitle),
-          backgroundColor: const Color(0xFF1B80F3),
+          backgroundColor: ColorDef.appBarBackColor2,
+          foregroundColor: ColorDef.appBarTitleColor,
           centerTitle: true,
           actions: _detailPage.buildAppBarActionArea(context,
               itemInfo: _itemInfo,

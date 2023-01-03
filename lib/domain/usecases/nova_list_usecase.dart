@@ -21,7 +21,7 @@ class NewsListUseCase with SimpleBloc<NovaListUseCaseOutput> {
         targetUrl: "https://www.6parknews.com/newspark/index.php?act=gold",
         docType: NovaDocType.list),
     FetchNewsListRepoInput(
-        targetUrl: "https:/www.6parknews.com/newspark/index.php?act=hotview",
+        targetUrl: "https://www.6parknews.com/newspark/index.php?act=hotview",
         docType: NovaDocType.table),
     FetchNewsListRepoInput(
         targetUrl:

@@ -30,7 +30,7 @@ class WeeklyReportPage extends StatefulWidget {
   final WeeklyReportPresenter presenter;
   const WeeklyReportPage({Key? key, required this.presenter}) : super(key: key);
   @override
-  _WeeklyReportPageState createState() => _WeeklyReportPageState();
+  State<WeeklyReportPage> createState() => _WeeklyReportPageState();
 }
 
 class _WeeklyReportPageState extends State<WeeklyReportPage> {
@@ -58,7 +58,8 @@ class _WeeklyReportPageState extends State<WeeklyReportPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(_appBarTitle),
-        backgroundColor: ColorDef.appBarBackColor,
+        backgroundColor: ColorDef.appBarBackColor2,
+        foregroundColor: ColorDef.appBarTitleColor,
         centerTitle: true,
         actions: _detailPage.buildAppBarActionArea(context,
             itemInfo: _itemInfo,

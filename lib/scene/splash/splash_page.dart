@@ -7,7 +7,7 @@ class SplashPage extends StatefulWidget {
   const SplashPage({Key? key, required this.presenter}) : super(key: key);
 
   @override
-  _SplashPageState createState() => _SplashPageState();
+  State<SplashPage> createState() => _SplashPageState();
 }
 
 class _SplashPageState extends State<SplashPage> {
@@ -26,18 +26,18 @@ class _SplashPageState extends State<SplashPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFABC5FD),
+      backgroundColor: Colors.white,
       body: Stack(
         alignment: Alignment.center,
         children: <Widget>[
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: ClipRRect(
+              borderRadius: BorderRadius.circular(8.0),
               child: Image.asset(
                 'assets/images/ses_splash.png',
                 fit: BoxFit.fill,
               ),
-              borderRadius: BorderRadius.circular(8.0),
             ),
           ),
           Align(

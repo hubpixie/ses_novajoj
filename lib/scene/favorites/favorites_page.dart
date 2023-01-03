@@ -10,7 +10,7 @@ class FavoritesPage extends StatefulWidget {
   const FavoritesPage({Key? key, required this.presenter}) : super(key: key);
 
   @override
-  _FavoritesPageState createState() => _FavoritesPageState();
+  State<FavoritesPage> createState() => _FavoritesPageState();
 }
 
 class _FavoritesPageState extends State<FavoritesPage> {
@@ -32,6 +32,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
       appBar: AppBar(
         title: Text(_appBarTitle),
         backgroundColor: ColorDef.appBarBackColor,
+        foregroundColor: ColorDef.appBarTitleColor,
         centerTitle: true,
       ),
       body: FutureBuilder<FavoritesPresenterOutput>(

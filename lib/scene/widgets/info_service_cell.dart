@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 
-typedef _RowSelectingDelegate = void Function(int);
-typedef _RowStartSelectingDelegate = void Function(int, TapDownDetails);
-typedef _OtherRowSelectingDelegate = void Function(int);
-typedef _OtherRowLongPressDelegate = void Function(int);
+typedef RowSelectingDelegate = void Function(int);
+typedef RowStartSelectingDelegate = void Function(int, TapDownDetails);
+typedef OtherRowSelectingDelegate = void Function(int);
+typedef OtherRowLongPressDelegate = void Function(int);
 
 class InfoServiceCell extends StatelessWidget {
   final String sectionTitle;
   final List<Widget> rowTitles;
   final Widget? otherTitle;
   final double Function(int index)? calcRowHeight;
-  final _RowSelectingDelegate? onRowSelecting;
-  final _RowStartSelectingDelegate? onRowStartSelecting;
-  final _OtherRowLongPressDelegate? onRowLongPress;
-  final _OtherRowSelectingDelegate? onOtherRowSelecting;
+  final RowSelectingDelegate? onRowSelecting;
+  final RowStartSelectingDelegate? onRowStartSelecting;
+  final OtherRowLongPressDelegate? onRowLongPress;
+  final OtherRowSelectingDelegate? onOtherRowSelecting;
 
   const InfoServiceCell(
       {Key? key,

@@ -18,7 +18,7 @@ class BbsMenuPage extends StatefulWidget {
       : super(key: key);
 
   @override
-  _BbsMenuPageState createState() => _BbsMenuPageState();
+  State<BbsMenuPage> createState() => _BbsMenuPageState();
 }
 
 class _BbsMenuPageState extends State<BbsMenuPage>
