@@ -31,7 +31,8 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(UseL10n.of(context)?.infoServiceTop ?? ''),
+        title: Text(UseL10n.of(context)?.infoServiceTop ?? '',
+            style: const TextStyle(color: Colors.black87)),
         backgroundColor: ColorDef.appBarBackColor2,
         foregroundColor: ColorDef.appBarTitleColor,
         automaticallyImplyLeading: false,
@@ -381,7 +382,7 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
       double minTextHeight = 21.0}) {
     final textPainter = TextPainter(textDirection: TextDirection.ltr);
     final style = TextStyle(fontSize: fontSize, fontWeight: fontWeight);
-    textPainter.text = TextSpan(text: text, style: style);
+    textPainter.text = TextSpan(text: text.runes.string, style: style);
     textPainter.layout();
     final lines = (textPainter.size.width / textWidth).ceil();
     final height = lines * textPainter.size.height;

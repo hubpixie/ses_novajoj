@@ -121,8 +121,9 @@ extension NovaWebApiDetail on NovaWebApi {
 
         for (Element tr in tablelElement?.children ?? []) {
           for (Element td in tr.children) {
-            final alink =
-                td.children.firstWhere((element) => element.localName == 'a');
+            final alink = td.children.firstWhere(
+                (element) => element.localName == 'a',
+                orElse: () => Element.tag('a'));
             if (alink.attributes['name'] == 'postfp') {
               retStr = StringUtil()
                   .substring(td.innerHtml, start: '：', end: alink.outerHtml);

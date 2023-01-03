@@ -20,13 +20,17 @@ class LocalListPage extends StatefulWidget {
 enum _MenuItemValueKey { key, text }
 
 class _LocalListPageState extends State<LocalListPage> {
-  late String? _appBarTitle = UseL10n.of(context)?.localListAppBarTitle;
-  late String? _selectedMenuItemText = UseL10n.of(context)?.localListMenuAll;
+  late String? _appBarTitle;
+  late String? _selectedMenuItemText;
   int _selectedMenuItemIndex = 0;
 
   @override
   void initState() {
     super.initState();
+    Future.delayed(const Duration(milliseconds: 500), () {
+      _appBarTitle = UseL10n.of(context)?.localListAppBarTitle;
+      _selectedMenuItemText = UseL10n.of(context)?.localListMenuAll;
+    });
     FirebaseUtil().sendViewEvent(route: AnalyticsRoute.localList);
     _loadData();
   }
@@ -160,11 +164,10 @@ class _LocalListPageState extends State<LocalListPage> {
       },
     ];
     return PopupMenuButton(
-      offset: const Offset(-1.0, -240.0),
+      offset: const Offset(-1.0, -10.0),
       elevation: 0,
       color: Colors.transparent,
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(10))),
+      position: PopupMenuPosition.under,
       itemBuilder: (context) {
         return <PopupMenuEntry<Widget>>[
           PopupMenuItem<Widget>(
@@ -172,6 +175,8 @@ class _LocalListPageState extends State<LocalListPage> {
               decoration: ShapeDecoration(
                   color: Colors.white,
                   shape: RoundedRectangleBorder(
+                      side: BorderSide(
+                          width: 0.5, color: Colors.black.withAlpha(100)),
                       borderRadius: BorderRadius.circular(5))),
               height: 250,
               width: 100,

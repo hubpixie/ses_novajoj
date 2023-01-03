@@ -28,105 +28,112 @@ class DetailPage {
       PopupMenuButton(
           // add icon, by default "3 dot" icon
           // icon: Icon(Icons.book)
+          position: PopupMenuPosition.under,
           itemBuilder: (context) {
-        List<PopupMenuItem<DetailMenuItem>> retMenus = [];
-        for (var element in menuItems_) {
-          int idx = menuItems_.indexOf(element);
-          final action = (menuActions != null) ? menuActions[idx] : null;
+            List<PopupMenuItem<DetailMenuItem>> retMenus = [];
+            for (var element in menuItems_) {
+              int idx = menuItems_.indexOf(element);
+              final action = (menuActions != null) ? menuActions[idx] : null;
 
-          if (element == DetailMenuItem.openOriginal) {
-            retMenus.add(
-              PopupMenuItem<DetailMenuItem>(
-                value: DetailMenuItem.openOriginal,
-                child: Text(
-                    UseL10n.of(context)?.detailPageMenuOpenOriginalPage ?? ''),
-              ),
-            );
-          } else if (element == DetailMenuItem.favorite && action != null) {
-            retMenus.add(
-              PopupMenuItem<DetailMenuItem>(
-                value: DetailMenuItem.favorite,
-                child: !(itemInfo?.isFavorite ?? false)
-                    ? Text(UseL10n.of(context)?.detailPageMenuAddBookmark ?? '')
-                    : Text(UseL10n.of(context)?.detailPageMenuRemoveBookmark ??
+              if (element == DetailMenuItem.openOriginal) {
+                retMenus.add(
+                  PopupMenuItem<DetailMenuItem>(
+                    value: DetailMenuItem.openOriginal,
+                    child: Text(
+                        UseL10n.of(context)?.detailPageMenuOpenOriginalPage ??
+                            ''),
+                  ),
+                );
+              } else if (element == DetailMenuItem.favorite && action != null) {
+                retMenus.add(
+                  PopupMenuItem<DetailMenuItem>(
+                    value: DetailMenuItem.favorite,
+                    child: !(itemInfo?.isFavorite ?? false)
+                        ? Text(UseL10n.of(context)?.detailPageMenuAddBookmark ??
+                            '')
+                        : Text(
+                            UseL10n.of(context)?.detailPageMenuRemoveBookmark ??
+                                ''),
+                  ),
+                );
+              } else if (element == DetailMenuItem.readComments &&
+                  action != null) {
+                retMenus.add(
+                  PopupMenuItem<DetailMenuItem>(
+                    value: DetailMenuItem.readComments,
+                    child: Text(
+                        UseL10n.of(context)?.detailPageMenuReadComments ?? ''),
+                  ),
+                );
+              } else if (element == DetailMenuItem.changeSettings &&
+                  action != null) {
+                retMenus.add(
+                  PopupMenuItem<DetailMenuItem>(
+                    value: DetailMenuItem.changeSettings,
+                    child: Text(UseL10n.of(context)
+                            ?.detailPageMenuChangeMiscInfoSettings ??
                         ''),
-              ),
-            );
-          } else if (element == DetailMenuItem.readComments && action != null) {
-            retMenus.add(
-              PopupMenuItem<DetailMenuItem>(
-                value: DetailMenuItem.readComments,
-                child:
-                    Text(UseL10n.of(context)?.detailPageMenuReadComments ?? ''),
-              ),
-            );
-          } else if (element == DetailMenuItem.changeSettings &&
-              action != null) {
-            retMenus.add(
-              PopupMenuItem<DetailMenuItem>(
-                value: DetailMenuItem.changeSettings,
-                child: Text(
-                    UseL10n.of(context)?.detailPageMenuChangeMiscInfoSettings ??
+                  ),
+                );
+              } else if (element == DetailMenuItem.removeSettings &&
+                  action != null) {
+                retMenus.add(
+                  PopupMenuItem<DetailMenuItem>(
+                    value: DetailMenuItem.removeSettings,
+                    child: Text(UseL10n.of(context)
+                            ?.detailPageMenuRemoveMiscInfoSettings ??
                         ''),
-              ),
-            );
-          } else if (element == DetailMenuItem.removeSettings &&
-              action != null) {
-            retMenus.add(
-              PopupMenuItem<DetailMenuItem>(
-                value: DetailMenuItem.removeSettings,
-                child: Text(
-                    UseL10n.of(context)?.detailPageMenuRemoveMiscInfoSettings ??
-                        ''),
-              ),
-            );
-          }
-        }
-        return retMenus;
-      }, onSelected: (DetailMenuItem value) {
-        int idx = menuItems_.indexOf(value);
-        final action = (menuActions != null) ? menuActions[idx] : null;
-        if (value == DetailMenuItem.openOriginal) {
-          if (action != null) {
-            action.call();
-            return;
-          }
-          ExtWebView.openBrowser(context, url: itemInfo?.urlString);
-          return;
-        } else if (value == DetailMenuItem.favorite) {
-          if (action != null) {
-            action.call();
-            return;
-          }
-          return;
-        } else if (value == DetailMenuItem.changeSettings) {
-          if (action is Function({dynamic afterAction})) {
-            action.call(afterAction: afterAction);
-          } else {
-            action?.call();
-          }
-          return;
-        } else if (value == DetailMenuItem.removeSettings) {
-          ConfirmDialog().show(context,
-              message: UseL10n.of(context)?.msgConfirmToDeleteSettings ?? '',
-              buttonTitles: [
-                UseL10n.of(context)?.cancelButtonTitle ?? '',
-                UseL10n.of(context)?.deleteButtonTitle ?? ''
-              ],
-              actions: [
-                () {
-                  Navigator.of(context).pop();
-                },
-                () {
-                  Navigator.of(context).pop();
-                  action?.call();
-                }
-              ]);
-          return;
-        } else if (value == DetailMenuItem.readComments) {
-          return;
-        }
-      }),
+                  ),
+                );
+              }
+            }
+            return retMenus;
+          },
+          onSelected: (DetailMenuItem value) {
+            int idx = menuItems_.indexOf(value);
+            final action = (menuActions != null) ? menuActions[idx] : null;
+            if (value == DetailMenuItem.openOriginal) {
+              if (action != null) {
+                action.call();
+                return;
+              }
+              ExtWebView.openBrowser(context, url: itemInfo?.urlString);
+              return;
+            } else if (value == DetailMenuItem.favorite) {
+              if (action != null) {
+                action.call();
+                return;
+              }
+              return;
+            } else if (value == DetailMenuItem.changeSettings) {
+              if (action is Function({dynamic afterAction})) {
+                action.call(afterAction: afterAction);
+              } else {
+                action?.call();
+              }
+              return;
+            } else if (value == DetailMenuItem.removeSettings) {
+              ConfirmDialog().show(context,
+                  message:
+                      UseL10n.of(context)?.msgConfirmToDeleteSettings ?? '',
+                  buttonTitles: [
+                    UseL10n.of(context)?.cancelButtonTitle ?? '',
+                    UseL10n.of(context)?.deleteButtonTitle ?? ''
+                  ],
+                  actions: [
+                    () {
+                      Navigator.of(context).pop();
+                    },
+                    () {
+                      Navigator.of(context).pop();
+                      action?.call();
+                    }
+                  ]);
+              return;
+            } else if (value == DetailMenuItem.readComments) {
+              return;
+            }
+          }),
     ];
   }
 }
