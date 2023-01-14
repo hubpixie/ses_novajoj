@@ -17,9 +17,11 @@ class ThreadNovaListRepositoryImpl extends ThreadNovaListRepository {
   @override
   Future<Result<List<ThreadNovaListItem>>> fetchThreadNovaList(
       {required FetchThreadNovaListRepoInput input}) async {
+    String targetUrl =
+        input.targetUrl.replaceAll('{{page}}', '${input.pageIndex}');
     Result<List<ThreadNovaListItemRes>> result = await _api.fetchNovaList(
-        parameter: NovaItemParameter(
-            targetUrl: input.targetUrl, docType: input.docType));
+        parameter:
+            NovaItemParameter(targetUrl: targetUrl, docType: input.docType));
 
     late Result<List<ThreadNovaListItem>> ret;
     List<ThreadNovaListItem> novaItems = <ThreadNovaListItem>[];
@@ -28,6 +30,9 @@ class ThreadNovaListRepositoryImpl extends ThreadNovaListRepository {
         ThreadNovaListItem retItem = ThreadNovaListItem(
           itemInfo: item.itemInfo,
         );
+        retItem.itemInfo.pageCount =
+            targetUrl == input.targetUrl ? 1 : 10; //default
+        retItem.itemInfo.pageNumber = input.pageIndex;
         novaItems.add(retItem);
       }
       ret = Result.success(data: novaItems);
