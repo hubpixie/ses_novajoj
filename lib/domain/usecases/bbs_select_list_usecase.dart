@@ -8,7 +8,9 @@ import 'bbs_select_list_usecase_output.dart';
 
 class BbsSelectListUseCaseInput {
   String targetUrl;
-  BbsSelectListUseCaseInput({required this.targetUrl});
+  int targetPageIndex;
+  BbsSelectListUseCaseInput(
+      {required this.targetUrl, this.targetPageIndex = 1});
 }
 
 abstract class BbsSelectListUseCase
@@ -24,7 +26,9 @@ class BbsSelectListUseCaseImpl extends BbsSelectListUseCase {
   void fetchBbsSelectList({required BbsSelectListUseCaseInput input}) async {
     final result = await repository.fetchBbsNovaSelectList(
         input: FetchBbsNovaSelectListRepoInput(
-            targetUrl: input.targetUrl, docType: NovaDocType.bbsSelect));
+            targetUrl: input.targetUrl,
+            pageIndex: input.targetPageIndex,
+            docType: NovaDocType.bbsSelect));
 
     result.when(success: (value) {
       List<BbsNovaSelectListItem> list = value;

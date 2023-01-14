@@ -1,5 +1,4 @@
 import 'package:ses_novajoj/foundation/data/result.dart';
-import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/networking/api/nova_web_api.dart';
 import 'package:ses_novajoj/networking/request/nova_item_parameter.dart';
 import 'package:ses_novajoj/domain/entities/nova_list_item.dart';

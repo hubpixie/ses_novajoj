@@ -23,6 +23,8 @@ class _BbsSelectListPageState extends State<BbsSelectListPage> {
   late Map? _parameters;
   late String _appBarTitle;
   late String? _targetUrl;
+  final ScrollController _scrollController = ScrollController();
+  int _currentPageIndex = 1;
 
   @override
   void initState() {
@@ -55,6 +57,7 @@ class _BbsSelectListPageState extends State<BbsSelectListPage> {
               if (data is ShowBbsSelectListPageModel) {
                 if (data.error == null) {
                   return CustomScrollView(
+                    controller: _scrollController,
                     slivers: _buildForYouList(context,
                             dataList: data.viewModelList!) +
                         _buildLatestList(context,
@@ -113,6 +116,9 @@ class _BbsSelectListPageState extends State<BbsSelectListPage> {
     if (latestList.isEmpty) {
       return [];
     }
+    final itemCnt = latestList.length;
+    final lastViewModel = latestList[itemCnt - 1];
+
     return [
       SliverList(
           delegate: SliverChildBuilderDelegate((context, index) {
@@ -134,9 +140,15 @@ class _BbsSelectListPageState extends State<BbsSelectListPage> {
             _buildLatestCard(context, dataList: latestList, row: index),
           ]);
         } else {
+          if (lastViewModel.itemInfo.pageCount! > 1 && index == itemCnt) {
+            return _buildPagingArea(context, itemInfo: lastViewModel.itemInfo);
+          }
           return _buildLatestCard(context, dataList: latestList, row: index);
         }
-      }, childCount: latestList.length))
+      },
+              childCount: lastViewModel.itemInfo.pageCount! > 1
+                  ? itemCnt + 1
+                  : itemCnt))
     ];
   }
 
@@ -249,6 +261,70 @@ class _BbsSelectListPageState extends State<BbsSelectListPage> {
         });
   }
 
+  Widget _buildPagingArea(BuildContext context,
+      {required NovaItemInfo itemInfo}) {
+    Widget _makeIconButton(IconData? iconData,
+        {required int targetPageIndex, required int pageCnt}) {
+      return SizedBox(
+          height: 35,
+          width: 35,
+          child: IconButton(
+              iconSize: 35,
+              padding: const EdgeInsets.only(left: 5),
+              onPressed: (targetPageIndex < 1 || targetPageIndex > pageCnt)
+                  ? null
+                  : () {
+                      _currentPageIndex = targetPageIndex;
+                      _loadData(isReloaded: true);
+                    },
+              icon: Icon(iconData)));
+    }
+
+    final pageNum = itemInfo.pageNumber ?? 0;
+    final pageCnt = itemInfo.pageCount ?? 0;
+
+    return Card(
+        color: Colors.grey[100],
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Spacer(flex: 10),
+            _makeIconButton(Icons.first_page,
+                targetPageIndex: (pageNum > 1 && pageNum <= pageCnt) ? 1 : -1,
+                pageCnt: pageCnt),
+            const Spacer(),
+            _makeIconButton(Icons.chevron_left,
+                targetPageIndex: pageNum - 1, pageCnt: pageCnt),
+            const Spacer(flex: 2),
+            Text('$pageNum/$pageCnt'),
+            const Spacer(flex: 1),
+            _makeIconButton(Icons.chevron_right,
+                targetPageIndex: pageNum + 1, pageCnt: pageCnt),
+            const Spacer(),
+            _makeIconButton(Icons.last_page,
+                targetPageIndex:
+                    (pageNum >= 1 && pageNum < pageCnt) ? pageCnt : -1,
+                pageCnt: pageCnt),
+            const Spacer(flex: 5),
+            SizedBox(
+                height: 25,
+                width: 25,
+                child: IconButton(
+                    iconSize: 25,
+                    padding: const EdgeInsets.only(left: 5),
+                    onPressed: () {
+                      _scrollController.animateTo(
+                        _scrollController.position.minScrollExtent,
+                        curve: Curves.easeOut,
+                        duration: const Duration(milliseconds: 500),
+                      );
+                    },
+                    icon: const Icon(Icons.arrow_circle_up))),
+            const Spacer(flex: 5)
+          ],
+        ));
+  }
+
   void _parseRouteParameter() {
     if (_pageLoadIsFirst) {
       _pageLoadIsFirst = false;
@@ -271,10 +347,21 @@ class _BbsSelectListPageState extends State<BbsSelectListPage> {
     }
   }
 
-  void _loadData() {
+  void _loadData({bool isReloaded = false}) {
     if (_targetUrl != null) {
       widget.presenter.eventViewReady(
-          input: BbsSelectListPresenterInput(targetUrl: _targetUrl ?? ''));
+          input: BbsSelectListPresenterInput(
+              targetUrl: _targetUrl ?? '', targetPageIndex: _currentPageIndex));
+      if (isReloaded) {
+        Future.delayed(Duration.zero, () {
+          _scrollController.animateTo(
+              _scrollController.position.maxScrollExtent,
+              curve: Curves.easeOut,
+              duration: const Duration(milliseconds: 1000));
+
+          setState(() {});
+        });
+      }
     } else {
       log.warning('bbs_select_list_page: parameter is error!');
     }
