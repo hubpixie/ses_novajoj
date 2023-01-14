@@ -32,7 +32,7 @@ class _HistorioPageState extends State<HistorioPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(_appBarTitle),
-        backgroundColor: ColorDef.appBarBackColor,
+        backgroundColor: ColorDef.appBarBackColor2,
         foregroundColor: ColorDef.appBarTitleColor,
         centerTitle: true,
       ),

@@ -20,8 +20,8 @@ class LocalListPage extends StatefulWidget {
 enum _MenuItemValueKey { key, text }
 
 class _LocalListPageState extends State<LocalListPage> {
-  late String? _appBarTitle;
-  late String? _selectedMenuItemText;
+  String? _appBarTitle;
+  String? _selectedMenuItemText;
   int _selectedMenuItemIndex = 0;
 
   @override

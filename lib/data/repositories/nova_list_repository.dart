@@ -1,4 +1,5 @@
 import 'package:ses_novajoj/foundation/data/result.dart';
+import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/networking/api/nova_web_api.dart';
 import 'package:ses_novajoj/networking/request/nova_item_parameter.dart';
 import 'package:ses_novajoj/domain/entities/nova_list_item.dart';
@@ -17,11 +18,11 @@ class NovaListRepositoryImpl extends NovaListRepository {
   @override
   Future<Result<List<NovaListItem>>> fetchNewsList(
       {required FetchNewsListRepoInput input}) async {
-    // Future.delayed(
-    //     Duration(milliseconds: NumberUtil().randomInt(min: 2500, max: 3500)));
+    String targetUrl =
+        input.targetUrl.replaceAll('{{page}}', '${input.pageIndex}');
     Result<List<NovaListItemRes>> result = await _api.fetchNovaList(
-        parameter: NovaItemParameter(
-            targetUrl: input.targetUrl, docType: input.docType));
+        parameter:
+            NovaItemParameter(targetUrl: targetUrl, docType: input.docType));
 
     late Result<List<NovaListItem>> ret;
     List<NovaListItem> novaItems = <NovaListItem>[];
@@ -30,6 +31,9 @@ class NovaListRepositoryImpl extends NovaListRepository {
         NovaListItem retItem = NovaListItem(
           itemInfo: item.itemInfo,
         );
+        retItem.itemInfo.pageCount =
+            targetUrl == input.targetUrl ? 1 : 50; //default
+        retItem.itemInfo.pageNumber = input.pageIndex;
         novaItems.add(retItem);
       }
       ret = Result.success(data: novaItems);

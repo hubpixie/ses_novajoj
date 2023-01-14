@@ -6,9 +6,12 @@ import 'package:ses_novajoj/scene/foundation/page/page_parameter.dart';
 
 class DetailPage {
   Widget buildContentArea(BuildContext context,
-      {dynamic detailItem, bool imageZommingEnabled = true}) {
+      {dynamic detailItem,
+      bool isWebDetail = false,
+      bool imageZommingEnabled = true}) {
     return ExtWebView(
       detailItem: detailItem,
+      isWebDetail: isWebDetail,
       imageZoomingEnabled: imageZommingEnabled,
     );
   }

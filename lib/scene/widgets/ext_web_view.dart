@@ -12,10 +12,14 @@ import 'package:ses_novajoj/foundation/log_util.dart';
 
 class ExtWebView extends StatefulWidget {
   final dynamic detailItem;
+  final bool isWebDetail;
   final bool imageZoomingEnabled;
 
   const ExtWebView(
-      {Key? key, required this.detailItem, this.imageZoomingEnabled = true})
+      {Key? key,
+      required this.detailItem,
+      this.isWebDetail = false,
+      this.imageZoomingEnabled = true})
       : super(key: key);
 
   static openBrowser(BuildContext context, {String? url}) {
@@ -72,125 +76,120 @@ class _ExtWebViewState extends State<ExtWebView> {
   @override
   Widget build(BuildContext context) {
     String htmlText = widget.detailItem?.htmlText ?? '';
-    return /*Flexible(
-        child: Wrap(children: <Widget>[*/
-        Expanded(
-            child: Container(
-                alignment: Alignment.topLeft,
-                height: MediaQuery.of(context).size.height - 100,
-                width: MediaQuery.of(context).size.width,
-                child: Stack(
-                  children: [
-                    InAppWebView(
-                      key: _webViewKey,
-                      //initialUrlRequest: URLRequest(url: Uri.parse('about:blank')),
-                      initialData: htmlText.isNotEmpty
-                          ? InAppWebViewInitialData(
-                              data: htmlText,
-                            )
-                          : null,
-                      initialOptions: _webViewGroupOptions,
-                      onWebViewCreated: (controller) {
-                        if (htmlText.isEmpty) {
-                          controller.loadUrl(
-                              urlRequest: URLRequest(
-                                  url: Uri.parse(
-                                      widget.detailItem?.itemInfo?.urlString ??
-                                          '')));
-                        }
-                      },
-                      onLoadStart: (controller, url) {
-                        // setState(() {
-                        //   this.url = url.toString();
-                        //   urlController.text = this.url;
-                        // });
-                      },
-                      androidOnPermissionRequest:
-                          (controller, origin, resources) async {
-                        return PermissionRequestResponse(
-                            resources: resources,
-                            action: PermissionRequestResponseAction.GRANT);
-                      },
-                      shouldOverrideUrlLoading:
-                          (controller, navigationAction) async {
-                        var uri = navigationAction.request.url!;
-                        if (![
-                          "http",
-                          "https",
-                          "file",
-                          "chrome",
-                          "data",
-                          "javascript",
-                          "about"
-                        ].contains(uri.scheme)) {
-                          return NavigationActionPolicy.CANCEL;
-                        }
-                        return NavigationActionPolicy.ALLOW;
-                      },
-                      onLoadStop: (controller, url) async {
-                        if (widget.imageZoomingEnabled) {
-                          if (!Platform.isAndroid ||
-                              await AndroidWebViewFeature.isFeatureSupported(
-                                  AndroidWebViewFeature
-                                      .CREATE_WEB_MESSAGE_CHANNEL)) {
-                            // wait until the page is loaded, and then create the Web Message Channel
-                            var webMessageChannel =
-                                await controller.createWebMessageChannel();
-                            var port1 = webMessageChannel!.port1;
-                            var port2 = webMessageChannel.port2;
+    Widget bodyWidget = Container(
+        alignment: Alignment.topLeft,
+        height: MediaQuery.of(context).size.height - 100,
+        width: MediaQuery.of(context).size.width,
+        child: Stack(
+          children: [
+            InAppWebView(
+              key: _webViewKey,
+              //initialUrlRequest: URLRequest(url: Uri.parse('about:blank')),
+              initialData: htmlText.isNotEmpty
+                  ? InAppWebViewInitialData(
+                      data: htmlText,
+                    )
+                  : null,
+              initialOptions: _webViewGroupOptions,
+              onWebViewCreated: (controller) {
+                if (htmlText.isEmpty) {
+                  controller.loadUrl(
+                      urlRequest: URLRequest(
+                          url: Uri.parse(
+                              widget.detailItem?.itemInfo?.urlString ?? '')));
+                }
+              },
+              onLoadStart: (controller, url) {
+                // setState(() {
+                //   this.url = url.toString();
+                //   urlController.text = this.url;
+                // });
+              },
+              androidOnPermissionRequest:
+                  (controller, origin, resources) async {
+                return PermissionRequestResponse(
+                    resources: resources,
+                    action: PermissionRequestResponseAction.GRANT);
+              },
+              shouldOverrideUrlLoading: (controller, navigationAction) async {
+                var uri = navigationAction.request.url!;
+                if (![
+                  "http",
+                  "https",
+                  "file",
+                  "chrome",
+                  "data",
+                  "javascript",
+                  "about"
+                ].contains(uri.scheme)) {
+                  return NavigationActionPolicy.CANCEL;
+                }
+                return NavigationActionPolicy.ALLOW;
+              },
+              onLoadStop: (controller, url) async {
+                if (widget.imageZoomingEnabled) {
+                  if (!Platform.isAndroid ||
+                      await AndroidWebViewFeature.isFeatureSupported(
+                          AndroidWebViewFeature.CREATE_WEB_MESSAGE_CHANNEL)) {
+                    // wait until the page is loaded, and then create the Web Message Channel
+                    var webMessageChannel =
+                        await controller.createWebMessageChannel();
+                    var port1 = webMessageChannel!.port1;
+                    var port2 = webMessageChannel.port2;
 
-                            // set the web message callback for the port1
-                            await port1.setWebMessageCallback((message) async {
-                              Map<String, dynamic> jsonData =
-                                  json.decode(message?.trim() ?? '');
-                              String node = jsonData['node'] as String? ?? '';
-                              String ingSrc = jsonData['src'] as String? ?? '';
-                              if (node == "IMG") {
-                                log.info('double tap in dart!');
-                                _displayImageDialog(context, src: ingSrc);
-                              }
-                            });
+                    // set the web message callback for the port1
+                    await port1.setWebMessageCallback((message) async {
+                      Map<String, dynamic> jsonData =
+                          json.decode(message?.trim() ?? '');
+                      String node = jsonData['node'] as String? ?? '';
+                      String ingSrc = jsonData['src'] as String? ?? '';
+                      if (node == "IMG") {
+                        log.info('double tap in dart!');
+                        _displayImageDialog(context, src: ingSrc);
+                      }
+                    });
 
-                            // transfer port2 to the webpage to initialize the communication
-                            await controller.postWebMessage(
-                                message: WebMessage(
-                                    data: "capturePort", ports: [port2]),
-                                targetOrigin: Uri.parse("*"));
-                          }
-                        }
-                      },
-                      onLoadError: (controller, url, code, message) {
-                        //pullToRefreshController.endRefreshing();
-                      },
-                      onProgressChanged: (controller, progress) {
-                        if (progress == 100) {
-                          //pullToRefreshController.endRefreshing();
-                        }
-                        _progressController.add(progress / 100);
-                      },
-                      onUpdateVisitedHistory:
-                          (controller, url, androidIsReload) {
-                        // setState(() {
-                        // });
-                      },
-                      onConsoleMessage: (controller, consoleMessage) {
-                        //log.info(consoleMessage);
-                      },
-                    ),
-                    StreamBuilder(
-                        stream: _progressController.stream,
-                        builder: (context, snapshot) {
-                          double progess = snapshot.data is double
-                              ? (snapshot.data as double? ?? 0)
-                              : 0;
-                          return progess < 1.0
-                              ? LinearProgressIndicator(
-                                  value: progess,
-                                  backgroundColor: Colors.lightBlue)
-                              : Container();
-                        })
-                  ],
-                )) /*])*/);
+                    // transfer port2 to the webpage to initialize the communication
+                    await controller.postWebMessage(
+                        message:
+                            WebMessage(data: "capturePort", ports: [port2]),
+                        targetOrigin: Uri.parse("*"));
+                  }
+                }
+              },
+              onLoadError: (controller, url, code, message) {
+                //pullToRefreshController.endRefreshing();
+              },
+              onProgressChanged: (controller, progress) {
+                if (progress == 100) {
+                  //pullToRefreshController.endRefreshing();
+                }
+                _progressController.add(progress / 100);
+              },
+              onUpdateVisitedHistory: (controller, url, androidIsReload) {
+                // setState(() {
+                // });
+              },
+              onConsoleMessage: (controller, consoleMessage) {
+                //log.info(consoleMessage);
+              },
+            ),
+            StreamBuilder(
+                stream: _progressController.stream,
+                builder: (context, snapshot) {
+                  double progess = snapshot.data is double
+                      ? (snapshot.data as double? ?? 0)
+                      : 0;
+                  return progess < 1.0
+                      ? LinearProgressIndicator(
+                          value: progess, backgroundColor: Colors.lightBlue)
+                      : Container();
+                })
+          ],
+        ));
+    return widget.isWebDetail
+        ? Wrap(children: [bodyWidget])
+        : Expanded(child: bodyWidget);
   }
 
   Future<void> _saveNetworkImage({String? src}) async {

@@ -31,7 +31,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(_appBarTitle),
-        backgroundColor: ColorDef.appBarBackColor,
+        backgroundColor: ColorDef.appBarBackColor2,
         foregroundColor: ColorDef.appBarTitleColor,
         centerTitle: true,
       ),

@@ -30,6 +30,9 @@ class TopSubPage extends StatefulWidget {
 
 class _TopSubPageState extends State<TopSubPage>
     with AutomaticKeepAliveClientMixin<TopSubPage> {
+  final ScrollController _scrollController = ScrollController();
+  int _currentPageIndex = 1;
+
   @override
   bool get wantKeepAlive => true;
 
@@ -59,10 +62,35 @@ class _TopSubPageState extends State<TopSubPage>
             }
             final data = snapshot.data;
             if (data is ShowListPageModel) {
-              if (data.error == null) {
+              int itemCnt = data.viewModelList?.length ?? 0;
+              if (data.error == null && itemCnt > 0) {
+                final lastViewModel = data.viewModelList![itemCnt - 1];
                 return ListView.builder(
-                    itemCount: data.viewModelList?.length,
-                    itemBuilder: (context, index) => NovaListCell(
+                    controller: _scrollController,
+                    itemCount: lastViewModel.itemInfo.pageCount! > 1
+                        ? itemCnt + 1
+                        : itemCnt,
+                    itemBuilder: (context, index) {
+                      if (lastViewModel.itemInfo.pageCount! > 1 &&
+                          index == itemCnt) {
+                        return NovaListCell(
+                          viewModel: lastViewModel,
+                          index: index,
+                          onPageChanged: (pageIndex) {
+                            _currentPageIndex = pageIndex;
+                            _loadData();
+                          },
+                          pageEnd: true,
+                          onScrollToTop: () {
+                            _scrollController.animateTo(
+                              _scrollController.position.minScrollExtent,
+                              curve: Curves.easeOut,
+                              duration: const Duration(milliseconds: 500),
+                            );
+                          },
+                        );
+                      }
+                      return NovaListCell(
                         viewModel: data.viewModelList![index],
                         onCellSelecting: (selIndex) {
                           widget.presenter.eventSelectDetail(context,
@@ -86,7 +114,9 @@ class _TopSubPageState extends State<TopSubPage>
                               .thunnailUrlString = retUrl;
                           return retUrl;
                         },
-                        index: index));
+                        index: index,
+                      );
+                    });
               } else {
                 return ErrorView(
                   message: UseL10n.localizedTextWithError(context,
@@ -110,6 +140,7 @@ class _TopSubPageState extends State<TopSubPage>
     // fetch data
     widget.presenter.eventViewReady(
         targetUrlIndex: widget.tabIndex,
+        pageIndex: _currentPageIndex,
         prefixTitle: widget.prefixTitle,
         isReloaded: isReloaded);
 

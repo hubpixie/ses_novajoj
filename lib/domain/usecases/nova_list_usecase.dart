@@ -12,13 +12,14 @@ class NewsListUseCase with SimpleBloc<NovaListUseCaseOutput> {
 
   static final List<FetchNewsListRepoInput> _inputUrlData = [
     FetchNewsListRepoInput(
-        targetUrl: "https://www.6parknews.com/newspark/index.php",
+        targetUrl: "https://www.6parknews.com/newspark/index.php?p={{page}}",
         docType: NovaDocType.list),
     FetchNewsListRepoInput(
         targetUrl: "https://www.6parknews.com/newspark/index.php?act=longview",
         docType: NovaDocType.list),
     FetchNewsListRepoInput(
-        targetUrl: "https://www.6parknews.com/newspark/index.php?act=gold",
+        targetUrl:
+            "https://www.6parknews.com/newspark/index.php?act=gold&p={{page}}",
         docType: NovaDocType.list),
     FetchNewsListRepoInput(
         targetUrl: "https://www.6parknews.com/newspark/index.php?act=hotview",
@@ -29,7 +30,11 @@ class NewsListUseCase with SimpleBloc<NovaListUseCaseOutput> {
         docType: NovaDocType.table),
   ];
 
-  void fetchNewsList({required int targetUrlIndex, String? prefixTitle}) async {
+  void fetchNewsList(
+      {required int targetUrlIndex,
+      int? targetPageIndex,
+      String? prefixTitle}) async {
+    _inputUrlData[targetUrlIndex].pageIndex = targetPageIndex ?? 0;
     final result =
         await repository.fetchNewsList(input: _inputUrlData[targetUrlIndex]);
 

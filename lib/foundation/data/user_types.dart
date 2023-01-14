@@ -54,6 +54,8 @@ class NovaItemInfo {
   bool isFavorite;
   List<NovaItemInfo>? children;
   WeatherInfo? weatherInfo;
+  int? pageNumber;
+  int? pageCount;
 
   NovaItemInfo(
       {required this.id,
@@ -73,7 +75,9 @@ class NovaItemInfo {
       this.isNew = false,
       this.isFavorite = false,
       this.children,
-      this.weatherInfo});
+      this.weatherInfo,
+      this.pageNumber = 1,
+      this.pageCount = 20});
 }
 
 class HistorioInfo {
