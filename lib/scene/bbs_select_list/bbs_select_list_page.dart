@@ -352,16 +352,10 @@ class _BbsSelectListPageState extends State<BbsSelectListPage> {
       widget.presenter.eventViewReady(
           input: BbsSelectListPresenterInput(
               targetUrl: _targetUrl ?? '', targetPageIndex: _currentPageIndex));
-      if (isReloaded) {
-        Future.delayed(Duration.zero, () {
-          _scrollController.animateTo(
-              _scrollController.position.maxScrollExtent,
-              curve: Curves.easeOut,
-              duration: const Duration(milliseconds: 1000));
 
-          setState(() {});
-        });
-      }
+      Future.delayed(Duration.zero, () {
+        setState(() {});
+      });
     } else {
       log.warning('bbs_select_list_page: parameter is error!');
     }

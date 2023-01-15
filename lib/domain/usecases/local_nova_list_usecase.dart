@@ -8,9 +8,11 @@ import 'local_nova_list_usecase_output.dart';
 
 class LocalNovaListUseCaseInput {
   int itemIndex;
+  int targetPageIndex;
   String itemUrl;
 
-  LocalNovaListUseCaseInput({required this.itemIndex, this.itemUrl = ""});
+  LocalNovaListUseCaseInput(
+      {required this.itemIndex, this.targetPageIndex = 1, this.itemUrl = ""});
 }
 
 abstract class LocalNovaListUseCase
@@ -25,42 +27,45 @@ class LocalNovaListUseCaseImpl extends LocalNovaListUseCase {
 
   static final List<FetchLocalNovaListRepoInput> _inputUrlData = [
     FetchLocalNovaListRepoInput(
-        targetUrl: "https://local.6parknews.com/index.php?type_id=11",
+        targetUrl:
+            "https://local.6parknews.com/index.php?type_id=11&p={{page}}",
         docType: NovaDocType.list),
     FetchLocalNovaListRepoInput(
-        targetUrl: "https://local.6parknews.com/index.php?type_id=1",
+        targetUrl: "https://local.6parknews.com/index.php?type_id=1&p={{page}}",
         docType: NovaDocType.list),
     FetchLocalNovaListRepoInput(
-        targetUrl: "https://local.6parknews.com/index.php?type_id=2",
+        targetUrl: "https://local.6parknews.com/index.php?type_id=2&p={{page}}",
         docType: NovaDocType.list),
     FetchLocalNovaListRepoInput(
-        targetUrl: "https://local.6parknews.com/index.php?type_id=3",
+        targetUrl: "https://local.6parknews.com/index.php?type_id=3&p={{page}}",
         docType: NovaDocType.list),
     FetchLocalNovaListRepoInput(
-        targetUrl: "https://local.6parknews.com/index.php?type_id=4",
+        targetUrl: "https://local.6parknews.com/index.php?type_id=4&p={{page}}",
         docType: NovaDocType.list),
     FetchLocalNovaListRepoInput(
-        targetUrl: "https://local.6parknews.com/index.php?type_id=5",
+        targetUrl: "https://local.6parknews.com/index.php?type_id=5&p={{page}}",
         docType: NovaDocType.list),
     FetchLocalNovaListRepoInput(
-        targetUrl: "https://local.6parknews.com/index.php?type_id=6",
+        targetUrl: "https://local.6parknews.com/index.php?type_id=6&p={{page}}",
         docType: NovaDocType.list),
     FetchLocalNovaListRepoInput(
-        targetUrl: "https://local.6parknews.com/index.php?type_id=8",
+        targetUrl: "https://local.6parknews.com/index.php?type_id=8&p={{page}}",
         docType: NovaDocType.list),
     FetchLocalNovaListRepoInput(
-        targetUrl: "https://local.6parknews.com/index.php?type_id=9",
+        targetUrl: "https://local.6parknews.com/index.php?type_id=9&p={{page}}",
         docType: NovaDocType.list),
     FetchLocalNovaListRepoInput(
-        targetUrl: "https://local.6parknews.com/index.php?type_id=10",
+        targetUrl:
+            "https://local.6parknews.com/index.php?type_id=10&p={{page}}",
         docType: NovaDocType.list),
     FetchLocalNovaListRepoInput(
-        targetUrl: "https://local.6parknews.com/index.php?type_id=7",
+        targetUrl: "https://local.6parknews.com/index.php?type_id=7&p={{page}}",
         docType: NovaDocType.list),
   ];
 
   @override
   void fetchLocalNovaList({required LocalNovaListUseCaseInput input}) async {
+    _inputUrlData[input.itemIndex].pageIndex = input.targetPageIndex;
     final result = await repository.fetchLocalNovaList(
         input: _inputUrlData[input.itemIndex]);
 

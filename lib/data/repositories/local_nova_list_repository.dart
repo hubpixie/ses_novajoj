@@ -17,9 +17,11 @@ class LocalNovaListRepositoryImpl extends LocalNovaListRepository {
   @override
   Future<Result<List<LocalNovaListItem>>> fetchLocalNovaList(
       {required FetchLocalNovaListRepoInput input}) async {
+    String targetUrl =
+        input.targetUrl.replaceAll('{{page}}', '${input.pageIndex}');
     Result<List<LocalNovaListItemRes>> result = await _api.fetchNovaList(
-        parameter: NovaItemParameter(
-            targetUrl: input.targetUrl, docType: input.docType));
+        parameter:
+            NovaItemParameter(targetUrl: targetUrl, docType: input.docType));
 
     late Result<List<LocalNovaListItem>> ret;
     List<LocalNovaListItem> novaItems = <LocalNovaListItem>[];
@@ -28,6 +30,9 @@ class LocalNovaListRepositoryImpl extends LocalNovaListRepository {
         LocalNovaListItem retItem = LocalNovaListItem(
           itemInfo: item.itemInfo,
         );
+        retItem.itemInfo.pageCount =
+            targetUrl == input.targetUrl ? 1 : 10; //default
+        retItem.itemInfo.pageNumber = input.pageIndex;
         novaItems.add(retItem);
       }
       ret = Result.success(data: novaItems);

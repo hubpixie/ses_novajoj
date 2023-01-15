@@ -23,6 +23,8 @@ class _LocalListPageState extends State<LocalListPage> {
   String? _appBarTitle;
   String? _selectedMenuItemText;
   int _selectedMenuItemIndex = 0;
+  final ScrollController _scrollController = ScrollController();
+  int _currentPageIndex = 1;
 
   @override
   void initState() {
@@ -65,36 +67,63 @@ class _LocalListPageState extends State<LocalListPage> {
               }
               final data = snapshot.data;
               if (data is ShowLocalListPageModel) {
-                if (data.error == null) {
+                int itemCnt = data.viewModelList?.length ?? 0;
+                if (data.error == null && itemCnt > 0) {
+                  final lastViewModel = data.viewModelList![itemCnt - 1];
                   return ListView.builder(
-                      itemCount: data.viewModelList?.length,
-                      itemBuilder: (context, index) => NovaListCell(
-                          viewModel: data.viewModelList![index],
-                          onCellSelecting: (selIndex) {
-                            widget.presenter.eventSelectDetail(context,
-                                appBarTitle: _selectedMenuItemText ?? "",
-                                itemInfo: data.viewModelList![selIndex]
-                                    .itemInfo, completeHandler: () {
-                              _loadData(isReloaded: true);
-                            });
-                          },
-                          onThumbnailShowing: (thumbIndex) async {
-                            if (data.viewModelList![thumbIndex].itemInfo
-                                .thunnailUrlString.isNotEmpty) {
-                              return data.viewModelList![thumbIndex].itemInfo
-                                  .thunnailUrlString;
-                            }
-                            final retUrl = await widget.presenter
-                                .eventFetchThumbnail(
-                                    input: LocalListPresenterInput(
-                                        itemIndex: thumbIndex,
-                                        itemUrl: data.viewModelList![thumbIndex]
-                                            .itemInfo.urlString));
-                            data.viewModelList![thumbIndex].itemInfo
-                                .thunnailUrlString = retUrl;
-                            return retUrl;
-                          },
-                          index: index));
+                      itemCount: lastViewModel.itemInfo.pageCount! > 1
+                          ? itemCnt + 1
+                          : itemCnt,
+                      itemBuilder: (context, index) {
+                        if (lastViewModel.itemInfo.pageCount! > 1 &&
+                            index == itemCnt) {
+                          return NovaListCell(
+                            viewModel: lastViewModel,
+                            index: index,
+                            onPageChanged: (pageIndex) {
+                              _currentPageIndex = pageIndex;
+                              _loadData();
+                            },
+                            pageEnd: true,
+                            onScrollToTop: () {
+                              _scrollController.animateTo(
+                                _scrollController.position.minScrollExtent,
+                                curve: Curves.easeOut,
+                                duration: const Duration(milliseconds: 500),
+                              );
+                            },
+                          );
+                        }
+                        return NovaListCell(
+                            viewModel: data.viewModelList![index],
+                            onCellSelecting: (selIndex) {
+                              widget.presenter.eventSelectDetail(context,
+                                  appBarTitle: _selectedMenuItemText ?? "",
+                                  itemInfo: data.viewModelList![selIndex]
+                                      .itemInfo, completeHandler: () {
+                                _loadData(isReloaded: true);
+                              });
+                            },
+                            onThumbnailShowing: (thumbIndex) async {
+                              if (data.viewModelList![thumbIndex].itemInfo
+                                  .thunnailUrlString.isNotEmpty) {
+                                return data.viewModelList![thumbIndex].itemInfo
+                                    .thunnailUrlString;
+                              }
+                              final retUrl = await widget.presenter
+                                  .eventFetchThumbnail(
+                                      input: LocalListPresenterInput(
+                                          itemIndex: thumbIndex,
+                                          itemUrl: data
+                                              .viewModelList![thumbIndex]
+                                              .itemInfo
+                                              .urlString));
+                              data.viewModelList![thumbIndex].itemInfo
+                                  .thunnailUrlString = retUrl;
+                              return retUrl;
+                            },
+                            index: index);
+                      });
                 } else {
                   return ErrorView(
                     message: UseL10n.localizedTextWithError(context,
@@ -251,7 +280,9 @@ class _LocalListPageState extends State<LocalListPage> {
     // fetch data
     widget.presenter.eventViewReady(
         input: LocalListPresenterInput(
-            itemIndex: _selectedMenuItemIndex, isReloaded: isReloaded));
+            itemIndex: _selectedMenuItemIndex,
+            targetPageIndex: _currentPageIndex,
+            isReloaded: isReloaded));
 
     Future.delayed(Duration.zero, () {
       setState(() {});
