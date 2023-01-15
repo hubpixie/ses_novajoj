@@ -16,9 +16,11 @@ class BbsNovaSelectListRepositoryImpl extends BbsNovaSelectListRepository {
   @override
   Future<Result<List<BbsNovaSelectListItem>>> fetchBbsNovaSelectList(
       {required FetchBbsNovaSelectListRepoInput input}) async {
+    String targetUrl =
+        input.targetUrl.replaceAll('{{page}}', '${input.pageIndex}');
     final result = await _api.fetchSelectList(
-        parameter: NovaItemParameter(
-            targetUrl: input.targetUrl, docType: input.docType));
+        parameter:
+            NovaItemParameter(targetUrl: targetUrl, docType: input.docType));
     List<BbsNovaSelectListItem> list = [];
     late Result<List<BbsNovaSelectListItem>> ret;
 
@@ -27,6 +29,9 @@ class BbsNovaSelectListRepositoryImpl extends BbsNovaSelectListRepository {
         BbsNovaSelectListItem retItem = BbsNovaSelectListItem(
           itemInfo: item.itemInfo,
         );
+        retItem.itemInfo.pageCount =
+            targetUrl == input.targetUrl ? 1 : 10; //default
+        retItem.itemInfo.pageNumber = input.pageIndex;
         list.add(retItem);
       }
       ret = Result.success(data: list);

@@ -12,6 +12,7 @@ abstract class TopListPresenter with SimpleBloc<TopListPresenterOutput> {
   void eventViewReady(
       {required int targetUrlIndex,
       String? prefixTitle,
+      int? pageIndex,
       bool isReloaded = false});
   void eventSelectDetail(Object context,
       {required String appBarTitle, Object? itemInfo, Object? completeHandler});
@@ -35,6 +36,7 @@ class TopListPresenterImpl extends TopListPresenter {
   void eventViewReady(
       {required int targetUrlIndex,
       String? prefixTitle,
+      int? pageIndex,
       bool isReloaded = false}) async {
     _isProcessing = true;
     if (isReloaded) {
@@ -42,7 +44,9 @@ class TopListPresenterImpl extends TopListPresenter {
       _streamSubscription = _addStreamListener();
     }
     useCase.fetchNewsList(
-        targetUrlIndex: targetUrlIndex, prefixTitle: prefixTitle);
+        targetUrlIndex: targetUrlIndex,
+        targetPageIndex: pageIndex,
+        prefixTitle: prefixTitle);
   }
 
   @override

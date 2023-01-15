@@ -9,10 +9,14 @@ import 'local_list_router.dart';
 class LocalListPresenterInput {
   int itemIndex;
   String itemUrl;
+  int targetPageIndex;
   bool isReloaded;
 
   LocalListPresenterInput(
-      {required this.itemIndex, this.itemUrl = "", this.isReloaded = false});
+      {required this.itemIndex,
+      this.itemUrl = "",
+      this.targetPageIndex = 1,
+      this.isReloaded = false});
 }
 
 abstract class LocalListPresenter with SimpleBloc<LocalListPresenterOutput> {
@@ -34,14 +38,14 @@ class LocalListPresenterImpl extends LocalListPresenter {
 
   @override
   void eventViewReady({required LocalListPresenterInput input}) async {
-    useCase.fetchLocalNovaList(
-        input: LocalNovaListUseCaseInput(itemIndex: input.itemIndex));
     if (input.isReloaded) {
       await _streamSubscription.cancel();
       _streamSubscription = _addStreamListener();
     }
     useCase.fetchLocalNovaList(
-        input: LocalNovaListUseCaseInput(itemIndex: input.itemIndex));
+        input: LocalNovaListUseCaseInput(
+            itemIndex: input.itemIndex,
+            targetPageIndex: input.targetPageIndex));
   }
 
   @override

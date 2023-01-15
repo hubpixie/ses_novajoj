@@ -25,6 +25,9 @@ class ThreadSubPage extends StatefulWidget {
 
 class _ThreadSubPageState extends State<ThreadSubPage>
     with AutomaticKeepAliveClientMixin<ThreadSubPage> {
+  final ScrollController _scrollController = ScrollController();
+  int _currentPageIndex = 1;
+
   @override
   bool get wantKeepAlive => true;
 
@@ -49,36 +52,61 @@ class _ThreadSubPageState extends State<ThreadSubPage>
             }
             final data = snapshot.data;
             if (data is ShowThreadListPageModel) {
-              if (data.error == null) {
+              int itemCnt = data.viewModelList?.length ?? 0;
+              if (data.error == null && itemCnt > 0) {
+                final lastViewModel = data.viewModelList![itemCnt - 1];
                 return ListView.builder(
-                    itemCount: data.viewModelList?.length,
-                    itemBuilder: (context, index) => NovaListCell(
-                        viewModel: data.viewModelList![index],
-                        onCellSelecting: (selIndex) {
-                          widget.presenter.eventSelectDetail(context,
-                              appBarTitle: widget.appBarTitle,
-                              itemInfo: data.viewModelList![selIndex].itemInfo,
-                              completeHandler: () {
-                            _loadData(isReloaded: true);
-                          });
-                        },
-                        onThumbnailShowing: (thumbIndex) async {
-                          if (data.viewModelList![thumbIndex].itemInfo
-                              .thunnailUrlString.isNotEmpty) {
-                            return data.viewModelList![thumbIndex].itemInfo
-                                .thunnailUrlString;
-                          }
-                          final retUrl = await widget.presenter
-                              .eventFetchThumbnail(
-                                  input: ThreadListPresenterInput(
-                                      itemIndex: thumbIndex,
-                                      itemUrl: data.viewModelList![thumbIndex]
-                                          .itemInfo.urlString));
-                          data.viewModelList![thumbIndex].itemInfo
-                              .thunnailUrlString = retUrl;
-                          return retUrl;
-                        },
-                        index: index));
+                    itemCount: lastViewModel.itemInfo.pageCount! > 1
+                        ? itemCnt + 1
+                        : itemCnt,
+                    itemBuilder: (context, index) {
+                      if (lastViewModel.itemInfo.pageCount! > 1 &&
+                          index == itemCnt) {
+                        return NovaListCell(
+                          viewModel: lastViewModel,
+                          index: index,
+                          onPageChanged: (pageIndex) {
+                            _currentPageIndex = pageIndex;
+                            _loadData();
+                          },
+                          pageEnd: true,
+                          onScrollToTop: () {
+                            _scrollController.animateTo(
+                              _scrollController.position.minScrollExtent,
+                              curve: Curves.easeOut,
+                              duration: const Duration(milliseconds: 500),
+                            );
+                          },
+                        );
+                      }
+                      return NovaListCell(
+                          viewModel: data.viewModelList![index],
+                          onCellSelecting: (selIndex) {
+                            widget.presenter.eventSelectDetail(context,
+                                appBarTitle: widget.appBarTitle,
+                                itemInfo: data.viewModelList![selIndex]
+                                    .itemInfo, completeHandler: () {
+                              _loadData(isReloaded: true);
+                            });
+                          },
+                          onThumbnailShowing: (thumbIndex) async {
+                            if (data.viewModelList![thumbIndex].itemInfo
+                                .thunnailUrlString.isNotEmpty) {
+                              return data.viewModelList![thumbIndex].itemInfo
+                                  .thunnailUrlString;
+                            }
+                            final retUrl = await widget.presenter
+                                .eventFetchThumbnail(
+                                    input: ThreadListPresenterInput(
+                                        itemIndex: thumbIndex,
+                                        itemUrl: data.viewModelList![thumbIndex]
+                                            .itemInfo.urlString));
+                            data.viewModelList![thumbIndex].itemInfo
+                                .thunnailUrlString = retUrl;
+                            return retUrl;
+                          },
+                          index: index);
+                    });
               } else {
                 return ErrorView(
                   message: UseL10n.localizedTextWithError(context,
@@ -102,7 +130,9 @@ class _ThreadSubPageState extends State<ThreadSubPage>
     // fetch data
     widget.presenter.eventViewReady(
         input: ThreadListPresenterInput(
-            itemIndex: widget.tabIndex, isReloaded: isReloaded));
+            itemIndex: widget.tabIndex,
+            pageIndex: _currentPageIndex,
+            isReloaded: isReloaded));
 
     Future.delayed(Duration.zero, () {
       setState(() {});

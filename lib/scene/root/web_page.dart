@@ -60,6 +60,7 @@ class _WebPageState extends State<WebPage> {
         ),
         body: _detailPage.buildContentArea(context,
             detailItem: _detailItem,
+            isWebDetail: true,
             imageZommingEnabled:
                 (_detailItem?.htmlText.isNotEmpty ?? false) ? true : false));
   }

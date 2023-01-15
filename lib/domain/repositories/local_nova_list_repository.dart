@@ -4,9 +4,11 @@ import 'package:ses_novajoj/foundation/data/result.dart';
 
 class FetchLocalNovaListRepoInput {
   String targetUrl;
+  int pageIndex;
   NovaDocType docType;
 
-  FetchLocalNovaListRepoInput({required this.targetUrl, required this.docType});
+  FetchLocalNovaListRepoInput(
+      {required this.targetUrl, this.pageIndex = 1, required this.docType});
 }
 
 abstract class LocalNovaListRepository {

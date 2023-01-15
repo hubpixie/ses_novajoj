@@ -7,10 +7,13 @@ import 'bbs_select_list_router.dart';
 
 class BbsSelectListPresenterInput {
   String targetUrl;
+  int targetPageIndex;
   bool isReloaded;
 
   BbsSelectListPresenterInput(
-      {required this.targetUrl, this.isReloaded = false});
+      {required this.targetUrl,
+      this.targetPageIndex = 1,
+      this.isReloaded = false});
 }
 
 abstract class BbsSelectListPresenter
@@ -43,7 +46,9 @@ class BbsSelectListPresenterImpl extends BbsSelectListPresenter {
   @override
   void eventViewReady({required BbsSelectListPresenterInput input}) {
     useCase.fetchBbsSelectList(
-        input: BbsSelectListUseCaseInput(targetUrl: input.targetUrl));
+        input: BbsSelectListUseCaseInput(
+            targetUrl: input.targetUrl,
+            targetPageIndex: input.targetPageIndex));
   }
 
   @override

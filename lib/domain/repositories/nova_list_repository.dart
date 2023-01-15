@@ -4,9 +4,11 @@ import 'package:ses_novajoj/domain/entities/nova_list_item.dart';
 
 class FetchNewsListRepoInput {
   String targetUrl;
+  int pageIndex;
   NovaDocType docType;
 
-  FetchNewsListRepoInput({required this.targetUrl, required this.docType});
+  FetchNewsListRepoInput(
+      {required this.targetUrl, this.pageIndex = 1, required this.docType});
 }
 
 abstract class NovaListRepository {

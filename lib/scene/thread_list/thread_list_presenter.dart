@@ -9,10 +9,14 @@ import 'thread_list_router.dart';
 class ThreadListPresenterInput {
   int itemIndex;
   String itemUrl;
+  int pageIndex;
   bool isReloaded;
 
   ThreadListPresenterInput(
-      {required this.itemIndex, this.itemUrl = "", this.isReloaded = false});
+      {required this.itemIndex,
+      this.itemUrl = "",
+      this.pageIndex = 1,
+      this.isReloaded = false});
 }
 
 abstract class ThreadListPresenter with SimpleBloc<ThreadListPresenterOutput> {
@@ -34,14 +38,13 @@ class ThreadListPresenterImpl extends ThreadListPresenter {
 
   @override
   void eventViewReady({required ThreadListPresenterInput input}) async {
-    useCase.fetchThreadNovaList(
-        input: ThreadNovaListUseCaseInput(itemIndex: input.itemIndex));
     if (input.isReloaded) {
       await _streamSubscription.cancel();
       _streamSubscription = _addStreamListener();
     }
     useCase.fetchThreadNovaList(
-        input: ThreadNovaListUseCaseInput(itemIndex: input.itemIndex));
+        input: ThreadNovaListUseCaseInput(
+            itemIndex: input.itemIndex, targetPageIndex: input.pageIndex));
   }
 
   @override
