@@ -50,7 +50,8 @@ class _TopDetailPageState extends State<TopDetailPage> {
         actions: _detailPage
             .buildAppBarActionArea(context, itemInfo: _itemInfo, menuItems: [
           DetailMenuItem.openOriginal,
-          DetailMenuItem.favorite
+          DetailMenuItem.favorite,
+          DetailMenuItem.readComments
         ], menuActions: [
           null,
           () {
@@ -60,6 +61,9 @@ class _TopDetailPageState extends State<TopDetailPage> {
             widget.presenter.eventSaveBookmark(
                 input: TopDetailPresenterInput(
                     itemInfo: _itemInfo!, htmlText: _htmlText!));
+          },
+          () {
+            widget.presenter.eventViewCommentList(context);
           }
         ]),
       ),

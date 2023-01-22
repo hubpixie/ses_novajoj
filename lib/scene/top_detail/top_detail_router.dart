@@ -1,13 +1,16 @@
+import 'package:flutter/material.dart';
+import 'package:ses_novajoj/scene/foundation/page/screen_route_enums.dart';
+
 abstract class TopDetailRouter {
-  //void gotoTop(Object context);
+  void gotoCommentList(Object context);
 }
 
 class TopDetailRouterImpl extends TopDetailRouter {
   TopDetailRouterImpl();
 
-  // @override
-  // void gotoTop(Object context) {
-  //   log.info('gotoTop');
-  //   Navigator.pushNamed(context as BuildContext, ScreenRouteName.tabs.name);
-  // }
+  @override
+  void gotoCommentList(Object context) {
+    Navigator.pushNamed(
+        context as BuildContext, ScreenRouteName.commentList.name);
+  }
 }

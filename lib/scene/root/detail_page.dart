@@ -134,6 +134,10 @@ class DetailPage {
                   ]);
               return;
             } else if (value == DetailMenuItem.readComments) {
+              if (action != null) {
+                action.call();
+                return;
+              }
               return;
             }
           }),
