@@ -3,10 +3,10 @@ import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/foundation/data/result.dart';
 
 class FetchCommentListRepoInput {
-  Object id;
-  String string;
+  NovaItemInfo itemInfo;
+  NovaDocType docType;
 
-  FetchCommentListRepoInput({required this.id, required this.string});
+  FetchCommentListRepoInput({required this.itemInfo, required this.docType});
 }
 
 abstract class CommentListRepository {

@@ -17,7 +17,8 @@ class TopDetailPresenterInput {
 abstract class TopDetailPresenter with SimpleBloc<TopDetailPresenterOutput> {
   bool get isProcessing;
   void eventViewReady({required TopDetailPresenterInput input});
-  void eventViewCommentList(BuildContext context);
+  void eventViewCommentList(BuildContext context,
+      {required String appBarTitle, Object? itemInfo});
   bool eventSaveBookmark({required TopDetailPresenterInput input});
 }
 
@@ -52,8 +53,10 @@ class TopDetailPresenterImpl extends TopDetailPresenter {
   }
 
   @override
-  void eventViewCommentList(BuildContext context) {
-    router.gotoCommentList(context);
+  void eventViewCommentList(BuildContext context,
+      {required String appBarTitle, Object? itemInfo}) {
+    router.gotoCommentList(context,
+        appBarTitle: appBarTitle, itemInfo: itemInfo);
   }
 
   @override

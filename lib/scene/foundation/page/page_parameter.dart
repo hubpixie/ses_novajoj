@@ -8,6 +8,8 @@ enum BbsSelectListParamKeys { appBarTitle, targetUrl }
 
 enum CitySelectParamKeys { appBarTitle, itemInfo, sourceRoute }
 
+enum CommentListParamKeys { appBarTitle, itemInfo }
+
 enum MiscInfoSelectParamKeys { appBarTitle, itemInfo }
 
 enum HistorioParamKeys { appBarTitle, itemInfos, sourceRoute }

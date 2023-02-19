@@ -10,11 +10,8 @@ class ShowCommentListPageModel extends CommentListPresenterOutput {
 }
 
 class CommentListViewModel {
-  int id; 
+  NovaItemInfo itemInfo;
 
   CommentListViewModel(CommentListUseCaseModel model)
-      : id = model.id/*,
-       name = model.name,
-      ...
-      */;
+      : itemInfo = model.itemInfo;
 }

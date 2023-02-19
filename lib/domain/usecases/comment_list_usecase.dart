@@ -6,7 +6,9 @@ import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'comment_list_usecase_output.dart';
 
 class CommentListUseCaseInput {
+  NovaItemInfo itemInfo;
 
+  CommentListUseCaseInput({required this.itemInfo});
 }
 
 abstract class CommentListUseCase with SimpleBloc<CommentListUseCaseOutput> {
@@ -21,11 +23,10 @@ class CommentListUseCaseImpl extends CommentListUseCase {
   void fetchCommentList({required CommentListUseCaseInput input}) async {
     final result = await repository.fetchCommentList(
         input: FetchCommentListRepoInput(
-            id: 9999, string: "99999" /* // TODO: dummy code*/));
+            itemInfo: input.itemInfo, docType: NovaDocType.none));
 
     result.when(success: (value) {
-      streamAdd(
-          PresentModel(model: CommentListUseCaseModel(9999, value.toString() /* // TODO: dummy code*/)));
+      streamAdd(PresentModel(model: CommentListUseCaseModel(value.itemInfo)));
     }, failure: (error) {
       streamAdd(PresentModel(error: error));
     });

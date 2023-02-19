@@ -4,28 +4,32 @@ import 'package:ses_novajoj/foundation/data/result.dart';
 // import 'package:ses_novajoj/networking/request/comment_list_item_parameter.dart';
 import 'package:ses_novajoj/domain/entities/comment_list_item.dart';
 import 'package:ses_novajoj/domain/repositories/comment_list_repository.dart';
-
-/// TODO: This is dummy Web API class.
-/// You should  web api class is defined in its dart file, like `my_web_api.dart`
-class MyWebApi {}
+import 'package:ses_novajoj/networking/api/base_nova_web_api.dart';
+import 'package:ses_novajoj/networking/request/comment_item_parameter.dart';
 
 class CommentListRepositoryImpl extends CommentListRepository {
-  final MyWebApi _api;
+  final BaseNovaWebApi _api;
 
   // sigleton
   static final CommentListRepositoryImpl _instance =
       CommentListRepositoryImpl._internal();
-  CommentListRepositoryImpl._internal() : _api = MyWebApi();
+  CommentListRepositoryImpl._internal() : _api = BaseNovaWebApi();
   factory CommentListRepositoryImpl() => _instance;
 
   @override
   Future<Result<CommentListItem>> fetchCommentList(
-
       {required FetchCommentListRepoInput input}) async {
-    Result<CommentListItem> result =
-        Result.success(data: CommentListItem(id: 9999, string: "9999"));    // TODO: call api
+    final ret = await _api.fetchCommentInfos(
+        parameter: CommentItemParameter(
+            itemInfo: input.itemInfo, docType: input.docType));
 
-    // TODO: change api result for `CommentList' repository
+    late Result<CommentListItem> result;
+    ret.when(success: (response) {
+      result =
+          Result.success(data: CommentListItem(itemInfo: response.itemInfo));
+    }, failure: (error) {
+      result = Result.failure(error: error);
+    });
     return result;
   }
 }

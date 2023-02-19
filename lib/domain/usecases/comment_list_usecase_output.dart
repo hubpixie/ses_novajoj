@@ -1,6 +1,6 @@
 import 'package:ses_novajoj/foundation/data/user_types.dart';
 
-abstract class  CommentListUseCaseOutput {}
+abstract class CommentListUseCaseOutput {}
 
 class PresentModel extends CommentListUseCaseOutput {
   final CommentListUseCaseModel? model;
@@ -9,8 +9,7 @@ class PresentModel extends CommentListUseCaseOutput {
 }
 
 class CommentListUseCaseModel {
-  int id;
-  String string;
+  NovaItemInfo itemInfo;
 
-  CommentListUseCaseModel(this.id, this.string);
+  CommentListUseCaseModel(this.itemInfo);
 }

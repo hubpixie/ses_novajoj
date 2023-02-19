@@ -63,7 +63,8 @@ class _TopDetailPageState extends State<TopDetailPage> {
                     itemInfo: _itemInfo!, htmlText: _htmlText!));
           },
           () {
-            widget.presenter.eventViewCommentList(context);
+            widget.presenter.eventViewCommentList(context,
+                appBarTitle: '', itemInfo: _itemInfo);
           }
         ]),
       ),

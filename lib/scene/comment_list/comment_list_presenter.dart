@@ -7,10 +7,13 @@ import 'comment_list_presenter_output.dart';
 import 'comment_list_router.dart';
 
 class CommentListPresenterInput {
+  NovaItemInfo itemInfo;
 
+  CommentListPresenterInput({required this.itemInfo});
 }
 
-abstract class CommentListPresenter with SimpleBloc<CommentListPresenterOutput> {
+abstract class CommentListPresenter
+    with SimpleBloc<CommentListPresenterOutput> {
   void eventViewReady({required CommentListPresenterInput input});
 }
 
@@ -34,6 +37,7 @@ class CommentListPresenterImpl extends CommentListPresenter {
 
   @override
   void eventViewReady({required CommentListPresenterInput input}) {
-    useCase.fetchCommentList(input: CommentListUseCaseInput());
+    useCase.fetchCommentList(
+        input: CommentListUseCaseInput(itemInfo: input.itemInfo));
   }
 }
