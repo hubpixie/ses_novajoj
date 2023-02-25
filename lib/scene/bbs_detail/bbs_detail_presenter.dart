@@ -14,6 +14,8 @@ class BbsDetailPresenterInput {
 
 abstract class BbsDetailPresenter with SimpleBloc<BbsDetailPresenterOutput> {
   void eventViewReady({required BbsDetailPresenterInput input});
+  void eventViewCommentList(Object context,
+      {required String appBarTitle, Object? itemInfo});
   bool eventSaveBookmark({required BbsDetailPresenterInput input});
 }
 
@@ -39,6 +41,14 @@ class BbsDetailPresenterImpl extends BbsDetailPresenter {
   void eventViewReady({required BbsDetailPresenterInput input}) {
     useCase.fetchBbsNovaDetail(
         input: BbsNovaDetailUseCaseInput(itemInfo: input.itemInfo));
+  }
+
+  @override
+  void eventViewCommentList(Object context,
+      {required String appBarTitle, Object? itemInfo}) {
+    router.gotoCommentList(context,
+        appBarTitle: appBarTitle, itemInfo: itemInfo);
+    ;
   }
 
   @override

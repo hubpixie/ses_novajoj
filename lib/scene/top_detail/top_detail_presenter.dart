@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/domain/foundation/bloc/simple_bloc.dart';
 import 'package:ses_novajoj/domain/usecases/nova_detail_usecase.dart';
@@ -17,7 +16,7 @@ class TopDetailPresenterInput {
 abstract class TopDetailPresenter with SimpleBloc<TopDetailPresenterOutput> {
   bool get isProcessing;
   void eventViewReady({required TopDetailPresenterInput input});
-  void eventViewCommentList(BuildContext context,
+  void eventViewCommentList(Object context,
       {required String appBarTitle, Object? itemInfo});
   bool eventSaveBookmark({required TopDetailPresenterInput input});
 }
@@ -53,7 +52,7 @@ class TopDetailPresenterImpl extends TopDetailPresenter {
   }
 
   @override
-  void eventViewCommentList(BuildContext context,
+  void eventViewCommentList(Object context,
       {required String appBarTitle, Object? itemInfo}) {
     router.gotoCommentList(context,
         appBarTitle: appBarTitle, itemInfo: itemInfo);
