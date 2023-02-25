@@ -76,6 +76,8 @@
     "detailPageMenuChangeMiscInfoSettings":"变更此设置",
     "detailPageMenuRemoveMiscInfoSettings":"删除此设置",
     "detailPageMenuReadComments":"查看评论",
+    "commentAreaTitle":"评论专区",
+    "commentAreaNoContentString":"此评论被屏蔽或删除。",
     "infoServiceTop":"信息定制",
     "infoServiceMyTime":"我的时间",
     "infoServiceMyTimeWork":"工作时间",

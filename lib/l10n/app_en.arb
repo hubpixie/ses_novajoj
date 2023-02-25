@@ -76,6 +76,8 @@
   "detailPageMenuChangeMiscInfoSettings":"Change Settings",
   "detailPageMenuRemoveMiscInfoSettings":"Remove Settings",
   "detailPageMenuReadComments":"Read Comments",
+  "commentAreaTitle":"Comment List",
+  "commentAreaNoContentString":"This comment has been blocked or deleted.",
   "infoServiceTop":"Informationfv ",
   "infoServiceMyTime":"My Time",
   "infoServiceMyTimeWork":"It's Working",

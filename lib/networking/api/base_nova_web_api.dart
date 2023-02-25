@@ -322,7 +322,7 @@ class BaseNovaWebApi {
         // step
         novaComment.step = (Element inElem) {
           return StringUtil()
-              .substring(inElem.innerHtml, start: 'name="', end: '">');
+              .substring(inElem.innerHtml, start: 'name="step', end: '">');
         }(authDiv.getElementsByClassName('r_step').first);
         // author
         novaComment.author = (Element inElem) {
@@ -334,8 +334,11 @@ class BaseNovaWebApi {
         }(authDiv.getElementsByClassName('r_auther').first);
         // createdAt
         novaComment.createAt = (Element inElem) {
-          return StringUtil()
-              .substring(inElem.innerHtml, start: "</b> ", end: "");
+          String retStr =
+              StringUtil().substring(inElem.innerHtml, start: "</b> ", end: "");
+          return retStr.length - 3 > 0
+              ? retStr.substring(0, retStr.length - 3)
+              : retStr;
         }(authDiv.getElementsByClassName('r_date').first);
 
         //
@@ -353,7 +356,12 @@ class BaseNovaWebApi {
               retStr = retStr.replaceAll(subElem.outerHtml, '');
             }
           }
-          return retStr.replaceAll('<br>', '\n').trim();
+          retStr = StringUtil().substring(retStr, start: '', end: '<p><b>');
+          return retStr
+              .replaceFirst(':<br>', '\n')
+              .replaceAll('<br>', '\n')
+              .replaceAll('\n\n', '\n')
+              .trim();
         }(contentDiv, replyElemInfos);
 
         // replyList
@@ -368,12 +376,15 @@ class BaseNovaWebApi {
             subComment.author = '';
             subComment.createAt = '';
             subComment.step = subElem.getElementsByTagName('a').first.innerHtml;
+
             subComment.plainString = StringUtil()
                 .substring(inElem.innerHtml, start: subElem.outerHtml, end: '');
             if (subComment.plainString.isEmpty) {
               subComment.plainString = StringUtil().substring(inElem.innerHtml,
                   start: subElem.outerHtml, end: '<');
             }
+            subComment.plainString = StringUtil()
+                .substring(subComment.plainString, start: '', end: '<p><b>');
             subComment.plainString = subComment.plainString
                 .replaceFirst(':<br>', '\n')
                 .replaceAll('<br>', '\n')
