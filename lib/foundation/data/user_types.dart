@@ -31,6 +31,21 @@ class NovaComment {
   List<NovaComment>? replyList;
 }
 
+class CommentMenuSetting {
+  bool latestInfoIsEnabled;
+  bool sortingByStepAscIsEnabled;
+  bool defaultFontSizeIsEnabled;
+  double itemHeaderFontSize;
+  double itemBodyFontSize;
+
+  CommentMenuSetting(
+      {this.latestInfoIsEnabled = true,
+      this.sortingByStepAscIsEnabled = true,
+      this.defaultFontSizeIsEnabled = true,
+      this.itemBodyFontSize = 14,
+      this.itemHeaderFontSize = 16});
+}
+
 class NovaItemInfo {
   int id;
   ServiceType serviceType;
