@@ -28,6 +28,8 @@ class NovaComment {
   late String createAt;
   late String plainString;
   String? bodyHtmlString;
+  int pageNumber = 1;
+  int pageCount = 1;
   List<NovaComment>? replyList;
 }
 

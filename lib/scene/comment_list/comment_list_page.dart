@@ -447,7 +447,19 @@ class _CommentListPageState extends State<CommentListPage> {
                   color: ColorDef.generalTextColor)));
         });
       }
-      return RichText(text: TextSpan(children: textSpans));
+
+      return Theme(
+        data: ThemeData(
+            primarySwatch: Colors.lightBlue,
+            textSelectionTheme: TextSelectionThemeData(
+              cursorColor: Colors.grey,
+              selectionColor: Colors.lightBlue.withOpacity(0.5),
+              selectionHandleColor: Colors.grey,
+            )),
+        child: SelectableText.rich(
+          TextSpan(children: textSpans),
+        ),
+      );
     }
   }
 
