@@ -9,10 +9,15 @@ import 'comment_list_router.dart';
 
 class CommentListPresenterInput {
   NovaItemInfo itemInfo;
+  int targetPageIndex;
   bool sortingByStepAsc;
+  bool latestInfoIsEnabled;
 
   CommentListPresenterInput(
-      {required this.itemInfo, this.sortingByStepAsc = true});
+      {required this.itemInfo,
+      this.targetPageIndex = 1,
+      this.sortingByStepAsc = true,
+      this.latestInfoIsEnabled = false});
 }
 
 abstract class CommentListPresenter
@@ -44,7 +49,11 @@ class CommentListPresenterImpl extends CommentListPresenter {
   @override
   void eventViewReady({required CommentListPresenterInput input}) {
     useCase.fetchCommentList(
-        input: CommentListUseCaseInput(itemInfo: input.itemInfo));
+        input: CommentListUseCaseInput(
+            itemInfo: input.itemInfo,
+            pageIndex: input.targetPageIndex,
+            latestInfoIsEnabled: input.latestInfoIsEnabled,
+            sortingByStepAsc: input.sortingByStepAsc));
   }
 
   @override
@@ -52,6 +61,7 @@ class CommentListPresenterImpl extends CommentListPresenter {
     useCase.sortCommentList(
         input: CommentListUseCaseInput(
             itemInfo: input.itemInfo,
+            pageIndex: input.targetPageIndex,
             sortingByStepAsc: input.sortingByStepAsc));
   }
 

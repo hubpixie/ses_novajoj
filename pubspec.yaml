@@ -38,11 +38,12 @@ dependencies:
     sdk: flutter
 
   async:
-  intl: ^0.17.0
+  bubble_tab_indicator:
   encrypted_shared_preferences: ^3.0.1
   freezed_annotation: ^2.2.0
   html: ^0.15.1
   http:
+  intl: ^0.17.0
   country_icons: ^2.0.2
   connectivity_plus: ^2.3.9
   cached_network_image: ^3.2.1
@@ -50,7 +51,7 @@ dependencies:
   photo_view: ^0.14.0
   path:
   path_provider: ^2.0.11
-  bubble_tab_indicator:
+  scroll_to_index:
   
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

@@ -182,18 +182,49 @@ class BaseNovaWebApi {
       }
 
       ///send request for fetching nova list.
-      final response = await BaseApiClient.client
-          .get(Uri.parse(parameter.itemInfo.commentUrlString));
-      if (response.statusCode >= HttpStatus.badRequest) {
-        return Result.failure(
-            error: AppError.fromStatusCode(response.statusCode));
-      }
+      ///
+      List<NovaComment> comments = [];
+      List<String> urlStrArr = [
+        parameter.itemInfo.commentUrlString,
+        '${parameter.itemInfo.commentUrlString}&p=2',
+        '${parameter.itemInfo.commentUrlString}&p=3',
+      ];
+      bool breakFlg = false;
+      late CommentListItemItemRes resp;
 
-      ///prepares to parse nova list from response.body.
-      final document = html_parser.parse(response.body);
-      return _parseLiItems(
-          parameter: parameter,
-          commentElements: document.getElementById("reply_list_all")?.children);
+      for (var url in urlStrArr) {
+        final response = await BaseApiClient.client.get(Uri.parse(url));
+        if (response.statusCode >= HttpStatus.badRequest) {
+          return Result.failure(
+              error: AppError.fromStatusCode(response.statusCode));
+        }
+
+        ///prepares to parse nova list from response.body.
+        final document = html_parser.parse(response.body);
+        final result = await _parseLiItems(
+            parameter: parameter,
+            commentElements:
+                document.getElementById("reply_list_all")?.children);
+        List<NovaComment> commentArr = [];
+        result.when(
+            success: (value) {
+              resp = value;
+              commentArr = value.itemInfo.comments ?? [];
+              String step = value.itemInfo.comments?.last.step ?? '';
+              if (step == '1') {
+                breakFlg = true;
+              }
+            },
+            failure: (error) {});
+        if (comments.length != commentArr.length) {
+          comments.addAll(commentArr);
+        }
+        if (breakFlg) {
+          break;
+        }
+      }
+      resp.itemInfo.comments = comments;
+      return Result.success(data: resp);
     } on AppError catch (error) {
       return Result.failure(error: error);
     } on Exception catch (error) {
@@ -373,6 +404,7 @@ class BaseNovaWebApi {
           List<NovaComment> subComments = [];
           for (final subElem in inReplyElemInfos) {
             NovaComment subComment = NovaComment();
+            subComment.pageNumber = -1;
             subComment.author = '';
             subComment.createAt = '';
             subComment.step = subElem.getElementsByTagName('a').first.innerHtml;

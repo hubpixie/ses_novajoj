@@ -48,7 +48,6 @@ class BbsDetailPresenterImpl extends BbsDetailPresenter {
       {required String appBarTitle, Object? itemInfo}) {
     router.gotoCommentList(context,
         appBarTitle: appBarTitle, itemInfo: itemInfo);
-    ;
   }
 
   @override

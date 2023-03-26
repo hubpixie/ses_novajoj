@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:scroll_to_index/scroll_to_index.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/domain/foundation/bloc/bloc_provider.dart';
 import 'package:ses_novajoj/foundation/firebase_util.dart';
@@ -36,10 +39,15 @@ class _CommentListPageState extends State<CommentListPage> {
   static const double _kCommentItemBodyDefaultFontSize = 16;
   bool _pageLoadIsFirst = true;
 
-  final ScrollController _scrollController = ScrollController();
+  late AutoScrollController _scrollController;
   SnackBar? _snackBar;
+  int _currentPageIndex = 1;
+  int _prevPageIndex = -1;
+  String _fromStep = "";
+  String _toStep = "";
+  double _targetOffset = -1;
+  bool _topRowIsEnabled = false;
 
-  final Map<int, double> _cardHeightDic = {};
   late String _appBarTitle;
   Map? _parameters;
   NovaItemInfo? _itemInfo;
@@ -52,6 +60,13 @@ class _CommentListPageState extends State<CommentListPage> {
   @override
   void initState() {
     super.initState();
+
+    // init scrollController
+    _scrollController = AutoScrollController(
+        viewportBoundaryGetter: () =>
+            Rect.fromLTRB(0, 0, 0, MediaQuery.of(context).padding.bottom),
+        axis: Axis.vertical);
+
     // fetch commentNenuSetting
     widget.presenter.eventViewMenuItemSetting().then((value) {
       _commentMenuSetting = value;
@@ -63,12 +78,10 @@ class _CommentListPageState extends State<CommentListPage> {
           _commentItemHeaderFontSize = _commentMenuSetting!.itemHeaderFontSize;
           _commentItemBodyFontSize = _commentMenuSetting!.itemBodyFontSize;
         }
-        // TODO: sort - 1
-        //
       } else {
-        // TODO: sort - 2
         _commentMenuSetting = CommentMenuSetting();
       }
+      _loadData();
     });
   }
 
@@ -112,13 +125,13 @@ class _CommentListPageState extends State<CommentListPage> {
           }
           return <PopupMenuEntry<_CommentMenuItem>>[
             PopupMenuItem(
-                enabled: false,
-                value: _CommentMenuItem.fetchEarliestInfo,
+                enabled: !_commentMenuSetting!.sortingByStepAscIsEnabled,
+                value: _CommentMenuItem.fetchLatestInfo,
                 child: Text(
                     UseL10n.of(context_)?.commentListMenuFetchLatestInfo ??
                         '')),
             PopupMenuItem(
-                enabled: false,
+                enabled: _commentMenuSetting!.sortingByStepAscIsEnabled,
                 value: _CommentMenuItem.fetchEarliestInfo,
                 child: Text(
                     UseL10n.of(context_)?.commentListMenuFetchEarliestInfo ??
@@ -152,27 +165,33 @@ class _CommentListPageState extends State<CommentListPage> {
           // print onSelected
           switch (value) {
             case _CommentMenuItem.fetchLatestInfo:
+              _topRowIsEnabled = true;
+              _commentMenuSetting?.latestInfoIsEnabled = true;
+              _currentPageIndex = 1;
+              _loadData();
               break;
             case _CommentMenuItem.fetchEarliestInfo:
+              _topRowIsEnabled = true;
+              _commentMenuSetting?.latestInfoIsEnabled = false;
+              _currentPageIndex = 1;
+              _loadData();
               break;
             case _CommentMenuItem.sortByStepAsc:
-              // setState(() {
-              //   _commentList?.sort((a, b) => NumberUtil()
-              //       .parseInt(string: a.step)!
-              //       .compareTo(NumberUtil().parseInt(string: b.step)!));
-              // });
+              _topRowIsEnabled = false;
               _commentMenuSetting?.sortingByStepAscIsEnabled = true;
               widget.presenter.eventViewSort(
                   input: CommentListPresenterInput(
                       itemInfo: _newItemInfo!, sortingByStepAsc: true));
               break;
             case _CommentMenuItem.sortByStepDesc:
+              _topRowIsEnabled = false;
               _commentMenuSetting?.sortingByStepAscIsEnabled = false;
               widget.presenter.eventViewSort(
                   input: CommentListPresenterInput(
                       itemInfo: _newItemInfo!, sortingByStepAsc: false));
               break;
             case _CommentMenuItem.defaultFontSize:
+              _topRowIsEnabled = false;
               _commentMenuSetting?.defaultFontSizeIsEnabled = true;
               setState(() {
                 _commentItemHeaderFontSize = _kCommentItemHeaderDefaultFontSize;
@@ -180,6 +199,7 @@ class _CommentListPageState extends State<CommentListPage> {
               });
               break;
             case _CommentMenuItem.zoomoutFont:
+              _topRowIsEnabled = false;
               double headFontSize = _commentItemHeaderFontSize;
               double bodyFontSize = _commentItemBodyFontSize;
               headFontSize -= 2;
@@ -200,6 +220,7 @@ class _CommentListPageState extends State<CommentListPage> {
               });
               break;
             case _CommentMenuItem.zoominFont:
+              _topRowIsEnabled = false;
               double headFontSize = _commentItemHeaderFontSize;
               double bodyFontSize = _commentItemBodyFontSize;
               headFontSize += 2;
@@ -257,15 +278,36 @@ class _CommentListPageState extends State<CommentListPage> {
 
   Widget _buildBodyItemListArea(BuildContext context,
       {List<NovaComment>? comments}) {
+    Future.delayed((const Duration(milliseconds: 100)), () {
+      _scrollToTargetPageAndRowIfNeed(_commentList,
+          fromStep: _fromStep, toStep: _toStep, targetOffset: _targetOffset);
+      _toStep = '';
+    });
+
+    final itemCnt = comments?.length ?? 0;
+    final lastComment = comments?.last;
+
     return ListView.builder(
         controller: _scrollController,
-        itemCount: comments?.length,
+        itemCount: (comments?.length ?? 0) + 1,
         padding: const EdgeInsets.only(top: 10.0),
         itemBuilder: (context, index) {
-          return Container(
-              padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-              child:
-                  _buildRowCardArea(context, comments: comments, index: index));
+          if (lastComment!.pageCount >= 1 && index == itemCnt) {
+            if (lastComment.pageCount == 1) {
+              return const SizedBox(height: 0);
+            }
+            return Container(
+                padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+                child: _buildPagingArea(context, novaComment: lastComment));
+          }
+          return AutoScrollTag(
+              key: ValueKey(index),
+              controller: _scrollController,
+              index: index,
+              child: Container(
+                  padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+                  child: _buildRowCardArea(context,
+                      comments: comments, index: index)));
         });
   }
 
@@ -311,16 +353,12 @@ class _CommentListPageState extends State<CommentListPage> {
                         _buildContentArea(context, novaComment: novaComment))),
           )
         ]));
-    Future.delayed(const Duration(milliseconds: 100), () {
-      _calcCardSizes(columnKey, index);
-    });
     return card;
   }
 
   Widget _buildContentArea(BuildContext context, {NovaComment? novaComment}) {
     const String replyCd = '\u21b1';
     String plainStr = novaComment?.plainString ?? '';
-    double currOffset = _calcScrollOffset(novaComment: novaComment);
 
     String contentStr = () {
       String retStr = '';
@@ -376,37 +414,25 @@ class _CommentListPageState extends State<CommentListPage> {
                 fontSize: _commentItemBodyFontSize, color: ColorDef.linkColor),
             recognizer: TapGestureRecognizer()
               ..onTap = () {
-                double targetOffset = _calcScrollOffset(novaComment: elem);
-                _scrollController.animateTo(
-                  targetOffset,
-                  curve: Curves.easeOut,
-                  duration: const Duration(milliseconds: 500),
-                );
+                // if scrollTarget pageNumber  is not the current pageNumber, and call loadData()
+                _fromStep = novaComment.step;
+                _prevPageIndex = _currentPageIndex;
+                _toStep = elem.step;
+                _currentPageIndex = elem.pageNumber;
+                _targetOffset = _scrollController.position.pixels;
 
-                if (_snackBar != null) {
-                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                  _snackBar = null;
+                if (_currentPageIndex != _prevPageIndex) {
+                  // load data if need
+                  _loadData();
+                  return;
                 }
-                final snackBar = SnackBar(
-                  content: Text(
-                    'Go back to Step ${novaComment.step}',
-                  ),
-                  duration: const Duration(seconds: 60),
-                  action: SnackBarAction(
-                    label: 'OK',
-                    onPressed: () {
-                      _scrollController.animateTo(
-                        currOffset,
-                        curve: Curves.easeOut,
-                        duration: const Duration(milliseconds: 500),
-                      );
-                    },
-                  ),
-                );
-                // Find the ScaffoldMessenger in the widget tree
-                // and use it to show a SnackBar.
-                ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                _snackBar = snackBar;
+
+                // Otherwise directly scroll to destination row.
+                // back to `offset` position.
+                _scrollToTargetPageAndRowIfNeed(_commentList,
+                    fromStep: _fromStep,
+                    toStep: _toStep,
+                    targetOffset: _scrollController.position.pixels);
               },
           ));
           textSpans.add(TextSpan(
@@ -425,27 +451,147 @@ class _CommentListPageState extends State<CommentListPage> {
     }
   }
 
-  void _calcCardSizes(GlobalKey key, int index) async {
-    if (key.currentContext != null) {
-      Size? size = key.currentContext?.size;
-      final height = size?.height ?? 50;
-      _cardHeightDic[index] = height;
+  Widget _buildPagingArea(BuildContext context,
+      {required NovaComment novaComment}) {
+    Widget _makeIconButton(IconData? iconData,
+        {required int targetPageIndex, required int pageCnt}) {
+      return SizedBox(
+          height: 35,
+          width: 35,
+          child: IconButton(
+              iconSize: 35,
+              padding: const EdgeInsets.only(left: 5),
+              onPressed: (targetPageIndex < 1 || targetPageIndex > pageCnt)
+                  ? null
+                  : () {
+                      _currentPageIndex = targetPageIndex;
+                      _loadData();
+                    },
+              icon: Icon(iconData)));
+    }
+
+    final pageNum = novaComment.pageNumber;
+    final pageCnt = novaComment.pageCount;
+
+    return Card(
+        color: Colors.grey[100],
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Spacer(flex: 10),
+            _makeIconButton(Icons.first_page,
+                targetPageIndex: (pageNum > 1 && pageNum <= pageCnt) ? 1 : -1,
+                pageCnt: pageCnt),
+            const Spacer(),
+            _makeIconButton(Icons.chevron_left,
+                targetPageIndex: pageNum - 1, pageCnt: pageCnt),
+            const Spacer(flex: 2),
+            Text('$pageNum/$pageCnt'),
+            const Spacer(flex: 1),
+            _makeIconButton(Icons.chevron_right,
+                targetPageIndex: pageNum + 1, pageCnt: pageCnt),
+            const Spacer(),
+            _makeIconButton(Icons.last_page,
+                targetPageIndex:
+                    (pageNum >= 1 && pageNum < pageCnt) ? pageCnt : -1,
+                pageCnt: pageCnt),
+            const Spacer(flex: 5),
+            SizedBox(
+                height: 25,
+                width: 25,
+                child: IconButton(
+                    iconSize: 25,
+                    padding: const EdgeInsets.only(left: 5),
+                    onPressed: () {
+                      _scrollController.animateTo(
+                        _scrollController.position.minScrollExtent,
+                        curve: Curves.easeOut,
+                        duration: const Duration(milliseconds: 300),
+                      );
+                    },
+                    icon: const Icon(Icons.arrow_circle_up))),
+            const Spacer(flex: 5)
+          ],
+        ));
+  }
+
+  void _scrollToTargetPageAndRowIfNeed(List<NovaComment>? comments,
+      {required String fromStep,
+      required String toStep,
+      required double targetOffset}) {
+    if (toStep.isNotEmpty) {
+      int idx = comments?.map((e) => e.step).toList().indexOf(_toStep) ?? -1;
+      if (idx >= 0) {
+        if (fromStep.isNotEmpty) {
+          _scrollController.scrollToIndex(idx,
+              preferPosition: AutoScrollPosition.begin,
+              duration: const Duration(milliseconds: 300));
+        } else {
+          // back to targetOffset
+          _scrollController.animateTo(targetOffset,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.linearToEaseOut);
+        }
+      }
+
+      // back to `fromStep` position.
+      if (fromStep.isNotEmpty) {
+        int idx = comments?.map((e) => e.step).toList().indexOf(fromStep) ?? -1;
+        _currentPageIndex = _prevPageIndex;
+        if (idx < 0) {
+          _prevPageIndex = -1;
+        }
+        Future.delayed(const Duration(milliseconds: 100), () {
+          _showSnackBarWhenGoingBack(fromStep: fromStep, offset: targetOffset);
+        });
+      }
+    } else {
+      if (_topRowIsEnabled) {
+        _topRowIsEnabled = false;
+        _scrollController.scrollToIndex(0,
+            preferPosition: AutoScrollPosition.begin,
+            duration: const Duration(milliseconds: 300));
+      }
     }
   }
 
-  double _calcScrollOffset({NovaComment? novaComment}) {
-    double offset = 0;
-    for (int idx = 0; idx < _cardHeightDic.length; idx++) {
-      offset += _cardHeightDic[idx] ?? 0;
-      if ('${idx + 2}' == novaComment?.step) {
-        offset += 10;
-        offset = offset > _scrollController.position.maxScrollExtent
-            ? _scrollController.position.maxScrollExtent
-            : offset;
-        break;
-      }
+  void _showSnackBarWhenGoingBack(
+      {required String fromStep, required double offset}) {
+    // create snackBar
+    if (_snackBar != null) {
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      _snackBar = null;
     }
-    return offset;
+    final snackBar = SnackBar(
+      content: Text(
+        'Go back to Step $fromStep',
+      ),
+      duration: const Duration(seconds: 60),
+      action: SnackBarAction(
+        label: 'OK',
+        onPressed: () {
+          _toStep = fromStep;
+          _fromStep = '';
+          _targetOffset = offset;
+          if (_currentPageIndex != _prevPageIndex) {
+            // Firstly jump previous page using loadData()
+            //
+
+            _loadData();
+            return;
+          }
+
+          // back to `offset` position.
+          _scrollController.animateTo(offset,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.linearToEaseOut);
+        },
+      ),
+    );
+    // Find the ScaffoldMessenger in the widget tree
+    // and use it to show a SnackBar.
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    _snackBar = snackBar;
   }
 
   void _parseRouteParameter(BuildContext context) {
@@ -466,16 +612,18 @@ class _CommentListPageState extends State<CommentListPage> {
         // send viewEvent
         FirebaseUtil().sendViewEvent(route: AnalyticsRoute.commentList);
       }
-
-      // fetch data
-      _loadData();
     }
   }
 
   void _loadData() {
     if (_itemInfo != null) {
       widget.presenter.eventViewReady(
-          input: CommentListPresenterInput(itemInfo: _itemInfo!));
+          input: CommentListPresenterInput(
+              itemInfo: _itemInfo!,
+              targetPageIndex: _currentPageIndex,
+              latestInfoIsEnabled: _commentMenuSetting!.latestInfoIsEnabled,
+              sortingByStepAsc:
+                  _commentMenuSetting!.sortingByStepAscIsEnabled));
     } else {
       log.warning('bbs_detail_page: parameter is error!');
     }
