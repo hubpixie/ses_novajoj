@@ -8,6 +8,9 @@ class ColorDef {
   static const Color tabLabelColor = Color.fromARGB(0xDD, 0x00, 0x00, 0x00);
   static const Color commentColor = Color.fromARGB(0xFF, 0xFF, 0xF6, 0XC0);
   static const Color labelColor = Color.fromARGB(0xFF, 0XC6, 0x92, 0x83);
+  static const Color linkColor = Color.fromARGB(0xFF, 0X21, 0x96, 0xF3);
+  static const Color generalTextColor = Color.fromARGB(0x8A, 0x00, 0x00, 0X00);
+  static const Color illeagalTextColor = Color.fromARGB(0xFF, 0x9E, 0x9E, 0x9E);
   static const Color searchedResultMarkColor =
       Color.fromARGB(0xFF, 0xF1, 0x97, 0x33);
 }

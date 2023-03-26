@@ -153,7 +153,15 @@ class MiscInfoListRouterImpl extends MiscInfoListRouter {
               if (removeAction is Function) {
                 removeAction.call();
               }
-            }
+            },
+      () {
+        // transfer to comment list page
+        Navigator.pushNamed(context_, ScreenRouteName.commentList.name,
+            arguments: {
+              CommentListParamKeys.appBarTitle: appBarTitle,
+              CommentListParamKeys.itemInfo: itemInfo
+            });
+      }
     ];
 
     // Transfer to web page / detail page.
@@ -164,7 +172,8 @@ class MiscInfoListRouterImpl extends MiscInfoListRouter {
       WebPageParamKeys.menuItems: [
         DetailMenuItem.openOriginal,
         DetailMenuItem.favorite,
-        DetailMenuItem.removeSettings
+        DetailMenuItem.removeSettings,
+        DetailMenuItem.readComments
       ],
       WebPageParamKeys.menuActions: menuActions
     }).then((value) {
@@ -193,7 +202,15 @@ class MiscInfoListRouterImpl extends MiscInfoListRouter {
               if (removeAction is Function) {
                 removeAction.call();
               }
-            }
+            },
+      () {
+        // transfer to comment list page
+        Navigator.pushNamed(context_, ScreenRouteName.commentList.name,
+            arguments: {
+              CommentListParamKeys.appBarTitle: appBarTitle,
+              CommentListParamKeys.itemInfo: itemInfo
+            });
+      }
     ];
 
     // Transfer to web page / detail page.
@@ -203,7 +220,8 @@ class MiscInfoListRouterImpl extends MiscInfoListRouter {
       WebPageParamKeys.htmlText: htmlText,
       WebPageParamKeys.menuItems: [
         DetailMenuItem.openOriginal,
-        DetailMenuItem.removeSettings
+        DetailMenuItem.removeSettings,
+        DetailMenuItem.readComments
       ],
       WebPageParamKeys.menuActions: menuActions
     }).then((value) {

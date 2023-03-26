@@ -131,6 +131,31 @@ extension CityInfoDescript on CityInfo {
   }
 }
 
+extension CommentMenuSettingDescript on CommentMenuSetting {
+  static CommentMenuSetting fromJson(Map<String, dynamic> json) {
+    CommentMenuSetting self = CommentMenuSetting();
+    self.latestInfoIsEnabled = json['latest_info_is_enabled'] ?? true;
+    self.defaultFontSizeIsEnabled =
+        json['default_font_size_is_enabled'] ?? true;
+    self.sortingByStepAscIsEnabled =
+        json['sorting_by_step_asc_is_enabled'] ?? true;
+    self.itemHeaderFontSize = json['item_header_font_size'] ?? 0;
+    self.itemBodyFontSize = json['item_body_font_size'] ?? 0;
+    return self;
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+
+    data['latest_info_is_enabled'] = latestInfoIsEnabled;
+    data['default_font_size_is_enabled'] = defaultFontSizeIsEnabled;
+    data['sorting_by_step_asc_is_enabled'] = sortingByStepAscIsEnabled;
+    data['item_header_font_size'] = itemHeaderFontSize;
+    data['item_body_font_size'] = itemBodyFontSize;
+    return data;
+  }
+}
+
 extension HistorioInfoDescript on HistorioInfo {
   String get createdAtText {
     return DateUtil().getDateString(date: createdAt, format: 'yyyy/MM/dd');

@@ -50,7 +50,8 @@ class _BbsDetailPageState extends State<BbsDetailPage> {
         actions: _detailPage
             .buildAppBarActionArea(context, itemInfo: _itemInfo, menuItems: [
           DetailMenuItem.openOriginal,
-          DetailMenuItem.favorite
+          DetailMenuItem.favorite,
+          DetailMenuItem.readComments
         ], menuActions: [
           null,
           () {
@@ -60,6 +61,10 @@ class _BbsDetailPageState extends State<BbsDetailPage> {
             widget.presenter.eventSaveBookmark(
                 input: BbsDetailPresenterInput(
                     itemInfo: _itemInfo!, htmlText: _htmlText!));
+          },
+          () {
+            widget.presenter.eventViewCommentList(context,
+                appBarTitle: '', itemInfo: _itemInfo);
           }
         ]),
       ),

@@ -21,17 +21,31 @@ enum ServiceType {
   // history,
 }
 
-class Comment {
-  int id;
-  String author;
-  String createAt;
-  String bodyHtmlString;
+class NovaComment {
+  late int id;
+  late String author;
+  late String step;
+  late String createAt;
+  late String plainString;
+  String? bodyHtmlString;
+  int pageNumber = 1;
+  int pageCount = 1;
+  List<NovaComment>? replyList;
+}
 
-  Comment(
-      {required this.id,
-      required this.author,
-      required this.createAt,
-      required this.bodyHtmlString});
+class CommentMenuSetting {
+  bool latestInfoIsEnabled;
+  bool sortingByStepAscIsEnabled;
+  bool defaultFontSizeIsEnabled;
+  double itemHeaderFontSize;
+  double itemBodyFontSize;
+
+  CommentMenuSetting(
+      {this.latestInfoIsEnabled = true,
+      this.sortingByStepAscIsEnabled = true,
+      this.defaultFontSizeIsEnabled = true,
+      this.itemBodyFontSize = 14,
+      this.itemHeaderFontSize = 16});
 }
 
 class NovaItemInfo {
@@ -45,7 +59,7 @@ class NovaItemInfo {
   DateTime createAt;
   int orderIndex;
   String loadCommentAt;
-  List<Comment>? comments;
+  List<NovaComment>? comments;
   String commentUrlString;
   int commentCount;
   int reads;
@@ -68,6 +82,7 @@ class NovaItemInfo {
       required this.createAt,
       this.orderIndex = 0,
       this.loadCommentAt = '',
+      this.comments,
       this.commentUrlString = '',
       this.commentCount = 0,
       this.reads = 0,

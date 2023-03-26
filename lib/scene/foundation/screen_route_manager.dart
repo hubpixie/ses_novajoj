@@ -9,6 +9,7 @@ import 'package:ses_novajoj/scene/thread_detail/thread_detail_page_builder.dart'
 import 'package:ses_novajoj/scene/bbs_detail/bbs_detail_page_builder.dart';
 import 'package:ses_novajoj/scene/bbs_select_list/bbs_select_list_page_builder.dart';
 import 'package:ses_novajoj/scene/city_select/city_select_page_builder.dart';
+import 'package:ses_novajoj/scene/comment_list/comment_list_page_builder.dart';
 import 'package:ses_novajoj/scene/misc_info_select/misc_info_select_page_builder.dart';
 import 'package:ses_novajoj/scene/weekly_report/weekly_report_page_builder.dart';
 import 'package:ses_novajoj/scene/historio/historio_page_builder.dart';
@@ -48,6 +49,9 @@ class ScreenRouteManager {
       case ScreenRouteName.citySelect:
         return MaterialPageRoute(
             builder: (_) => CitySelectPageBuilder().page, settings: settings);
+      case ScreenRouteName.commentList:
+        return MaterialPageRoute(
+            builder: (_) => CommentListPageBuilder().page, settings: settings);
       case ScreenRouteName.miscInfoSelect:
         return MaterialPageRoute(
             builder: (_) => MiscInfoSelectPageBuilder().page,

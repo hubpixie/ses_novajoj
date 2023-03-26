@@ -61,13 +61,17 @@ class DetailPage {
                 );
               } else if (element == DetailMenuItem.readComments &&
                   action != null) {
-                retMenus.add(
-                  PopupMenuItem<DetailMenuItem>(
-                    value: DetailMenuItem.readComments,
-                    child: Text(
-                        UseL10n.of(context)?.detailPageMenuReadComments ?? ''),
-                  ),
-                );
+                final commCnt = itemInfo?.commentCount ?? 0;
+                if (commCnt >= 1) {
+                  retMenus.add(
+                    PopupMenuItem<DetailMenuItem>(
+                      value: DetailMenuItem.readComments,
+                      child: Text(
+                          UseL10n.of(context)?.detailPageMenuReadComments ??
+                              ''),
+                    ),
+                  );
+                }
               } else if (element == DetailMenuItem.changeSettings &&
                   action != null) {
                 retMenus.add(
@@ -134,6 +138,10 @@ class DetailPage {
                   ]);
               return;
             } else if (value == DetailMenuItem.readComments) {
+              if (action != null) {
+                action.call();
+                return;
+              }
               return;
             }
           }),

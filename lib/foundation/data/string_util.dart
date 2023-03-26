@@ -15,7 +15,7 @@ class StringUtil {
     }
     int pos2 = string.indexOf(end);
     if (end.isEmpty) {
-      pos2 = string.length - 1;
+      pos2 = string.length;
     } else {
       if (pos2 < pos1) {
         pos2 = string.indexOf(end, pos1 + start.length);

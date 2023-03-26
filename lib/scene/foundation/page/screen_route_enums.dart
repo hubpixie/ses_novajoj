@@ -12,6 +12,7 @@ enum ScreenRouteName {
   bbsDetail,
   bbsSelectList,
   citySelect,
+  commentList,
   miscInfoSelect,
   weeklyReport,
   historio,
@@ -46,6 +47,8 @@ extension ScreenRouteNameSummary on ScreenRouteName {
         return 'bbsSelectList';
       case ScreenRouteName.citySelect:
         return 'citySelect';
+      case ScreenRouteName.commentList:
+        return 'commentList';
       case ScreenRouteName.miscInfoSelect:
         return 'miscInfoSelect';
       case ScreenRouteName.weeklyReport:
@@ -80,6 +83,7 @@ extension ScreenRouteNameSummary on ScreenRouteName {
       case ScreenRouteName.bbsDetail:
       case ScreenRouteName.bbsSelectList:
       case ScreenRouteName.citySelect:
+      case ScreenRouteName.commentList:
       case ScreenRouteName.miscInfoSelect:
       case ScreenRouteName.weeklyReport:
       case ScreenRouteName.historio:

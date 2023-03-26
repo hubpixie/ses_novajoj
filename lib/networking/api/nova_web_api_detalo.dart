@@ -92,6 +92,8 @@ extension NovaWebApiDetail on NovaWebApi {
             type: AppErrorType.dataError,
             reason: FailureReason.missingRootNode);
       }
+      // parentUrl
+      String parentUrl = _parentUrl(url: parameter.itemInfo.urlString);
 
       // createAt (detail)
       retVal.itemInfo.createAt = (DateTime value) {
@@ -133,6 +135,26 @@ extension NovaWebApiDetail on NovaWebApi {
         }
         return retStr;
       }();
+
+      // commentUrlString
+      final commentLinkTag =
+          rootElement?.getElementsByClassName('reply_link_img');
+      retVal.itemInfo.commentUrlString = (Element? aLink) {
+        // reply_link_img
+        String str = aLink?.attributes['href'] ?? '';
+        str = "$parentUrl/${str.replaceAll('\\"', '')}";
+        return str;
+      }(commentLinkTag?.first);
+
+      // commentCount
+      retVal.itemInfo.commentCount = (Element? aLink) {
+        if (aLink != null) {
+          final countStr = StringUtil()
+              .substring(aLink.innerHtml, start: '<span>', end: ' ');
+          return NumberUtil().parseInt(string: countStr) ?? 0;
+        }
+        return 0;
+      }(commentLinkTag?.first);
 
       return Result.success(data: retVal);
     } on AppError catch (error) {

@@ -12,6 +12,7 @@ enum _UserDataKey {
   miscWeatherCities,
   miscHistory,
   miscFavorites,
+  commentMenuSetting,
 }
 
 extension _UserDataKeyInfo on _UserDataKey {
@@ -27,6 +28,8 @@ extension _UserDataKeyInfo on _UserDataKey {
         return 'misc_history';
       case _UserDataKey.miscFavorites:
         return 'misc_favorites';
+      case _UserDataKey.commentMenuSetting:
+        return 'comment_menu_setting';
       default:
         return '';
     }
@@ -55,6 +58,17 @@ class UserData {
   List<CityInfo> get miscWeatherCities => _miscWeatherCities;
   List<String> get miscHistorioList => _miscHistorioList;
   List<String> get miscFavoritesList => _miscFavoritesList;
+  Future<CommentMenuSetting?> get commentMenuSetting async {
+    String savedValue =
+        await _preferences.getString(_UserDataKey.commentMenuSetting.name);
+    if (savedValue.isEmpty) {
+      return null;
+    }
+    final jsonData = await json.decode(savedValue);
+    return jsonData != null
+        ? CommentMenuSettingDescript.fromJson(jsonData)
+        : null;
+  }
 
   ///
   /// read all keys and their values
@@ -354,6 +368,22 @@ class UserData {
     // save list
     _saveHistorioList(
         newValues: _miscFavoritesList, key: _UserDataKey.miscFavorites.name);
+  }
+
+  ///
+  /// saveCommentMenuSetting
+  ///
+  void saveCommentMenuSetting({required CommentMenuSetting newValue}) {
+    String key = _UserDataKey.commentMenuSetting.name;
+    final encoded = jsonEncode(newValue.toJson());
+
+    _preferences
+        .setString(_UserDataKey.commentMenuSetting.name, encoded)
+        .then((succeeded) {
+      if (!succeeded) {
+        log.warning('Cannot save $key info SharedPref!');
+      }
+    });
   }
 
   ///

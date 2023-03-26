@@ -16,6 +16,8 @@ class TopDetailPresenterInput {
 abstract class TopDetailPresenter with SimpleBloc<TopDetailPresenterOutput> {
   bool get isProcessing;
   void eventViewReady({required TopDetailPresenterInput input});
+  void eventViewCommentList(Object context,
+      {required String appBarTitle, Object? itemInfo});
   bool eventSaveBookmark({required TopDetailPresenterInput input});
 }
 
@@ -47,6 +49,13 @@ class TopDetailPresenterImpl extends TopDetailPresenter {
   void eventViewReady({required TopDetailPresenterInput input}) {
     useCase.fetchNewsDetail(
         input: NewsDetailUseCaseInput(itemInfo: input.itemInfo));
+  }
+
+  @override
+  void eventViewCommentList(Object context,
+      {required String appBarTitle, Object? itemInfo}) {
+    router.gotoCommentList(context,
+        appBarTitle: appBarTitle, itemInfo: itemInfo);
   }
 
   @override
