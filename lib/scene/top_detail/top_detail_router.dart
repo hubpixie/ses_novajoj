@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ses_novajoj/scene/foundation/page/page_parameter.dart';
 import 'package:ses_novajoj/scene/foundation/page/screen_route_enums.dart';
-import 'package:ses_novajoj/scene/root/image_loader/image_loader_page.dart';
 
 abstract class TopDetailRouter {
   void gotoCommentList(Object context,

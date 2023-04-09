@@ -1,13 +1,8 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
-import 'package:path/path.dart';
-import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
-import 'package:photo_view/photo_view.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:ses_novajoj/foundation/log_util.dart';
 
 typedef ImageLoadingDelegate = void Function(int, List<dynamic>);
@@ -66,7 +61,6 @@ class _ExtWebViewState extends State<ExtWebView> {
           ios: IOSInAppWebViewOptions(
             allowsInlineMediaPlayback: true,
           ));
-  //double _progress = 0;
   late StreamController<double> _progressController;
 
   @override
@@ -150,11 +144,13 @@ class _ExtWebViewState extends State<ExtWebView> {
                       Map<String, dynamic> jsonData =
                           json.decode(message?.trim() ?? '');
                       String node = jsonData['node'] as String? ?? '';
-                      String ingSrc = jsonData['src'] as String? ?? '';
-                      if (node == "IMG") {
+                      // String ingSrc = jsonData['src'] as String? ?? '';
+                      int index = jsonData['index'] as int? ?? -1;
+                      final imageUrls = jsonData['imageUrls'] as List? ?? [];
+
+                      if (node == "IMG" && imageUrls.isNotEmpty) {
                         log.info('double tap in dart!');
-                        //_displayImageDialog(context, src: ingSrc);
-                        widget.onImageLoad?.call(0, []);
+                        widget.onImageLoad?.call(index, imageUrls);
                       }
                     });
 
@@ -173,6 +169,7 @@ class _ExtWebViewState extends State<ExtWebView> {
                 if (progress == 100) {
                   //pullToRefreshController.endRefreshing();
                 }
+                _progressController.stream.drain();
                 _progressController.add(progress / 100);
               },
               onUpdateVisitedHistory: (controller, url, androidIsReload) {
@@ -199,83 +196,6 @@ class _ExtWebViewState extends State<ExtWebView> {
     return widget.isWebDetail
         ? Wrap(children: [bodyWidget])
         : Expanded(child: bodyWidget);
-  }
-
-  Future<void> _saveNetworkImage({String? src}) async {
-    final urlStr = src ?? '';
-    if (urlStr.isEmpty) {
-      return;
-    }
-    // download tempFile
-    final response = await http.get(Uri.parse(urlStr));
-    final tempDic = Directory.systemTemp.path;
-    final tempUrl = File(urlStr);
-    final filename = basename(tempUrl.path).contains('.')
-        ? basename(tempUrl.path)
-        : '001.jpg';
-    final filePathName = '$tempDic/images/$filename';
-    await Directory('$tempDic/images').create(recursive: true);
-    File tempFile = File(filePathName); //
-    await tempFile.writeAsBytes(response.bodyBytes);
-
-    // Add to Gallery/Cameraroll
-    await ImageGallerySaver.saveFile(tempFile.path);
-    log.info('Image is saved!');
-    tempFile.delete();
-  }
-
-  void _displayImageDialog(BuildContext context, {String? src}) {
-    showGeneralDialog(
-      context: context,
-      barrierDismissible: false,
-      transitionDuration: const Duration(milliseconds: 500),
-      transitionBuilder: (context, animation, secondaryAnimation, child) {
-        return FadeTransition(
-          opacity: animation,
-          child: ScaleTransition(
-            scale: animation,
-            child: child,
-          ),
-        );
-      },
-      pageBuilder: (dialogContext, animation, secondaryAnimation) {
-        return SafeArea(
-          child: Container(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height,
-            padding: const EdgeInsets.all(5),
-            color: Colors.black,
-            child: Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Row(
-                    children: [
-                      TextButton(
-                          onPressed: () {
-                            Navigator.of(dialogContext).pop();
-                          },
-                          child: const Icon(Icons.close_outlined)),
-                      const Spacer(),
-                      TextButton(
-                          onPressed: () {
-                            _saveNetworkImage(src: src)
-                                .then((value) => Navigator.of(context).pop());
-                          },
-                          child: const Icon(Icons.save_alt_sharp)),
-                    ],
-                  ),
-                  Expanded(
-                      child: PhotoView(
-                    imageProvider: CachedNetworkImageProvider(src ?? ''),
-                  )),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
   }
 }
 

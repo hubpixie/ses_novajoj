@@ -39,6 +39,11 @@ class StringUtil {
     return string;
   }
 
+  String lastSegment(String string) {
+    final arr = string.split('/');
+    return arr.last;
+  }
+
   String thousandFormat(int value) {
     return NumberFormat('###,##0').format(value);
   }

@@ -1,4 +1,3 @@
-import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/domain/foundation/bloc/simple_bloc.dart';
 import 'package:ses_novajoj/domain/usecases/image_loader_usecase.dart';
 import 'package:ses_novajoj/domain/usecases/image_loader_usecase_output.dart';
@@ -7,11 +6,15 @@ import 'image_loader_presenter_output.dart';
 import 'image_loader_router.dart';
 
 class ImageLoaderPresenterInput {
+  String imageSrc;
 
+  ImageLoaderPresenterInput({required this.imageSrc});
 }
 
-abstract class ImageLoaderPresenter with SimpleBloc<ImageLoaderPresenterOutput> {
-  void eventViewReady({required ImageLoaderPresenterInput input});
+abstract class ImageLoaderPresenter
+    with SimpleBloc<ImageLoaderPresenterOutput> {
+  Future<bool> eventRegisterImageIntoGallery(
+      {required ImageLoaderPresenterInput input});
 }
 
 class ImageLoaderPresenterImpl extends ImageLoaderPresenter {
@@ -33,7 +36,9 @@ class ImageLoaderPresenterImpl extends ImageLoaderPresenter {
   }
 
   @override
-  void eventViewReady({required ImageLoaderPresenterInput input}) {
-    useCase.fetchImageLoader(input: ImageLoaderUseCaseInput());
+  Future<bool> eventRegisterImageIntoGallery(
+      {required ImageLoaderPresenterInput input}) async {
+    return useCase.saveNetworkMedia(
+        input: ImageLoaderUseCaseInput(imageSrc: input.imageSrc));
   }
 }

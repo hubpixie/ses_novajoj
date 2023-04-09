@@ -1,15 +1,11 @@
-import 'package:ses_novajoj/domain/entities/image_loader_item.dart';
-import 'package:ses_novajoj/foundation/data/user_types.dart';
-import 'package:ses_novajoj/foundation/data/result.dart';
-
 class FetchImageLoaderRepoInput {
-  Object id;
-  String string;
+  String mediaUrlString;
 
-  FetchImageLoaderRepoInput({required this.id, required this.string});
+  FetchImageLoaderRepoInput({required this.mediaUrlString});
 }
 
 abstract class ImageLoaderRepository {
-  Future<Result<ImageLoaderItem>> fetchImageLoader(
-      {required FetchImageLoaderRepoInput input});
+  // Future<Result<ImageLoaderItem>> fetchImageLoader(
+  //     {required FetchImageLoaderRepoInput input});
+  Future<bool> saveNetworkMedia({required FetchImageLoaderRepoInput input});
 }
