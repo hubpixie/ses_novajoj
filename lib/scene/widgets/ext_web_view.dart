@@ -10,16 +10,24 @@ import 'package:photo_view/photo_view.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:ses_novajoj/foundation/log_util.dart';
 
+typedef ImageLoadingDelegate = void Function(int, List<dynamic>);
+
+class PageScrollController {}
+
 class ExtWebView extends StatefulWidget {
   final dynamic detailItem;
   final bool isWebDetail;
   final bool imageZoomingEnabled;
+  final ImageLoadingDelegate? onImageLoad;
+  final PageScrollController? scrollController;
 
   const ExtWebView(
       {Key? key,
       required this.detailItem,
       this.isWebDetail = false,
-      this.imageZoomingEnabled = true})
+      this.imageZoomingEnabled = true,
+      this.onImageLoad,
+      this.scrollController})
       : super(key: key);
 
   static openBrowser(BuildContext context, {String? url}) {
@@ -145,7 +153,8 @@ class _ExtWebViewState extends State<ExtWebView> {
                       String ingSrc = jsonData['src'] as String? ?? '';
                       if (node == "IMG") {
                         log.info('double tap in dart!');
-                        _displayImageDialog(context, src: ingSrc);
+                        //_displayImageDialog(context, src: ingSrc);
+                        widget.onImageLoad?.call(0, []);
                       }
                     });
 

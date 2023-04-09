@@ -18,6 +18,10 @@ abstract class TopDetailPresenter with SimpleBloc<TopDetailPresenterOutput> {
   void eventViewReady({required TopDetailPresenterInput input});
   void eventViewCommentList(Object context,
       {required String appBarTitle, Object? itemInfo});
+  void eventViewImageLoader(Object context,
+      {required String appBarTitle,
+      int? imageSrcIndex,
+      List<dynamic>? imageSrcList});
   bool eventSaveBookmark({required TopDetailPresenterInput input});
 }
 
@@ -56,6 +60,17 @@ class TopDetailPresenterImpl extends TopDetailPresenter {
       {required String appBarTitle, Object? itemInfo}) {
     router.gotoCommentList(context,
         appBarTitle: appBarTitle, itemInfo: itemInfo);
+  }
+
+  @override
+  void eventViewImageLoader(Object context,
+      {required String appBarTitle,
+      int? imageSrcIndex,
+      List<dynamic>? imageSrcList}) {
+    router.gotoImageLoader(context,
+        appBarTitle: appBarTitle,
+        imageSrcIndex: imageSrcIndex,
+        imageSrcList: imageSrcList);
   }
 
   @override

@@ -87,7 +87,13 @@ class _TopDetailPageState extends State<TopDetailPage> {
                   return Column(
                     children: [
                       _detailPage.buildContentArea(context,
-                          detailItem: data.viewModel)
+                          detailItem: data.viewModel,
+                          onImageLoad: (int srcIndex, List<dynamic> srcList) {
+                        widget.presenter.eventViewImageLoader(context,
+                            appBarTitle: '',
+                            imageSrcIndex: srcIndex,
+                            imageSrcList: srcList);
+                      })
                     ],
                   );
                 } else {

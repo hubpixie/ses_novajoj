@@ -17,6 +17,7 @@ enum ScreenRouteName {
   weeklyReport,
   historio,
   favorites,
+  imageLoader,
   webPage,
 }
 
@@ -57,6 +58,8 @@ extension ScreenRouteNameSummary on ScreenRouteName {
         return 'historio';
       case ScreenRouteName.favorites:
         return 'favorites';
+      case ScreenRouteName.imageLoader:
+        return 'ImageLoader';
       case ScreenRouteName.webPage:
         return 'webPage';
       default:
@@ -88,6 +91,7 @@ extension ScreenRouteNameSummary on ScreenRouteName {
       case ScreenRouteName.weeklyReport:
       case ScreenRouteName.historio:
       case ScreenRouteName.favorites:
+      case ScreenRouteName.imageLoader:
       case ScreenRouteName.webPage:
         return toString().split(".").last;
       default:

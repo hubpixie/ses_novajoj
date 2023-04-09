@@ -8,11 +8,13 @@ class DetailPage {
   Widget buildContentArea(BuildContext context,
       {dynamic detailItem,
       bool isWebDetail = false,
-      bool imageZommingEnabled = true}) {
+      bool imageZommingEnabled = true,
+      ImageLoadingDelegate? onImageLoad}) {
     return ExtWebView(
       detailItem: detailItem,
       isWebDetail: isWebDetail,
       imageZoomingEnabled: imageZommingEnabled,
+      onImageLoad: onImageLoad,
     );
   }
 
