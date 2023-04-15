@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/scene/foundation/color_def.dart';
 import 'package:ses_novajoj/scene/foundation/page/page_parameter.dart';
-//import 'package:ses_novajoj/scene/foundation/page/screen_route_enums.dart';
+import 'package:ses_novajoj/scene/root/web/web_presenter.dart';
 import 'package:ses_novajoj/scene/root/detail_page.dart';
 
 class WebPageDetailItem {
@@ -21,7 +21,8 @@ class WebPageDetailItem {
 }
 
 class WebPage extends StatefulWidget {
-  const WebPage({Key? key}) : super(key: key);
+  final WebPresenter presenter;
+  const WebPage({Key? key, required this.presenter}) : super(key: key);
 
   @override
   State<WebPage> createState() => _WebPageState();
@@ -61,8 +62,12 @@ class _WebPageState extends State<WebPage> {
         body: _detailPage.buildContentArea(context,
             detailItem: _detailItem,
             isWebDetail: true,
-            imageZommingEnabled:
-                (_detailItem?.htmlText.isNotEmpty ?? false) ? true : false));
+            imageZommingEnabled: (_detailItem?.htmlText.isNotEmpty ?? false)
+                ? true
+                : false, onImageLoad: (int srcIndex, List<dynamic> srcList) {
+          widget.presenter.eventViewImageLoader(context,
+              appBarTitle: '', imageSrcIndex: srcIndex, imageSrcList: srcList);
+        }));
   }
 
   void _parseRouteParameter() {

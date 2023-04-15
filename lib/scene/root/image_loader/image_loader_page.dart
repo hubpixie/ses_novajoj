@@ -5,6 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 import 'package:ses_novajoj/foundation/data/string_util.dart';
+import 'package:ses_novajoj/foundation/log_util.dart';
 import 'package:ses_novajoj/scene/foundation/page/page_parameter.dart';
 import 'package:ses_novajoj/scene/root/image_loader/image_loader_presenter.dart';
 
@@ -22,6 +23,7 @@ class _ImageLoaderPageState extends State<ImageLoaderPage> {
   late int _imageIndex;
   late List<dynamic> _imageSrcList;
   int _currPageIndex = 0;
+  bool _isPageLoading = false;
 
   Map? _parameters;
 
@@ -45,6 +47,8 @@ class _ImageLoaderPageState extends State<ImageLoaderPage> {
   void dispose() {
     _imageNameController.close();
     _imageLoadedController.close();
+    _imageLoadingStates = {};
+
     super.dispose();
   }
 
@@ -62,9 +66,6 @@ class _ImageLoaderPageState extends State<ImageLoaderPage> {
           return Future.value(true);
         },
         child: Scaffold(
-          /* appBar: AppBar(
-        title: const Text("title"),
-      ),*/
           body: SafeArea(
             child: Container(
               width: MediaQuery.of(context).size.width,
@@ -111,6 +112,8 @@ class _ImageLoaderPageState extends State<ImageLoaderPage> {
                               bool imageLoaded = snapshot.data is bool
                                   ? (snapshot.data as bool? ?? false)
                                   : false;
+                              log.info(
+                                  'currPageIndex -- 1 =$_currPageIndex, name=${_getImageFileName()}, loaded=$imageLoaded');
                               return TextButton(
                                   style: !imageLoaded
                                       ? TextButton.styleFrom(
@@ -141,39 +144,92 @@ class _ImageLoaderPageState extends State<ImageLoaderPage> {
                         itemCount: _imageSrcList.length,
                         onPageChanged: (pageIndex) {
                           _currPageIndex = pageIndex;
-                          int pageIndex_ = pageIndex;
-                          // imageLoaded
-                          Future.delayed(const Duration(milliseconds: 300), () {
-                            // imageName
-                            String imageName =
-                                _getImageFileName(pageIndex: pageIndex_);
+                          // dismiss snackBar if need
+                          if (_snackBar != null) {
+                            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                            _snackBar = null;
+                          }
 
-                            if (!_imageLoadingStates.containsKey(imageName)) {
-                              _imageLoadingStates[imageName] = true;
-                              _imageLoadedController.add(true);
-                            }
+                          // imageName
+                          String imageName = _getImageFileName();
+                          int pageIndex_ = pageIndex;
+                          _imageNameController.sink.add(imageName);
+
+                          log.info(
+                              'currPageIndex -- 2 =$_currPageIndex, name=${_getImageFileName()}, loaded=false?');
+
+                          // imageLoaded [1]
+                          if (!_imageLoadingStates.containsKey(imageName)) {
+                            _imageLoadedController.sink.add(false);
+                            log.info(
+                                'currPageIndex -- 3 =$_currPageIndex, name=${_getImageFileName()}, loaded=false');
+                          } else {
+                            _imageLoadedController.sink
+                                .add(_imageLoadingStates[imageName]!);
+                            log.info(
+                                'currPageIndex -- 4 =$_currPageIndex, name=${_getImageFileName()}, loaded=true');
+                            return;
+                          }
+
+                          // imageLoaded [2]
+                          Future.delayed(const Duration(milliseconds: 500), () {
+                            int delayTime = _isPageLoading ? 1500 : 0;
+
+                            Future.delayed(Duration(milliseconds: delayTime),
+                                () {
+                              // imageName
+                              String imageName =
+                                  _getImageFileName(pageIndex: pageIndex_);
+
+                              if (!_imageLoadingStates.containsKey(imageName)) {
+                                _imageLoadingStates[imageName] = true;
+                                if (_currPageIndex == pageIndex_) {
+                                  log.info(
+                                      'currPageIndex -- 5 =$_currPageIndex, name=${_getImageFileName()}, loaded=true');
+                                  _imageLoadedController.sink.add(true);
+                                }
+                              } else {
+                                log.info(
+                                    'currPageIndex -- 6 =$_currPageIndex, name=${_getImageFileName()}, loaded=$_imageLoadingStates[imageName]');
+                              }
+                            });
                           });
                         },
                         pageController: _pageController,
                         loadingBuilder: (BuildContext context,
                             ImageChunkEvent? loadingProgress) {
+                          _isPageLoading = true;
+                          String imageName = _getImageFileName();
+
+                          double? progress;
                           if (loadingProgress == null ||
-                              loadingProgress.expectedTotalBytes == null ||
-                              loadingProgress.expectedTotalBytes ==
-                                  loadingProgress.cumulativeBytesLoaded) {
-                            String imageName = _getImageFileName();
-                            // imageLoaded
-                            _imageLoadingStates[imageName] = true;
-                            _imageLoadedController
-                                .add(_imageLoadingStates[imageName]!);
-                            return Container();
+                              (loadingProgress.expectedTotalBytes != null &&
+                                  loadingProgress.expectedTotalBytes ==
+                                      loadingProgress.cumulativeBytesLoaded)) {
+                            // imageLoaded as false if loading is completed
+                            if (loadingProgress != null) {
+                              _imageLoadingStates[imageName] = true;
+                              _imageLoadedController.sink.add(true);
+                            }
+                            log.info(
+                                'currPageIndex -- 7 =$_currPageIndex, name=${_getImageFileName()}, loaded=${_imageLoadingStates[imageName]}, (loadingProgress == null: ${loadingProgress == null}');
+                          } else {
+                            // progress
+                            progress = loadingProgress.cumulativeBytesLoaded /
+                                loadingProgress.expectedTotalBytes!;
+
+                            if (!_imageLoadingStates.containsKey(imageName)) {
+                              _imageLoadingStates[imageName] = false;
+                              _imageLoadedController.sink.add(false);
+                            }
+                            // log.info(
+                            //     'currPageIndex -- 8 =$_currPageIndex, name=${_getImageFileName()}, loaded=${_imageLoadingStates[imageName]}');
                           }
+
+                          // imageLoaded as false if loading is not completed.
                           return Center(
                             child: CircularProgressIndicator(
-                              value: loadingProgress.expectedTotalBytes != null
-                                  ? loadingProgress.cumulativeBytesLoaded /
-                                      loadingProgress.expectedTotalBytes!
-                                  : null,
+                              value: progress,
                             ),
                           );
                         },
@@ -260,6 +316,7 @@ class _ImageLoaderPageState extends State<ImageLoaderPage> {
           }
         });
       }
+
       // PhotoViewScaleStateController list
       _scaleStateControllers =
           List.filled(_imageSrcList.length, PhotoViewScaleStateController());
@@ -269,13 +326,25 @@ class _ImageLoaderPageState extends State<ImageLoaderPage> {
       // init some variables
       _currPageIndex = _imageIndex;
       String imageName = _getImageFileName();
-      Future.delayed(const Duration(milliseconds: 500), () {
-        _imageLoadedController.add(false);
+      _imageLoadingStates = {};
+
+      Future.delayed(const Duration(milliseconds: 300), () {
+        if (!_imageLoadingStates.containsKey(imageName)) {
+          _imageLoadedController.sink.add(false);
+          log.info(
+              'currPageIndex -- 9 =$_currPageIndex, name=${_getImageFileName()}, loaded=false');
+        }
         Future.delayed(const Duration(milliseconds: 500), () {
-          if (!_imageLoadingStates.containsKey(imageName)) {
-            _imageLoadingStates[imageName] = true;
-            _imageLoadedController.add(true);
-          }
+          int delayTime = _isPageLoading ? 2500 : 0;
+
+          Future.delayed(Duration(milliseconds: delayTime), () {
+            if (!_imageLoadingStates.containsKey(imageName)) {
+              _imageLoadingStates[imageName] = true;
+              _imageLoadedController.sink.add(true);
+              log.info(
+                  'currPageIndex -- 10 =$_currPageIndex, name=${_getImageFileName()}, loaded=true');
+            }
+          });
         });
       });
     }
@@ -285,8 +354,8 @@ class _ImageLoaderPageState extends State<ImageLoaderPage> {
     int pageIndex_ = pageIndex < 0 ? _currPageIndex : pageIndex;
 
     String str = StringUtil().lastSegment(_imageSrcList[pageIndex_]);
-    if (str.length > 14) {
-      return str.substring(0, 10) + str.substring(str.length - 4, str.length);
+    if (str.length > 20) {
+      return str.substring(0, 16) + str.substring(str.length - 4, str.length);
     }
     return str;
   }

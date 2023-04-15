@@ -16,6 +16,10 @@ abstract class BbsDetailPresenter with SimpleBloc<BbsDetailPresenterOutput> {
   void eventViewReady({required BbsDetailPresenterInput input});
   void eventViewCommentList(Object context,
       {required String appBarTitle, Object? itemInfo});
+  void eventViewImageLoader(Object context,
+      {required String appBarTitle,
+      int? imageSrcIndex,
+      List<dynamic>? imageSrcList});
   bool eventSaveBookmark({required BbsDetailPresenterInput input});
 }
 
@@ -48,6 +52,17 @@ class BbsDetailPresenterImpl extends BbsDetailPresenter {
       {required String appBarTitle, Object? itemInfo}) {
     router.gotoCommentList(context,
         appBarTitle: appBarTitle, itemInfo: itemInfo);
+  }
+
+  @override
+  void eventViewImageLoader(Object context,
+      {required String appBarTitle,
+      int? imageSrcIndex,
+      List<dynamic>? imageSrcList}) {
+    router.gotoImageLoader(context,
+        appBarTitle: appBarTitle,
+        imageSrcIndex: imageSrcIndex,
+        imageSrcList: imageSrcList);
   }
 
   @override

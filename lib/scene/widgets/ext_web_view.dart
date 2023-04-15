@@ -144,9 +144,10 @@ class _ExtWebViewState extends State<ExtWebView> {
                       Map<String, dynamic> jsonData =
                           json.decode(message?.trim() ?? '');
                       String node = jsonData['node'] as String? ?? '';
-                      // String ingSrc = jsonData['src'] as String? ?? '';
-                      int index = jsonData['index'] as int? ?? -1;
-                      final imageUrls = jsonData['imageUrls'] as List? ?? [];
+                      String ingSrc = jsonData['src'] as String? ?? '';
+                      int index = jsonData['index'] as int? ?? 0;
+                      final imageUrls =
+                          jsonData['imageUrls'] as List? ?? [ingSrc];
 
                       if (node == "IMG" && imageUrls.isNotEmpty) {
                         log.info('double tap in dart!');

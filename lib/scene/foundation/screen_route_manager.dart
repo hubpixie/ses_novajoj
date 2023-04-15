@@ -15,7 +15,7 @@ import 'package:ses_novajoj/scene/weekly_report/weekly_report_page_builder.dart'
 import 'package:ses_novajoj/scene/historio/historio_page_builder.dart';
 import 'package:ses_novajoj/scene/favorites/favorites_page_builder.dart';
 import 'package:ses_novajoj/scene/root/image_loader/image_loader_page_builder.dart';
-import 'package:ses_novajoj/scene/root/web_page_builder.dart';
+import 'package:ses_novajoj/scene/root/web/web_page_builder.dart';
 
 class ScreenRouteManager {
   static Route<dynamic> generateRoute(RouteSettings? settings) {

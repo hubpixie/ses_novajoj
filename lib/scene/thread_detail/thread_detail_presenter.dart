@@ -16,6 +16,10 @@ class ThreadDetailPresenterInput {
 abstract class ThreadDetailPresenter
     with SimpleBloc<ThreadDetailPresenterOutput> {
   void eventViewReady({required ThreadDetailPresenterInput input});
+  void eventViewImageLoader(Object context,
+      {required String appBarTitle,
+      int? imageSrcIndex,
+      List<dynamic>? imageSrcList});
   bool eventSaveBookmark({required ThreadDetailPresenterInput input});
 }
 
@@ -41,6 +45,17 @@ class ThreadDetailPresenterImpl extends ThreadDetailPresenter {
   void eventViewReady({required ThreadDetailPresenterInput input}) {
     useCase.fetchThreadNovaDetail(
         input: ThreadNovaDetailUseCaseInput(itemInfo: input.itemInfo));
+  }
+
+  @override
+  void eventViewImageLoader(Object context,
+      {required String appBarTitle,
+      int? imageSrcIndex,
+      List<dynamic>? imageSrcList}) {
+    router.gotoImageLoader(context,
+        appBarTitle: appBarTitle,
+        imageSrcIndex: imageSrcIndex,
+        imageSrcList: imageSrcList);
   }
 
   @override

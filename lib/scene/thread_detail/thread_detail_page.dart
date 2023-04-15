@@ -80,8 +80,14 @@ class _ThreadDetailPageState extends State<ThreadDetailPage> {
                   _htmlText = data.viewModel?.htmlText;
                   _itemInfo = data.viewModel?.itemInfo;
                   return Column(children: [
-                    _detailPage.buildContentArea(context,
-                        detailItem: data.viewModel)
+                    _detailPage
+                        .buildContentArea(context, detailItem: data.viewModel,
+                            onImageLoad: (int srcIndex, List<dynamic> srcList) {
+                      widget.presenter.eventViewImageLoader(context,
+                          appBarTitle: '',
+                          imageSrcIndex: srcIndex,
+                          imageSrcList: srcList);
+                    })
                   ]);
                 } else {
                   return ErrorView(
