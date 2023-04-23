@@ -5,6 +5,8 @@ import 'package:ses_novajoj/scene/widgets/confirm_dialog.dart';
 import 'package:ses_novajoj/scene/foundation/page/page_parameter.dart';
 
 class DetailPage {
+  PageScrollController scrollController = PageScrollController();
+
   Widget buildContentArea(BuildContext context,
       {dynamic detailItem,
       bool isWebDetail = false,
@@ -15,6 +17,7 @@ class DetailPage {
       isWebDetail: isWebDetail,
       imageZoomingEnabled: imageZommingEnabled,
       onImageLoad: onImageLoad,
+      scrollController: scrollController,
     );
   }
 

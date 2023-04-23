@@ -19,7 +19,8 @@ abstract class ThreadDetailPresenter
   void eventViewImageLoader(Object context,
       {required String appBarTitle,
       int? imageSrcIndex,
-      List<dynamic>? imageSrcList});
+      List<dynamic>? imageSrcList,
+      Object? completeHandler});
   bool eventSaveBookmark({required ThreadDetailPresenterInput input});
 }
 
@@ -51,11 +52,13 @@ class ThreadDetailPresenterImpl extends ThreadDetailPresenter {
   void eventViewImageLoader(Object context,
       {required String appBarTitle,
       int? imageSrcIndex,
-      List<dynamic>? imageSrcList}) {
+      List<dynamic>? imageSrcList,
+      Object? completeHandler}) {
     router.gotoImageLoader(context,
         appBarTitle: appBarTitle,
         imageSrcIndex: imageSrcIndex,
-        imageSrcList: imageSrcList);
+        imageSrcList: imageSrcList,
+        completeHandler: completeHandler);
   }
 
   @override

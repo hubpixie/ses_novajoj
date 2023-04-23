@@ -8,7 +8,8 @@ abstract class BbsDetailRouter {
   void gotoImageLoader(Object context,
       {required String appBarTitle,
       int? imageSrcIndex,
-      List<dynamic>? imageSrcList});
+      List<dynamic>? imageSrcList,
+      Object? completeHandler});
 }
 
 class BbsDetailRouterImpl extends BbsDetailRouter {
@@ -29,13 +30,20 @@ class BbsDetailRouterImpl extends BbsDetailRouter {
   void gotoImageLoader(Object context,
       {required String appBarTitle,
       int? imageSrcIndex,
-      List<dynamic>? imageSrcList}) {
+      List<dynamic>? imageSrcList,
+      Object? completeHandler}) {
     Navigator.pushNamed(
         context as BuildContext, ScreenRouteName.imageLoader.name,
         arguments: {
           ImageLoaderParamKeys.appBarTitle: appBarTitle,
           ImageLoaderParamKeys.imageIndex: imageSrcIndex,
           ImageLoaderParamKeys.imageSrcList: imageSrcList,
-        });
+        }).then((value) {
+      if (completeHandler is Function(int)?) {
+        if (value is int) {
+          completeHandler?.call(value);
+        }
+      }
+    });
   }
 }

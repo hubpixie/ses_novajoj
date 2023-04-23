@@ -91,7 +91,9 @@ class _BbsDetailPageState extends State<BbsDetailPage> {
                       widget.presenter.eventViewImageLoader(context,
                           appBarTitle: '',
                           imageSrcIndex: srcIndex,
-                          imageSrcList: srcList);
+                          imageSrcList: srcList, completeHandler: (index) {
+                        _detailPage.scrollController.scrollTo(index: index);
+                      });
                     })
                   ]);
                 } else {

@@ -66,7 +66,11 @@ class _WebPageState extends State<WebPage> {
                 ? true
                 : false, onImageLoad: (int srcIndex, List<dynamic> srcList) {
           widget.presenter.eventViewImageLoader(context,
-              appBarTitle: '', imageSrcIndex: srcIndex, imageSrcList: srcList);
+              appBarTitle: '',
+              imageSrcIndex: srcIndex,
+              imageSrcList: srcList, completeHandler: (index) {
+            _detailPage.scrollController.scrollTo(index: index);
+          });
         }));
   }
 

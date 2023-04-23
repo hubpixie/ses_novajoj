@@ -249,8 +249,9 @@ class _ImageLoaderPageState extends State<ImageLoaderPage> {
                         if (primaryVelocity > 0 &&
                             offset.dy > 250 &&
                             !_scaleStateControllers[_currPageIndex].isZooming &&
-                            scaleDiff < 0.1) {
-                          Navigator.pop(context);
+                            scaleDiff < 0.2) {
+                          // dismiss the current page and scroll to the target image of gived index.
+                          Navigator.of(context).pop(_currPageIndex);
                         }
                       },
                     )),

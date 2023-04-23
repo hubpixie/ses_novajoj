@@ -129,7 +129,20 @@ class DetailItem {
                       // To listen to messages coming from the Dart side, set the onmessage event listener
                       port.onmessage = function (event) {
                           // event.data contains the message data coming from the Dart side 
-                          console.log(event.data);
+                          //console.log(event.data);
+                          var errorType = "";
+                          try {
+                            const received = JSON.parse(event.data);
+                            if (received.event == "scrollTo") {
+                              errorType = "scrollTo";
+                              const imgs = document.querySelectorAll("img");
+                              const x = imgs[received.index].offsetLeft;
+                              const y = imgs[received.index].offsetTop;
+                              window.scrollTo(x, y - 5);
+                            }
+                          } catch (e) {
+                            console.log(errorType + ' error!');
+                          }
                       };
                   }
               }

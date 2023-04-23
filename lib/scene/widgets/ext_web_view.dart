@@ -7,7 +7,13 @@ import 'package:ses_novajoj/foundation/log_util.dart';
 
 typedef ImageLoadingDelegate = void Function(int, List<dynamic>);
 
-class PageScrollController {}
+class PageScrollController {
+  StreamController<int>? _pageScrollStreamController;
+
+  void scrollTo({required int index}) {
+    _pageScrollStreamController?.add(index);
+  }
+}
 
 class ExtWebView extends StatefulWidget {
   final dynamic detailItem;
@@ -62,16 +68,28 @@ class _ExtWebViewState extends State<ExtWebView> {
             allowsInlineMediaPlayback: true,
           ));
   late StreamController<double> _progressController;
+  WebMessagePort? _messagePort1;
 
   @override
   void initState() {
+    // progressController
     _progressController = StreamController<double>.broadcast();
+
+    // scrollController
+    widget.scrollController
+        ?._pageScrollStreamController = StreamController<int>.broadcast()
+      ..stream.listen((e) {
+        _messagePort1
+            ?.postMessage(WebMessage(data: '{"event":"scrollTo", "index":$e}'));
+      });
+
     super.initState();
   }
 
   @override
   void dispose() {
     _progressController.close();
+    widget.scrollController?._pageScrollStreamController?.close();
     super.dispose();
   }
 
@@ -138,6 +156,7 @@ class _ExtWebViewState extends State<ExtWebView> {
                         await controller.createWebMessageChannel();
                     var port1 = webMessageChannel!.port1;
                     var port2 = webMessageChannel.port2;
+                    _messagePort1 = port1;
 
                     // set the web message callback for the port1
                     await port1.setWebMessageCallback((message) async {

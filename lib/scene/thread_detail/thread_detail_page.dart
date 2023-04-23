@@ -86,7 +86,9 @@ class _ThreadDetailPageState extends State<ThreadDetailPage> {
                       widget.presenter.eventViewImageLoader(context,
                           appBarTitle: '',
                           imageSrcIndex: srcIndex,
-                          imageSrcList: srcList);
+                          imageSrcList: srcList, completeHandler: (index) {
+                        _detailPage.scrollController.scrollTo(index: index);
+                      });
                     })
                   ]);
                 } else {

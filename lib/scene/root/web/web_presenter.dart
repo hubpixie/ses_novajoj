@@ -14,7 +14,8 @@ abstract class WebPresenter with SimpleBloc<dynamic> {
   void eventViewImageLoader(Object context,
       {required String appBarTitle,
       int? imageSrcIndex,
-      List<dynamic>? imageSrcList});
+      List<dynamic>? imageSrcList,
+      Object? completeHandler});
 }
 
 class WebPresenterImpl extends WebPresenter {
@@ -26,10 +27,12 @@ class WebPresenterImpl extends WebPresenter {
   void eventViewImageLoader(Object context,
       {required String appBarTitle,
       int? imageSrcIndex,
-      List<dynamic>? imageSrcList}) {
+      List<dynamic>? imageSrcList,
+      Object? completeHandler}) {
     router.gotoImageLoader(context,
         appBarTitle: appBarTitle,
         imageSrcIndex: imageSrcIndex,
-        imageSrcList: imageSrcList);
+        imageSrcList: imageSrcList,
+        completeHandler: completeHandler);
   }
 }

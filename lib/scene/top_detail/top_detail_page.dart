@@ -12,6 +12,7 @@ import 'package:ses_novajoj/scene/top_detail/top_detail_presenter.dart';
 import 'package:ses_novajoj/scene/top_detail/top_detail_presenter_output.dart';
 
 import 'package:ses_novajoj/scene/widgets/error_view.dart';
+import 'package:ses_novajoj/scene/widgets/ext_web_view.dart';
 
 class TopDetailPage extends StatefulWidget {
   final TopDetailPresenter presenter;
@@ -92,7 +93,9 @@ class _TopDetailPageState extends State<TopDetailPage> {
                         widget.presenter.eventViewImageLoader(context,
                             appBarTitle: '',
                             imageSrcIndex: srcIndex,
-                            imageSrcList: srcList);
+                            imageSrcList: srcList, completeHandler: (index) {
+                          _detailPage.scrollController.scrollTo(index: index);
+                        });
                       })
                     ],
                   );
