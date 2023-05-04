@@ -47,11 +47,13 @@ dependencies:
   country_icons: ^2.0.2
   connectivity_plus: ^2.3.9
   cached_network_image: ^3.2.1
+  flutter_cache_manager:
   image_gallery_saver: ^1.7.1
   photo_view: ^0.14.0
   path:
   path_provider: ^2.0.11
   scroll_to_index:
+  share_plus:
   
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

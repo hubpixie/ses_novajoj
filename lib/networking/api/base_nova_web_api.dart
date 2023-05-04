@@ -5,7 +5,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart' as html_parser;
 import 'package:image_gallery_saver/image_gallery_saver.dart';
-import 'package:path/path.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:ses_novajoj/foundation//log_util.dart';
 import 'package:ses_novajoj/foundation/data/string_util.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
@@ -461,24 +461,13 @@ class BaseNovaWebApi {
     }
 
     try {
-      // prepare temp filePath
-      final tempDic = Directory.systemTemp.path;
-      final tempUrl = File(urlStr);
-      final filename = basename(tempUrl.path).contains('.')
-          ? basename(tempUrl.path)
-          : '001.jpg';
-      final filePathName = '$tempDic/images/$filename';
-      await Directory('$tempDic/images').create(recursive: true);
-
       // download and save
-      File tempFile = File(filePathName); //
-      final response = await BaseApiClient.client.get(Uri.parse(urlStr));
-      await tempFile.writeAsBytes(response.bodyBytes);
+      File tempFile = await DefaultCacheManager().getSingleFile(urlStr);
 
       // Add to Gallery/Cameraroll
       await ImageGallerySaver.saveFile(tempFile.path);
       log.info('Image is saved!');
-      tempFile.delete();
+      // tempFile.delete();
       return true;
     } catch (error) {
       log.info('saveNetworkMedia is failed due to $error');

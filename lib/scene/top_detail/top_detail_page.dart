@@ -10,9 +10,7 @@ import 'package:ses_novajoj/scene/foundation/page/page_parameter.dart';
 import 'package:ses_novajoj/scene/root/detail_page.dart';
 import 'package:ses_novajoj/scene/top_detail/top_detail_presenter.dart';
 import 'package:ses_novajoj/scene/top_detail/top_detail_presenter_output.dart';
-
 import 'package:ses_novajoj/scene/widgets/error_view.dart';
-import 'package:ses_novajoj/scene/widgets/ext_web_view.dart';
 
 class TopDetailPage extends StatefulWidget {
   final TopDetailPresenter presenter;
