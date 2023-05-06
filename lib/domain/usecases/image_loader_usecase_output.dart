@@ -1,6 +1,6 @@
 import 'package:ses_novajoj/foundation/data/user_types.dart';
 
-abstract class  ImageLoaderUseCaseOutput {}
+abstract class ImageLoaderUseCaseOutput {}
 
 class PresentModel extends ImageLoaderUseCaseOutput {
   final ImageLoaderUseCaseModel? model;
@@ -9,8 +9,7 @@ class PresentModel extends ImageLoaderUseCaseOutput {
 }
 
 class ImageLoaderUseCaseModel {
-  int id;
-  String string;
+  NovaImageInfo imageInfo;
 
-  ImageLoaderUseCaseModel(this.id, this.string);
+  ImageLoaderUseCaseModel(this.imageInfo);
 }

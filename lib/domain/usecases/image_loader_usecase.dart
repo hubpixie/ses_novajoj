@@ -10,7 +10,8 @@ class ImageLoaderUseCaseInput {
 }
 
 abstract class ImageLoaderUseCase with SimpleBloc<ImageLoaderUseCaseOutput> {
-  void fetchImageLoader({required ImageLoaderUseCaseInput input});
+  Future<ImageLoaderUseCaseOutput> fetchImageInfo(
+      {required ImageLoaderUseCaseInput input});
   Future<bool> saveNetworkMedia({required ImageLoaderUseCaseInput input});
 }
 
@@ -19,7 +20,12 @@ class ImageLoaderUseCaseImpl extends ImageLoaderUseCase {
   ImageLoaderUseCaseImpl() : repository = ImageLoaderRepositoryImpl();
 
   @override
-  void fetchImageLoader({required ImageLoaderUseCaseInput input}) async {}
+  Future<ImageLoaderUseCaseOutput> fetchImageInfo(
+      {required ImageLoaderUseCaseInput input}) async {
+    final ret = await repository.fetchImageInfo(
+        input: FetchImageLoaderRepoInput(mediaUrlString: input.imageSrc));
+    return PresentModel(model: ImageLoaderUseCaseModel(ret.imageInfo));
+  }
 
   @override
   Future<bool> saveNetworkMedia(

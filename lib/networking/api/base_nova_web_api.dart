@@ -4,15 +4,12 @@ import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart' as html_parser;
-import 'package:image_gallery_saver/image_gallery_saver.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:ses_novajoj/foundation//log_util.dart';
 import 'package:ses_novajoj/foundation/data/string_util.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/foundation/data/result.dart';
 import 'package:ses_novajoj/networking/api_client/base_api_client.dart';
 import 'package:ses_novajoj/networking/request/comment_item_parameter.dart';
-import 'package:ses_novajoj/networking/request/image_loader_item_parameter.dart';
 import 'package:ses_novajoj/networking/request/nova_item_parameter.dart';
 import 'package:ses_novajoj/networking/response/comment_list_item_response.dart';
 import 'package:ses_novajoj/networking/response/misc_info_select_item_response.dart';
@@ -440,38 +437,6 @@ class BaseNovaWebApi {
       return Result.failure(error: error);
     } on Exception catch (error) {
       return Result.failure(error: AppError.fromException(error));
-    }
-  }
-
-  ///
-  ////api name: saveNetworkMedia
-  ///
-  Future<bool> saveNetworkMedia(
-      {required ImageLoaderItemParameter parameter}) async {
-    final urlStr = parameter.mediaUrlString;
-    if (urlStr.isEmpty) {
-      log.info('mediaUrl is empty!');
-      return false;
-    }
-
-    final networkState = await BaseApiClient.connectivityState();
-    if (networkState == ConnectivityResult.none) {
-      log.info('network is unavailable!');
-      return false;
-    }
-
-    try {
-      // download and save
-      File tempFile = await DefaultCacheManager().getSingleFile(urlStr);
-
-      // Add to Gallery/Cameraroll
-      await ImageGallerySaver.saveFile(tempFile.path);
-      log.info('Image is saved!');
-      // tempFile.delete();
-      return true;
-    } catch (error) {
-      log.info('saveNetworkMedia is failed due to $error');
-      return false;
     }
   }
 }

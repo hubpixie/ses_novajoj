@@ -1,9 +1,9 @@
+import 'package:ses_novajoj/foundation/data/user_types.dart';
+
 class ImageLoaderItem {
-  int id;
-  String string;
+  NovaImageInfo imageInfo;
 
   ImageLoaderItem({
-    required this.id,
-    required this.string,
+    required this.imageInfo,
   });
 }

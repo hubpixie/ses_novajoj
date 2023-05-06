@@ -1,3 +1,5 @@
+import 'package:ses_novajoj/domain/entities/image_loader_item.dart';
+
 class FetchImageLoaderRepoInput {
   String mediaUrlString;
 
@@ -5,7 +7,7 @@ class FetchImageLoaderRepoInput {
 }
 
 abstract class ImageLoaderRepository {
-  // Future<Result<ImageLoaderItem>> fetchImageLoader(
-  //     {required FetchImageLoaderRepoInput input});
   Future<bool> saveNetworkMedia({required FetchImageLoaderRepoInput input});
+  Future<ImageLoaderItem> fetchImageInfo(
+      {required FetchImageLoaderRepoInput input});
 }

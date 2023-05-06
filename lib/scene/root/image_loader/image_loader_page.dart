@@ -3,12 +3,13 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:path/path.dart';
+import 'package:carousel_slider/carousel_slider.dart';
+import 'package:ses_novajoj/foundation/data/user_types.dart';
+import 'package:ses_novajoj/scene/root/image_loader/image_loader_presenter_output.dart';
+import 'package:wakelock/wakelock.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:ses_novajoj/foundation/data/string_util.dart';
 import 'package:ses_novajoj/foundation/log_util.dart';
 import 'package:ses_novajoj/scene/foundation/page/page_parameter.dart';
 import 'package:ses_novajoj/scene/root/image_loader/image_loader_presenter.dart';
@@ -26,8 +27,11 @@ class _ImageLoaderPageState extends State<ImageLoaderPage> {
   // late String _appBarTitle;
   late int _imageIndex;
   late List<dynamic> _imageSrcList;
+  late List<NovaImageInfo> _novaImageInfoList;
   int _currPageIndex = 0;
+  int _currSlidePageIndex = 0;
   bool _isPageLoading = false;
+  bool _isSlideShow = false;
   Map? _parameters;
   late GlobalKey<ScaffoldState> _scaffoldKey;
 
@@ -41,7 +45,7 @@ class _ImageLoaderPageState extends State<ImageLoaderPage> {
   late StreamController<String> _imageTitleController;
   late StreamController<bool> _imageLoadedController;
   late StreamController<bool> _imageSharedController;
-  late StreamController<_InnnerImageInfo> _imageInfoController;
+  late StreamController<NovaImageInfo> _imageInfoController;
   late StreamController<bool> _imageSelectedController;
   late List<bool> _imageSelectedStates;
 
@@ -53,7 +57,7 @@ class _ImageLoaderPageState extends State<ImageLoaderPage> {
     _imageTitleController = StreamController<String>.broadcast();
     _imageLoadedController = StreamController<bool>.broadcast();
     _imageSharedController = StreamController<bool>.broadcast();
-    _imageInfoController = StreamController<_InnnerImageInfo>.broadcast();
+    _imageInfoController = StreamController<NovaImageInfo>.broadcast();
     _imageSelectedController = StreamController<bool>.broadcast();
     _imageLoadingStates = {};
   }
@@ -73,6 +77,7 @@ class _ImageLoaderPageState extends State<ImageLoaderPage> {
   @override
   Widget build(BuildContext context) {
     _parseRouteParameter(context);
+
     return WillPopScope(
         onWillPop: () {
           // dismiss snackBar if need
@@ -102,12 +107,18 @@ class _ImageLoaderPageState extends State<ImageLoaderPage> {
                         _buildImageSeletButton(context),
                       ],
                     ),
-                    _buildImageContentArea(context),
+                    _isSlideShow
+                        ? _buildSlideContentArea(context,
+                            srcList: _imageSrcList)
+                        : _buildImageContentArea(context,
+                            startPage: _currPageIndex),
                     Row(
                       children: [
                         _buildImageShareButton(context),
                         const Spacer(),
                         _buildImageInfoButton(context),
+                        const Spacer(),
+                        _buildSlideShowButton(context),
                         const Spacer(),
                         _buildImageSaveButton(context),
                       ],
@@ -125,16 +136,17 @@ class _ImageLoaderPageState extends State<ImageLoaderPage> {
         alignment: Alignment.centerLeft,
         width: 90,
         child: TextButton(
-          style: TextButton.styleFrom(
-              alignment: Alignment.center, primary: Colors.white),
-          onPressed: () {
-            // dismiss snackBar if need
-            _dismissSnackBar(context);
-            // dismiss bottomSheet if need
-            _bottomSheetController?.close();
-            // dismiss imageLoader page
-            Navigator.of(context).pop();
-          },
+          style: _buildEnabledButtonStyle(enabled: !_isSlideShow),
+          onPressed: _isSlideShow
+              ? null
+              : () {
+                  // dismiss snackBar if need
+                  _dismissSnackBar(context);
+                  // dismiss bottomSheet if need
+                  _bottomSheetController?.close();
+                  // dismiss imageLoader page
+                  Navigator.of(context).pop();
+                },
           child: const Icon(Icons.close_outlined),
         ));
   }
@@ -166,131 +178,79 @@ class _ImageLoaderPageState extends State<ImageLoaderPage> {
               width: 90,
               alignment: Alignment.centerRight,
               child: TextButton(
-                style: TextButton.styleFrom(
-                    alignment: Alignment.center, primary: Colors.white),
-                onPressed: () {
-                  // upadte imageSlect states
-                  _imageSelectedStates[_currPageIndex] = !selected;
-                  _imageSelectedController.add(!selected);
+                style: _buildEnabledButtonStyle(enabled: !_isSlideShow),
+                onPressed: _isSlideShow
+                    ? null
+                    : () {
+                        // upadte imageSlect states
+                        _imageSelectedStates[_currPageIndex] = !selected;
+                        _imageSelectedController.add(!selected);
 
-                  // update imageShare button state
-                  final shared = _imageSelectedStates
-                      .firstWhere((elem) => elem == true, orElse: () => false);
-                  _imageSharedController.add(shared);
-                },
+                        // update imageShare button state
+                        final shared = _imageSelectedStates.firstWhere(
+                            (elem) => elem == true,
+                            orElse: () => false);
+                        _imageSharedController.add(shared);
+                      },
                 child: Text(selected ? "unselect" : "select"),
               ));
         });
   }
 
-  Widget _buildImageContentArea(BuildContext context) {
+  Widget _buildImageContentArea(BuildContext context,
+      {required int startPage}) {
     return Expanded(
         child: GestureDetector(
-      child: PhotoViewGallery.builder(
-        scrollPhysics: const BouncingScrollPhysics(),
-        builder: (BuildContext context, int index) {
-          return PhotoViewGalleryPageOptions(
-            imageProvider: CachedNetworkImageProvider(_imageSrcList[index]),
-            controller: _photoViewControllers[index],
-            scaleStateController: _scaleStateControllers[index],
-          );
-        },
-        allowImplicitScrolling: true,
-        itemCount: _imageSrcList.length,
-        onPageChanged: (pageIndex) {
-          _currPageIndex = pageIndex;
-          // dismiss snackBar if need
-          _dismissSnackBar(context);
+      child: Container(
+        alignment: Alignment.center,
+        child: PhotoViewGallery.builder(
+          scrollPhysics: const BouncingScrollPhysics(),
+          builder: (BuildContext context, int index) {
+            return PhotoViewGalleryPageOptions(
+              imageProvider: CachedNetworkImageProvider(
+                _imageSrcList[index],
+              ),
+              controller: _photoViewControllers[index],
+              scaleStateController: _scaleStateControllers[index],
+            );
+          },
+          itemCount: _imageSrcList.length,
+          onPageChanged: (pageIndex) => _didImagePageChanged(pageIndex),
+          pageController: _pageController,
+          loadingBuilder:
+              (BuildContext context, ImageChunkEvent? loadingProgress) {
+            _isPageLoading = true;
+            String imageTitle = _getImageTitle();
 
-          // imageTitle
-          String imageTitle = _getImageTitle();
-          int pageIndex_ = pageIndex;
-          _imageTitleController.sink.add(imageTitle);
-
-          log.info(
-              'currPageIndex -- 2 =$_currPageIndex, name=${_getImageTitle()}, loaded=false?');
-
-          // switch imageSelected state
-          _imageSelectedController.add(_imageSelectedStates[_currPageIndex]);
-
-          // show imageInfo sheet if need
-          if (_bottomSheetController != null) {
-            _sendImageInfo(context);
-          }
-
-          // imageLoaded [1]
-          if (!_imageLoadingStates.containsKey(imageTitle)) {
-            _imageLoadedController.sink.add(false);
-            log.info(
-                'currPageIndex -- 3 =$_currPageIndex, name=${_getImageFileName()}, loaded=false');
-          } else {
-            _imageLoadedController.sink.add(_imageLoadingStates[imageTitle]!);
-            log.info(
-                'currPageIndex -- 4 =$_currPageIndex, name=${_getImageFileName()}, loaded=true');
-            return;
-          }
-
-          // imageLoaded [2]
-          Future.delayed(const Duration(milliseconds: 500), () {
-            int delayTime = _isPageLoading ? 1500 : 0;
-
-            Future.delayed(Duration(milliseconds: delayTime), () {
-              if (_imageLoadedController.isClosed) {
-                return;
+            double? progress;
+            if (loadingProgress == null ||
+                (loadingProgress.expectedTotalBytes != null &&
+                    loadingProgress.expectedTotalBytes ==
+                        loadingProgress.cumulativeBytesLoaded)) {
+              // imageLoaded as false if loading is completed
+              if (loadingProgress != null) {
+                _imageLoadingStates[imageTitle] = true;
+                _imageLoadedController.sink.add(true);
               }
-              // imageTitle
-              String imageTitle = _getImageTitle(pageIndex: pageIndex_);
+            } else {
+              // progress
+              progress = loadingProgress.cumulativeBytesLoaded /
+                  loadingProgress.expectedTotalBytes!;
 
               if (!_imageLoadingStates.containsKey(imageTitle)) {
-                _imageLoadingStates[imageTitle] = true;
-                if (_currPageIndex == pageIndex_) {
-                  log.info(
-                      'currPageIndex -- 5 =$_currPageIndex, name=${_getImageFileName()}, loaded=true');
-                  _imageLoadedController.sink.add(true);
-                }
-              } else {
-                log.info(
-                    'currPageIndex -- 6 =$_currPageIndex, name=${_getImageFileName()}, loaded=$_imageLoadingStates[imageTitle]');
+                _imageLoadingStates[imageTitle] = false;
+                _imageLoadedController.sink.add(false);
               }
-            });
-          });
-        },
-        pageController: _pageController,
-        loadingBuilder:
-            (BuildContext context, ImageChunkEvent? loadingProgress) {
-          _isPageLoading = true;
-          String imageTitle = _getImageTitle();
-
-          double? progress;
-          if (loadingProgress == null ||
-              (loadingProgress.expectedTotalBytes != null &&
-                  loadingProgress.expectedTotalBytes ==
-                      loadingProgress.cumulativeBytesLoaded)) {
-            // imageLoaded as false if loading is completed
-            if (loadingProgress != null) {
-              _imageLoadingStates[imageTitle] = true;
-              _imageLoadedController.sink.add(true);
             }
-            log.info(
-                'currPageIndex -- 7 =$_currPageIndex, name=${_getImageFileName()}, loaded=${_imageLoadingStates[imageTitle]}, (loadingProgress == null: ${loadingProgress == null}');
-          } else {
-            // progress
-            progress = loadingProgress.cumulativeBytesLoaded /
-                loadingProgress.expectedTotalBytes!;
 
-            if (!_imageLoadingStates.containsKey(imageTitle)) {
-              _imageLoadingStates[imageTitle] = false;
-              _imageLoadedController.sink.add(false);
-            }
-          }
-
-          // imageLoaded as false if loading is not completed.
-          return Center(
-            child: CircularProgressIndicator(
-              value: progress,
-            ),
-          );
-        },
+            // imageLoaded as false if loading is not completed.
+            return Center(
+              child: CircularProgressIndicator(
+                value: progress,
+              ),
+            );
+          },
+        ),
       ),
       onVerticalDragEnd: (DragEndDetails event) {
         Offset offset = event.velocity.pixelsPerSecond;
@@ -299,10 +259,11 @@ class _ImageLoaderPageState extends State<ImageLoaderPage> {
             ((_photoViewControllers[_currPageIndex].initial.scale ?? 0) -
                     (_photoViewControllers[_currPageIndex].scale ?? 0))
                 .abs();
+        log.info('scaleDiff = $scaleDiff');
         if (primaryVelocity > 0 &&
             offset.dy > 250 &&
-            !_scaleStateControllers[_currPageIndex].isZooming &&
-            scaleDiff < 0.2) {
+            /*!_scaleStateControllers[_currPageIndex].isZooming &&*/
+            scaleDiff < 0.3) {
           // dismiss snackBar if need
           _dismissSnackBar(context);
 
@@ -324,17 +285,14 @@ class _ImageLoaderPageState extends State<ImageLoaderPage> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Container();
           }
-          final shared =
+          var shared =
               snapshot.data is bool ? (snapshot.data as bool? ?? false) : false;
+          shared = _isSlideShow ? false : shared;
           final sharedCnt =
               _imageSelectedStates.where((elem) => elem).toList().length;
+
           return TextButton(
-              style: !shared
-                  ? TextButton.styleFrom(
-                      primary: Colors.grey, onSurface: Colors.grey)
-                  : TextButton.styleFrom(
-                      primary: Colors.white,
-                    ),
+              style: _buildEnabledButtonStyle(enabled: shared),
               onPressed: shared
                   ? () {
                       // dismiss snackBar if need
@@ -354,14 +312,43 @@ class _ImageLoaderPageState extends State<ImageLoaderPage> {
 
   Widget _buildImageInfoButton(BuildContext context) {
     return TextButton(
-      style: TextButton.styleFrom(
-          alignment: Alignment.center, primary: Colors.white),
-      onPressed: () {
-        _sendImageInfo(context);
-        _displayImageInfoSheet(context);
-      },
+      style: _buildEnabledButtonStyle(enabled: !_isSlideShow),
+      onPressed: _isSlideShow
+          ? null
+          : () {
+              _sendImageInfo(context, pageIndex: _currPageIndex);
+              _displayImageInfoSheet(context);
+            },
       child: const Icon(Icons.info_outlined),
     );
+  }
+
+  Widget _buildSlideShowButton(BuildContext context) {
+    return StreamBuilder(
+        stream: _imageLoadedController.stream,
+        builder: (context, snapshot) {
+          bool imageLoaded =
+              snapshot.data is bool ? (snapshot.data as bool? ?? false) : false;
+          return TextButton(
+              style: _buildEnabledButtonStyle(enabled: imageLoaded),
+              onPressed: !imageLoaded
+                  ? null
+                  : () {
+                      _isSlideShow = !_isSlideShow;
+                      // disable / enable screenLock if need
+                      Wakelock.toggle(enable: _isSlideShow);
+                      if (!_isSlideShow) {
+                        // keep current page index
+                        _currPageIndex = _currSlidePageIndex;
+                        _pageController =
+                            PageController(initialPage: _currPageIndex);
+                      }
+                      setState(() {});
+                    },
+              child: !_isSlideShow
+                  ? const Icon(Icons.slideshow_outlined)
+                  : const Icon(Icons.pause_circle_outline_outlined));
+        });
   }
 
   Widget _buildImageSaveButton(BuildContext context) {
@@ -370,19 +357,71 @@ class _ImageLoaderPageState extends State<ImageLoaderPage> {
         builder: (context, snapshot) {
           bool imageLoaded =
               snapshot.data is bool ? (snapshot.data as bool? ?? false) : false;
-          log.info(
-              'currPageIndex -- 1 =$_currPageIndex, name=${_getImageFileName()}, loaded=$imageLoaded');
+          imageLoaded = _isSlideShow ? false : imageLoaded;
           return TextButton(
-              style: !imageLoaded
-                  ? TextButton.styleFrom(
-                      primary: Colors.grey, onSurface: Colors.grey)
-                  : TextButton.styleFrom(
-                      primary: Colors.white,
-                    ),
+              style: _buildEnabledButtonStyle(enabled: imageLoaded),
               onPressed:
                   !imageLoaded ? null : () => _saveSelectedImage(context),
               child: const Icon(Icons.save_alt_sharp));
         });
+  }
+
+  void _didImagePageChanged(int pageIndex) {
+    _currPageIndex = pageIndex;
+    // dismiss snackBar if need
+    _dismissSnackBar(context);
+
+    // imageTitle
+    String imageTitle = _getImageTitle();
+    int pageIndex_ = pageIndex;
+    _imageTitleController.sink.add(imageTitle);
+
+    log.info(
+        'currPageIndex -- 2 =$_currPageIndex, name=${_getImageTitle()}, loaded=false?');
+
+    // switch imageSelected state
+    _imageSelectedController.add(_imageSelectedStates[_currPageIndex]);
+
+    // prepare fetching data of the left/right index.
+    _prefetchImageInfos(context, pageIndex: pageIndex);
+
+    // show imageInfo sheet if need
+    if (_bottomSheetController != null) {
+      _sendImageInfo(context, pageIndex: pageIndex);
+    }
+
+    // imageLoaded [1]
+    if (_novaImageInfoList[pageIndex].displayName == null) {
+      if (!_imageLoadingStates.containsKey(imageTitle)) {
+        _imageLoadedController.sink.add(false);
+      } else {
+        _imageLoadedController.sink.add(_imageLoadingStates[imageTitle]!);
+      }
+    } else {
+      _imageLoadingStates[imageTitle] = true;
+      _imageLoadedController.sink.add(true);
+      return;
+    }
+
+    // imageLoaded [2]
+    Future.delayed(const Duration(milliseconds: 500), () {
+      int delayTime = _isPageLoading ? 1500 : 0;
+
+      Future.delayed(Duration(milliseconds: delayTime), () {
+        if (_imageLoadedController.isClosed) {
+          return;
+        }
+        // imageTitle
+        String imageTitle = _getImageTitle(pageIndex: pageIndex_);
+
+        if (!_imageLoadingStates.containsKey(imageTitle)) {
+          _imageLoadingStates[imageTitle] = true;
+          if (_currPageIndex == pageIndex_) {
+            _imageLoadedController.sink.add(true);
+          }
+        } else {}
+      });
+    });
   }
 
   void _saveSelectedImage(BuildContext context) {
@@ -435,10 +474,9 @@ class _ImageLoaderPageState extends State<ImageLoaderPage> {
         return StreamBuilder(
             stream: _imageInfoController.stream,
             builder: (context, snapshot) {
-              _InnnerImageInfo imageInfo;
-              log.info('_sendImageInfo [2]: filename = ..');
-              if (snapshot.data is _InnnerImageInfo) {
-                imageInfo = snapshot.data as _InnnerImageInfo;
+              NovaImageInfo imageInfo;
+              if (snapshot.data is NovaImageInfo) {
+                imageInfo = snapshot.data as NovaImageInfo;
               } else {
                 return Container();
               }
@@ -457,7 +495,7 @@ class _ImageLoaderPageState extends State<ImageLoaderPage> {
                   //crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildImageInfoAlertRow(context_,
-                        title: 'File Name: ', text: imageInfo.filename),
+                        title: 'File Name: ', text: imageInfo.displayName!),
                     _buildImageInfoAlertRow(context_,
                         title: 'File Size:',
                         text: '${formatFileSize(imageInfo.filesize)} MB'),
@@ -500,6 +538,67 @@ class _ImageLoaderPageState extends State<ImageLoaderPage> {
     );
   }
 
+  Widget _buildSlideContentArea(BuildContext context,
+      {required List<dynamic> srcList}) {
+    List<Widget> widgets = [];
+    int pageIndex = _currPageIndex;
+
+    if (srcList.isEmpty) {
+      widgets.add(Container());
+    } else {
+      _imageSrcList.asMap().forEach((index, value) {
+        Widget widget = FutureBuilder<String>(
+          future: () async {
+            await _prefetchImageInfos(context, pageIndex: index, step: 0);
+            return _novaImageInfoList[index].filename;
+          }(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Container();
+            }
+            if (snapshot.data is String) {
+              String filename = snapshot.data as String;
+              return Image.file(File(filename));
+            } else {
+              return Container();
+            }
+          },
+        );
+        widgets.add(widget);
+      });
+    }
+    return Expanded(
+        child: CarouselSlider(
+            items: widgets,
+            options: CarouselOptions(
+              height: double.infinity,
+              viewportFraction: 0.8,
+              initialPage: pageIndex,
+              enableInfiniteScroll: true,
+              reverse: false,
+              autoPlay: true,
+              autoPlayInterval: const Duration(milliseconds: 3500),
+              autoPlayAnimationDuration: const Duration(milliseconds: 800),
+              autoPlayCurve: Curves.easeInOutQuart,
+              enlargeCenterPage: true,
+              enlargeFactor: 0.3,
+              onPageChanged: (value, _) async {
+                _currSlidePageIndex = value;
+                // imageTitle
+                String imageTitle = _getImageTitle(pageIndex: value);
+                _imageTitleController.sink.add(imageTitle);
+              },
+              scrollDirection: Axis.horizontal,
+            )));
+  }
+
+  ButtonStyle? _buildEnabledButtonStyle({required enabled}) {
+    return enabled
+        ? TextButton.styleFrom(
+            alignment: Alignment.center, primary: Colors.white)
+        : TextButton.styleFrom(primary: Colors.grey, onSurface: Colors.grey);
+  }
+
   void _parseRouteParameter(BuildContext context) {
     if (_pageLoadIsFirst) {
       _pageLoadIsFirst = false;
@@ -523,6 +622,7 @@ class _ImageLoaderPageState extends State<ImageLoaderPage> {
       // photoViewController list
       _photoViewControllers =
           List.filled(_imageSrcList.length, PhotoViewController());
+
       for (final item in _photoViewControllers) {
         item.outputStateStream.listen((event) {
           if (item.initial.scale == null) {
@@ -531,22 +631,31 @@ class _ImageLoaderPageState extends State<ImageLoaderPage> {
         });
       }
 
+      // _novaImageInfoList
+      _novaImageInfoList = [];
+      for (int idx = 0; idx < _imageSrcList.length; idx++) {
+        _novaImageInfoList.add(NovaImageInfo());
+      }
+      // prepare fetching image infos
+      _prefetchImageInfos(context, pageIndex: 0);
+
       // PhotoViewScaleStateController list
       _scaleStateControllers =
           List.filled(_imageSrcList.length, PhotoViewScaleStateController());
+
       // PageController
       _pageController = PageController(initialPage: _imageIndex);
 
       // init some variables
       _currPageIndex = _imageIndex;
+      _currSlidePageIndex = _imageIndex;
+
       String imageTitle = _getImageTitle();
       _imageLoadingStates = {};
 
       Future.delayed(const Duration(milliseconds: 300), () {
         if (!_imageLoadingStates.containsKey(imageTitle)) {
           _imageLoadedController.sink.add(false);
-          log.info(
-              'currPageIndex -- 9 =$_currPageIndex, name=${_getImageFileName()}, loaded=false');
         }
         // init imageSelected
         _imageSelectedStates = List.filled(_imageSrcList.length, false);
@@ -563,8 +672,6 @@ class _ImageLoaderPageState extends State<ImageLoaderPage> {
             if (!_imageLoadingStates.containsKey(imageTitle)) {
               _imageLoadingStates[imageTitle] = true;
               _imageLoadedController.sink.add(true);
-              log.info(
-                  'currPageIndex -- 10 =$_currPageIndex, name=${_getImageFileName()}, loaded=true');
             }
           });
         });
@@ -572,23 +679,30 @@ class _ImageLoaderPageState extends State<ImageLoaderPage> {
     }
   }
 
-  void _sendImageInfo(BuildContext context) async {
-    File file = await DefaultCacheManager()
-        .getSingleFile(_imageSrcList[_currPageIndex]);
-    String filename = (String name1, String name2) {
-      return StringUtil().substring(name1, start: '', end: '.') + name2;
-    }(_getImageFileName(), extension(file.path));
+  Future<void> _prefetchImageInfos(BuildContext context,
+      {int pageIndex = 0, int step = 3}) async {
+    for (int idx = pageIndex - step; idx <= pageIndex + step; idx++) {
+      if (idx < 0 || idx >= _imageSrcList.length) {
+        continue;
+      }
+      if (_novaImageInfoList[idx].displayName == null) {
+        final data = await widget.presenter.eventFetchImageInfo(
+            input: ImageLoaderPresenterInput(imageSrc: _imageSrcList[idx]));
+        if (data is ShowImageLoaderPageModel) {
+          NovaImageInfo imageInfo = data.viewModel!.imageInfo;
+          _novaImageInfoList[idx].displayName = imageInfo.displayName;
+          _novaImageInfoList[idx].filename = imageInfo.filename;
+          _novaImageInfoList[idx].filesize = imageInfo.filesize;
+          _novaImageInfoList[idx].imageWidth = imageInfo.imageWidth;
+          _novaImageInfoList[idx].imageHeight = imageInfo.imageHeight;
+        }
+      }
+    }
+  }
 
-    int size = await file.length();
-    final bytes = await file.readAsBytes();
-    final image = await decodeImageFromList(bytes);
+  void _sendImageInfo(BuildContext context, {int pageIndex = 0}) async {
     Future.delayed(const Duration(milliseconds: 300), () {
-      _InnnerImageInfo imageInfo = _InnnerImageInfo();
-      imageInfo.filename = filename;
-      imageInfo.filesize = size.toDouble();
-      imageInfo.imageWidth = image.width.toDouble();
-      imageInfo.imageHeight = image.height.toDouble();
-      _imageInfoController.add(imageInfo);
+      _imageInfoController.add(_novaImageInfoList[pageIndex]);
     });
   }
 
@@ -600,17 +714,16 @@ class _ImageLoaderPageState extends State<ImageLoaderPage> {
     List<XFile> xFiles = [];
     for (int idx = 0; idx < _imageSelectedStates.length; idx++) {
       if (_imageSelectedStates[idx]) {
-        final file =
-            await DefaultCacheManager().getSingleFile(_imageSrcList[idx]);
-        xFiles.add(XFile(file.path));
+        _prefetchImageInfos(context, pageIndex: idx);
+        xFiles.add(XFile(_novaImageInfoList[idx].filename));
       }
     }
     if (xFiles.isEmpty) {
       return;
     }
     await Share.shareXFiles(xFiles,
-        text: 'Share the image',
-        subject: 'Share the image',
+        text: 'Share images',
+        subject: 'Can share selected ${xFiles.length} images',
         sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size);
   }
 
@@ -618,21 +731,4 @@ class _ImageLoaderPageState extends State<ImageLoaderPage> {
     int pageIndex_ = pageIndex < 0 ? _currPageIndex : pageIndex;
     return '${pageIndex_ + 1} / ${_imageSrcList.length}';
   }
-
-  String _getImageFileName({int pageIndex = -1}) {
-    int pageIndex_ = pageIndex < 0 ? _currPageIndex : pageIndex;
-
-    String str = StringUtil().lastSegment(_imageSrcList[pageIndex_]);
-    if (str.length > 22) {
-      return str.substring(0, 16) + str.substring(str.length - 6, str.length);
-    }
-    return str;
-  }
-}
-
-class _InnnerImageInfo {
-  late String filename;
-  late double filesize;
-  late double imageWidth;
-  late double imageHeight;
 }

@@ -10,11 +10,8 @@ class ShowImageLoaderPageModel extends ImageLoaderPresenterOutput {
 }
 
 class ImageLoaderViewModel {
-  int id; 
+  NovaImageInfo imageInfo;
 
   ImageLoaderViewModel(ImageLoaderUseCaseModel model)
-      : id = model.id/*,
-       name = model.name,
-      ...
-      */;
+      : imageInfo = model.imageInfo;
 }
