@@ -85,13 +85,16 @@ class _TopDetailPageState extends State<TopDetailPage> {
                   _itemInfo = data.viewModel?.itemInfo;
                   return Column(
                     children: [
-                      _detailPage.buildContentArea(context,
-                          detailItem: data.viewModel,
-                          onImageLoad: (int srcIndex, List<dynamic> srcList) {
+                      _detailPage
+                          .buildContentArea(context, detailItem: data.viewModel,
+                              onImageLoad: (int srcIndex, List<dynamic> srcList,
+                                  parentViewImage) {
                         widget.presenter.eventViewImageLoader(context,
                             appBarTitle: '',
                             imageSrcIndex: srcIndex,
-                            imageSrcList: srcList, completeHandler: (index) {
+                            imageSrcList: srcList,
+                            parentViewImage: parentViewImage,
+                            completeHandler: (index) {
                           _detailPage.scrollController.scrollTo(index: index);
                         });
                       })

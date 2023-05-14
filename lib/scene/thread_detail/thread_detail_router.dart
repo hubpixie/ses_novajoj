@@ -7,6 +7,7 @@ abstract class ThreadDetailRouter {
       {required String appBarTitle,
       int? imageSrcIndex,
       List<dynamic>? imageSrcList,
+      dynamic parentViewImage,
       Object? completeHandler});
 }
 
@@ -18,6 +19,7 @@ class ThreadDetailRouterImpl extends ThreadDetailRouter {
       {required String appBarTitle,
       int? imageSrcIndex,
       List<dynamic>? imageSrcList,
+      dynamic parentViewImage,
       Object? completeHandler}) {
     Navigator.pushNamed(
         context as BuildContext, ScreenRouteName.imageLoader.name,
@@ -25,6 +27,7 @@ class ThreadDetailRouterImpl extends ThreadDetailRouter {
           ImageLoaderParamKeys.appBarTitle: appBarTitle,
           ImageLoaderParamKeys.imageIndex: imageSrcIndex,
           ImageLoaderParamKeys.imageSrcList: imageSrcList,
+          ImageLoaderParamKeys.parentViewImage: parentViewImage
         }).then((value) {
       if (completeHandler is Function(int)?) {
         if (value is int) {

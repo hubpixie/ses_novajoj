@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:dismissible_page/dismissible_page.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/scene/root/image_loader/image_loader_presenter_output.dart';
 import 'package:wakelock/wakelock.dart';
@@ -25,14 +26,16 @@ class ImageLoaderPage extends StatefulWidget {
 class _ImageLoaderPageState extends State<ImageLoaderPage> {
   bool _pageLoadIsFirst = true;
   // late String _appBarTitle;
+  Map? _parameters;
   late int _imageIndex;
+  // late String _parentViewImagePath;
   late List<dynamic> _imageSrcList;
   late List<NovaImageInfo> _novaImageInfoList;
   int _currPageIndex = 0;
   int _currSlidePageIndex = 0;
   bool _isPageLoading = false;
   bool _isSlideShow = false;
-  Map? _parameters;
+  // double _dragPercent = 0;
   late GlobalKey<ScaffoldState> _scaffoldKey;
 
   SnackBar? _snackBar;
@@ -93,6 +96,9 @@ class _ImageLoaderPageState extends State<ImageLoaderPage> {
               height: MediaQuery.of(context).size.height,
               padding: const EdgeInsets.all(5),
               color: Colors.black,
+              // decoration: BoxDecoration(
+              //     image: DecorationImage(
+              //         image: Image.file(File(_parentViewImagePath)).image)),
               child: Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -129,6 +135,36 @@ class _ImageLoaderPageState extends State<ImageLoaderPage> {
             ),
           ),
         ));
+  }
+
+  Widget _buildDismissableFrame(BuildContext context,
+      {required Widget child, required void Function() onDismissed}) {
+    return DismissiblePage(
+      onDismissed: () => onDismissed(),
+      // Start of the optional properties
+      isFullScreen: false,
+      disabled: false,
+      minRadius: 10,
+      maxRadius: 10,
+      dragSensitivity: 1.0,
+      maxTransformValue: 0.5,
+      direction: DismissiblePageDismissDirection.down,
+      backgroundColor: Colors.transparent,
+      onDragStart: () {},
+      onDragUpdate: (details) {
+        // _dragPercent = (details.offset.dy - dy);
+        // setState(() {});
+      },
+      dismissThresholds: const {
+        DismissiblePageDismissDirection.horizontal: 0.2,
+        DismissiblePageDismissDirection.vertical: 0.01
+      },
+      minScale: .5,
+      startingOpacity: 0.5,
+      reverseDuration: const Duration(milliseconds: 250),
+      // End of the optional properties
+      child: child,
+    );
   }
 
   Widget _buildDismissButton(BuildContext context) {
@@ -200,82 +236,72 @@ class _ImageLoaderPageState extends State<ImageLoaderPage> {
   Widget _buildImageContentArea(BuildContext context,
       {required int startPage}) {
     return Expanded(
-        child: GestureDetector(
       child: Container(
-        alignment: Alignment.center,
-        child: PhotoViewGallery.builder(
-          scrollPhysics: const BouncingScrollPhysics(),
-          builder: (BuildContext context, int index) {
-            return PhotoViewGalleryPageOptions(
-              imageProvider: CachedNetworkImageProvider(
-                _imageSrcList[index],
-              ),
-              controller: _photoViewControllers[index],
-              scaleStateController: _scaleStateControllers[index],
-            );
-          },
-          itemCount: _imageSrcList.length,
-          onPageChanged: (pageIndex) => _didImagePageChanged(pageIndex),
-          pageController: _pageController,
-          loadingBuilder:
-              (BuildContext context, ImageChunkEvent? loadingProgress) {
-            _isPageLoading = true;
-            String imageTitle = _getImageTitle();
+          alignment: Alignment.center,
+          color: Colors.transparent,
+          child: _buildDismissableFrame(
+            context,
+            onDismissed: () {
+              // dismiss snackBar if need
+              _dismissSnackBar(context);
 
-            double? progress;
-            if (loadingProgress == null ||
-                (loadingProgress.expectedTotalBytes != null &&
-                    loadingProgress.expectedTotalBytes ==
-                        loadingProgress.cumulativeBytesLoaded)) {
-              // imageLoaded as false if loading is completed
-              if (loadingProgress != null) {
-                _imageLoadingStates[imageTitle] = true;
-                _imageLoadedController.sink.add(true);
-              }
-            } else {
-              // progress
-              progress = loadingProgress.cumulativeBytesLoaded /
-                  loadingProgress.expectedTotalBytes!;
+              // dismiss bottomSheet if need
+              _bottomSheetController?.close();
 
-              if (!_imageLoadingStates.containsKey(imageTitle)) {
-                _imageLoadingStates[imageTitle] = false;
-                _imageLoadedController.sink.add(false);
-              }
-            }
+              // dismiss imageLoader page
+              // dismiss the current page and scroll to the target image of gived index.
+              Navigator.of(context).pop(_currPageIndex);
+            },
+            child: PhotoViewGallery.builder(
+              scrollPhysics: const BouncingScrollPhysics(),
+              builder: (BuildContext context, int index) {
+                return PhotoViewGalleryPageOptions(
+                  imageProvider: CachedNetworkImageProvider(
+                    _imageSrcList[index],
+                  ),
+                  controller: _photoViewControllers[index],
+                  scaleStateController: _scaleStateControllers[index],
+                );
+              },
+              itemCount: _imageSrcList.length,
+              onPageChanged: (pageIndex) => _didImagePageChanged(pageIndex),
+              pageController: _pageController,
+              loadingBuilder:
+                  (BuildContext context, ImageChunkEvent? loadingProgress) {
+                _isPageLoading = true;
+                String imageTitle = _getImageTitle();
 
-            // imageLoaded as false if loading is not completed.
-            return Center(
-              child: CircularProgressIndicator(
-                value: progress,
-              ),
-            );
-          },
-        ),
-      ),
-      onVerticalDragEnd: (DragEndDetails event) {
-        Offset offset = event.velocity.pixelsPerSecond;
-        double primaryVelocity = event.primaryVelocity ?? 0;
-        double scaleDiff =
-            ((_photoViewControllers[_currPageIndex].initial.scale ?? 0) -
-                    (_photoViewControllers[_currPageIndex].scale ?? 0))
-                .abs();
-        log.info('scaleDiff = $scaleDiff');
-        if (primaryVelocity > 0 &&
-            offset.dy > 250 &&
-            /*!_scaleStateControllers[_currPageIndex].isZooming &&*/
-            scaleDiff < 0.3) {
-          // dismiss snackBar if need
-          _dismissSnackBar(context);
+                double? progress;
+                if (loadingProgress == null ||
+                    (loadingProgress.expectedTotalBytes != null &&
+                        loadingProgress.expectedTotalBytes ==
+                            loadingProgress.cumulativeBytesLoaded)) {
+                  // imageLoaded as false if loading is completed
+                  if (loadingProgress != null) {
+                    _imageLoadingStates[imageTitle] = true;
+                    _imageLoadedController.sink.add(true);
+                  }
+                } else {
+                  // progress
+                  progress = loadingProgress.cumulativeBytesLoaded /
+                      loadingProgress.expectedTotalBytes!;
 
-          // dismiss bottomSheet if need
-          _bottomSheetController?.close();
+                  if (!_imageLoadingStates.containsKey(imageTitle)) {
+                    _imageLoadingStates[imageTitle] = false;
+                    _imageLoadedController.sink.add(false);
+                  }
+                }
 
-          // dismiss imageLoader page
-          // dismiss the current page and scroll to the target image of gived index.
-          Navigator.of(context).pop(_currPageIndex);
-        }
-      },
-    ));
+                // imageLoaded as false if loading is not completed.
+                return Center(
+                  child: CircularProgressIndicator(
+                    value: progress,
+                  ),
+                );
+              },
+            ),
+          )),
+    );
   }
 
   Widget _buildImageShareButton(BuildContext context) {
@@ -611,6 +637,8 @@ class _ImageLoaderPageState extends State<ImageLoaderPage> {
       _imageIndex = _parameters?[ImageLoaderParamKeys.imageIndex] as int? ?? 0;
       _imageSrcList =
           _parameters?[ImageLoaderParamKeys.imageSrcList] as List? ?? [];
+      // _parentViewImagePath =
+      //     _parameters?[ImageLoaderParamKeys.parentViewImage] as String? ?? '';
 
       //
       // FA

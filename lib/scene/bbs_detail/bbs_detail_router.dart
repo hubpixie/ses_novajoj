@@ -9,6 +9,7 @@ abstract class BbsDetailRouter {
       {required String appBarTitle,
       int? imageSrcIndex,
       List<dynamic>? imageSrcList,
+      dynamic parentViewImage,
       Object? completeHandler});
 }
 
@@ -31,6 +32,7 @@ class BbsDetailRouterImpl extends BbsDetailRouter {
       {required String appBarTitle,
       int? imageSrcIndex,
       List<dynamic>? imageSrcList,
+      dynamic parentViewImage,
       Object? completeHandler}) {
     Navigator.pushNamed(
         context as BuildContext, ScreenRouteName.imageLoader.name,
@@ -38,6 +40,7 @@ class BbsDetailRouterImpl extends BbsDetailRouter {
           ImageLoaderParamKeys.appBarTitle: appBarTitle,
           ImageLoaderParamKeys.imageIndex: imageSrcIndex,
           ImageLoaderParamKeys.imageSrcList: imageSrcList,
+          ImageLoaderParamKeys.parentViewImage: parentViewImage
         }).then((value) {
       if (completeHandler is Function(int)?) {
         if (value is int) {

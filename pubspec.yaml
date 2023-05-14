@@ -48,6 +48,7 @@ dependencies:
   connectivity_plus: ^2.3.9
   carousel_slider:
   cached_network_image: ^3.2.1
+  dismissible_page:
   flutter_cache_manager:
   image_gallery_saver: ^1.7.1
   image_size_getter:

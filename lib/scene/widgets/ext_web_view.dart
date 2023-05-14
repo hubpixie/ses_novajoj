@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:ses_novajoj/foundation/log_util.dart';
 
-typedef ImageLoadingDelegate = void Function(int, List<dynamic>);
+typedef ImageLoadingDelegate = void Function(int, List<dynamic>, dynamic);
 
 class PageScrollController {
   StreamController<int>? _pageScrollStreamController;
@@ -54,7 +54,6 @@ class ExtWebView extends StatefulWidget {
 }
 
 class _ExtWebViewState extends State<ExtWebView> {
-  final GlobalKey _webViewKey = GlobalKey();
   final InAppWebViewGroupOptions _webViewGroupOptions =
       InAppWebViewGroupOptions(
           crossPlatform: InAppWebViewOptions(
@@ -103,7 +102,6 @@ class _ExtWebViewState extends State<ExtWebView> {
         child: Stack(
           children: [
             InAppWebView(
-              key: _webViewKey,
               //initialUrlRequest: URLRequest(url: Uri.parse('about:blank')),
               initialData: htmlText.isNotEmpty
                   ? InAppWebViewInitialData(
@@ -170,7 +168,7 @@ class _ExtWebViewState extends State<ExtWebView> {
 
                       if (node == "IMG" && imageUrls.isNotEmpty) {
                         log.info('double tap in dart!');
-                        widget.onImageLoad?.call(index, imageUrls);
+                        widget.onImageLoad?.call(index, imageUrls, null);
                       }
                     });
 
@@ -192,13 +190,8 @@ class _ExtWebViewState extends State<ExtWebView> {
                 _progressController.stream.drain();
                 _progressController.add(progress / 100);
               },
-              onUpdateVisitedHistory: (controller, url, androidIsReload) {
-                // setState(() {
-                // });
-              },
-              onConsoleMessage: (controller, consoleMessage) {
-                //log.info(consoleMessage);
-              },
+              onUpdateVisitedHistory: (controller, url, androidIsReload) {},
+              onConsoleMessage: (controller, consoleMessage) {},
             ),
             StreamBuilder(
                 stream: _progressController.stream,

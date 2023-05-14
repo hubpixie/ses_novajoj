@@ -62,13 +62,15 @@ class _WebPageState extends State<WebPage> {
         body: _detailPage.buildContentArea(context,
             detailItem: _detailItem,
             isWebDetail: true,
-            imageZommingEnabled: (_detailItem?.htmlText.isNotEmpty ?? false)
-                ? true
-                : false, onImageLoad: (int srcIndex, List<dynamic> srcList) {
+            imageZommingEnabled:
+                (_detailItem?.htmlText.isNotEmpty ?? false) ? true : false,
+            onImageLoad:
+                (int srcIndex, List<dynamic> srcList, parentViewImage) {
           widget.presenter.eventViewImageLoader(context,
               appBarTitle: '',
               imageSrcIndex: srcIndex,
-              imageSrcList: srcList, completeHandler: (index) {
+              imageSrcList: srcList,
+              parentViewImage: parentViewImage, completeHandler: (index) {
             _detailPage.scrollController.scrollTo(index: index);
           });
         }));

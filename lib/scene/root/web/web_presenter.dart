@@ -15,6 +15,7 @@ abstract class WebPresenter with SimpleBloc<dynamic> {
       {required String appBarTitle,
       int? imageSrcIndex,
       List<dynamic>? imageSrcList,
+      dynamic parentViewImage,
       Object? completeHandler});
 }
 
@@ -28,11 +29,13 @@ class WebPresenterImpl extends WebPresenter {
       {required String appBarTitle,
       int? imageSrcIndex,
       List<dynamic>? imageSrcList,
+      dynamic parentViewImage,
       Object? completeHandler}) {
     router.gotoImageLoader(context,
         appBarTitle: appBarTitle,
         imageSrcIndex: imageSrcIndex,
         imageSrcList: imageSrcList,
+        parentViewImage: parentViewImage,
         completeHandler: completeHandler);
   }
 }
