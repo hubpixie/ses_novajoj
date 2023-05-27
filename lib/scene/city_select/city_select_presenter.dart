@@ -66,26 +66,28 @@ class CitySelectPresenterImpl extends CitySelectPresenter {
   bool eventSelectingCityInfo(Object context,
       {required CitySelectPresenterInput input}) {
     // save the selected url info
-    bool saved = UserData().saveUserInfoList(
-        newValue: input.selectedCityInfo,
-        order: input.order,
-        serviceType: input.serviceType);
-
-    // navigate the target as web page if exists
-    if (saved) {
-      if (input.sourceRoute == ScreenRouteName.weeklyReport.name) {
-        router.gotoWeeklyReportPage(context,
-            itemInfo: input.selectedCityInfo
-                ?.toItemInfo(serviceType: input.serviceType),
-            completeHandler: input.completeHandler);
-      } else {
-        router.gotoMiscListPage(context,
-            itemInfo: input.selectedCityInfo
-                ?.toItemInfo(serviceType: input.serviceType),
-            completeHandler: input.completeHandler);
+    UserData()
+        .saveUserInfoList(
+            newValue: input.selectedCityInfo,
+            order: input.order,
+            serviceType: input.serviceType)
+        .then((value) {
+      // navigate the target as web page if exists
+      if (value) {
+        if (input.sourceRoute == ScreenRouteName.weeklyReport.name) {
+          router.gotoWeeklyReportPage(context,
+              itemInfo: input.selectedCityInfo
+                  ?.toItemInfo(serviceType: input.serviceType),
+              completeHandler: input.completeHandler);
+        } else {
+          router.gotoMiscListPage(context,
+              itemInfo: input.selectedCityInfo
+                  ?.toItemInfo(serviceType: input.serviceType),
+              completeHandler: input.completeHandler);
+        }
       }
-    }
-    return saved;
+    });
+    return true;
   }
 
   @override

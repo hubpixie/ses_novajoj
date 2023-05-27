@@ -45,7 +45,10 @@ class ThreadNovaDetailUseCaseImpl extends ThreadNovaDetailUseCase {
               value.itemInfo, value.toHtmlString())));
       // save history
       historioRepository.saveNovaDetailHistory(
-          input: FetchHistorioRepoInput(detailItem: value, category: 'bbs'));
+          input: FetchHistorioRepoInput(
+              itemInfo: value.itemInfo,
+              bodyString: value.bodyString,
+              category: 'bbs'));
     }, failure: (error) {
       streamAdd(PresentModel(error: error));
     });

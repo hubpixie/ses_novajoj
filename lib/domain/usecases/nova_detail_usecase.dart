@@ -43,7 +43,10 @@ class NewsDetailUseCaseImpl extends NewsDetailUseCase {
           model: NovaDetailUseCaseModel(value.itemInfo, value.toHtmlString())));
       // save history
       historioRepository.saveNovaDetailHistory(
-          input: FetchHistorioRepoInput(detailItem: value, category: 'news'));
+          input: FetchHistorioRepoInput(
+              itemInfo: value.itemInfo,
+              bodyString: value.bodyString,
+              category: 'news'));
     }, failure: (error) {
       streamAdd(PresentModel(error: error));
     });

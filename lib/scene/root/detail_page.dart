@@ -6,7 +6,6 @@ import 'package:ses_novajoj/scene/foundation/page/page_parameter.dart';
 
 class DetailPage {
   PageScrollController scrollController = PageScrollController();
-  final GlobalKey _previewWebViewKey = GlobalKey();
 
   Widget buildContentArea(BuildContext context,
       {dynamic detailItem,

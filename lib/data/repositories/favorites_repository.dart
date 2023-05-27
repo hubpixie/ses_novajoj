@@ -16,7 +16,7 @@ class FavoritesRepositoryImpl extends FavoritesRepository {
   @override
   Future<Result<List<FavoritesItem>>> fetchFavorites(
       {required FetchFavoritesRepoInput input}) async {
-    final historioStrings = UserData().miscFavoritesList;
+    final historioStrings = await UserData().miscFavoritesList;
     final list = historioStrings.map((elem) {
       final jsonData = json.decode(elem);
       HistorioItemRes itemRes = HistorioItemRes.fromJson(jsonData);
@@ -42,7 +42,7 @@ class FavoritesRepositoryImpl extends FavoritesRepository {
         info.category = bookmark.category;
         info.id = bookmark.id;
         info.createdAt = bookmark.createdAt;
-        info.htmlText = bookmark.htmlText;
+        info.htmlText = '';
         info.itemInfo = bookmark.itemInfo;
         info.itemInfo.isFavorite = !bookmark.itemInfo.isFavorite;
         return info;
@@ -55,7 +55,7 @@ class FavoritesRepositoryImpl extends FavoritesRepository {
           bookmark: encoded,
           bookmarkIsOn: historioInfo.itemInfo.isFavorite,
           url: historioInfo.itemInfo.urlString,
-          htmlText: historioInfo.htmlText);
+          htmlText: bookmark.htmlText);
     }
   }
 }

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:ses_novajoj/domain/entities/detail_item.dart';
 import 'package:ses_novajoj/foundation/data/result.dart';
 import 'package:ses_novajoj/domain/entities/historio_item.dart';
 import 'package:ses_novajoj/domain/repositories/historio_repository.dart';
@@ -17,7 +18,7 @@ class HistorioRepositoryImpl extends HistorioRepository {
   Future<Result<List<HistorioItem>>> fetchHistorio(
       {required FetchHistorioRepoInput input}) async {
     // fetch historio
-    final favoriteStrings = UserData().miscFavoritesList;
+    final favoriteStrings = await UserData().miscFavoritesList;
     final bookmarks = favoriteStrings.map((elem) {
       final jsonData = json.decode(elem);
       HistorioItemRes itemRes = HistorioItemRes.fromJson(jsonData);
@@ -32,7 +33,7 @@ class HistorioRepositoryImpl extends HistorioRepository {
     }
 
     // fetch historio
-    final historioStrings = UserData().miscHistorioList;
+    final historioStrings = await UserData().miscHistorioList;
     final list = historioStrings.map((elem) {
       final jsonData = json.decode(elem);
       HistorioItemRes itemRes = HistorioItemRes.fromJson(jsonData);
@@ -45,15 +46,26 @@ class HistorioRepositoryImpl extends HistorioRepository {
   }
 
   @override
+  Future<String> fetchHtmlTextWithScript(
+      {required FetchHistorioRepoInput input}) async {
+    DetailItem detailItem =
+        DetailItem(itemInfo: input.itemInfo!, bodyString: input.bodyString!);
+    return detailItem.toHtmlString();
+  }
+
+  @override
   void saveNovaDetailHistory({required FetchHistorioRepoInput input}) {
-    if (input.detailItem != null) {
+    if (input.itemInfo != null && input.bodyString != null) {
+      DetailItem detailItem =
+          DetailItem(itemInfo: input.itemInfo!, bodyString: input.bodyString!);
+
       HistorioInfo historioInfo = () {
         HistorioInfo info = HistorioInfo();
         info.category = input.category ?? '';
         info.id = info.hashCode;
         info.createdAt = DateTime.now();
-        info.htmlText = input.detailItem!.toHtmlString();
-        info.itemInfo = input.detailItem!.itemInfo;
+        info.htmlText = '';
+        info.itemInfo = detailItem.itemInfo;
         return info;
       }();
       HistorioItemRes historioItemRes = HistorioItemRes.as(info: historioInfo);
@@ -63,7 +75,7 @@ class HistorioRepositoryImpl extends HistorioRepository {
       UserData().insertHistorio(
           historio: encoded,
           url: historioInfo.itemInfo.urlString,
-          htmlText: historioInfo.htmlText);
+          htmlText: detailItem.bodyString);
     }
   }
 }

@@ -58,19 +58,22 @@ class MiscInfoSelectPresenterImpl extends MiscInfoSelectPresenter {
   bool eventSelectingUrlInfo(Object context,
       {required MiscInfoSelectPresenterInput input}) {
     // save the selected url info
-    bool saved = UserData().saveUserInfoList(
-        newValue: input.selectedUrlInfo,
-        order: input.order,
-        serviceType: input.serviceType);
+    UserData()
+        .saveUserInfoList(
+            newValue: input.selectedUrlInfo,
+            order: input.order,
+            serviceType: input.serviceType)
+        .then((value) {
+      // navigate the target as web page if exists
+      if (value) {
+        router.gotoWebPage(context,
+            appBarTitle: input.appBarTitle,
+            itemInfo: input.selectedUrlInfo
+                ?.toItemInfo(serviceType: input.serviceType),
+            completeHandler: input.completeHandler);
+      }
+    });
 
-    // navigate the target as web page if exists
-    if (saved) {
-      router.gotoWebPage(context,
-          appBarTitle: input.appBarTitle,
-          itemInfo:
-              input.selectedUrlInfo?.toItemInfo(serviceType: input.serviceType),
-          completeHandler: input.completeHandler);
-    }
-    return saved;
+    return true;
   }
 }
