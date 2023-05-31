@@ -18,6 +18,14 @@ enum FavoritesParamKeys { appBarTitle, itemInfos, sourceRoute }
 
 enum WeeklyReportParamKeys { appBarTitle, itemInfo, menuItems, menuActions }
 
+enum ImageLoaderParamKeys {
+  appBarTitle,
+  imageSrc,
+  imageIndex,
+  imageSrcList,
+  parentViewImage
+}
+
 enum WebPageParamKeys {
   appBarTitle,
   itemInfo,

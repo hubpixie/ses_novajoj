@@ -25,15 +25,15 @@ class NovaDetailRepositoryImpl extends NovaDetailRepository {
 
     late Result<NovaDetailItem> ret;
     late NovaDetailItem retVal;
+    final favorList = await UserData().miscFavoritesList;
 
     result.when(success: (response) {
       if (response != null) {
         retVal = NovaDetailItem(
             itemInfo: () {
               NovaItemInfo info = response.itemInfo;
-              final fnd = UserData()
-                  .miscFavoritesList
-                  .indexWhere((elem) => elem.contains(info.urlString));
+              final fnd =
+                  favorList.indexWhere((elem) => elem.contains(info.urlString));
               info.isFavorite = fnd >= 0;
               return info;
             }(),

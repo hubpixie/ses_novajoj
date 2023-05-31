@@ -86,7 +86,17 @@ class _BbsDetailPageState extends State<BbsDetailPage> {
                   _itemInfo = data.viewModel?.itemInfo;
                   return Column(children: [
                     _detailPage.buildContentArea(context,
-                        detailItem: data.viewModel)
+                        detailItem: data.viewModel, onImageLoad: (int srcIndex,
+                            List<dynamic> srcList, parentViewImage) {
+                      widget.presenter.eventViewImageLoader(context,
+                          appBarTitle: '',
+                          imageSrcIndex: srcIndex,
+                          imageSrcList: srcList,
+                          parentViewImage: parentViewImage,
+                          completeHandler: (index) {
+                        _detailPage.scrollController.scrollTo(index: index);
+                      });
+                    })
                   ]);
                 } else {
                   return ErrorView(

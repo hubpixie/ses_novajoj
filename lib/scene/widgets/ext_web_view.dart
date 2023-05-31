@@ -1,25 +1,34 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
-import 'package:path/path.dart';
-import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
-import 'package:photo_view/photo_view.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:ses_novajoj/foundation/log_util.dart';
+
+typedef ImageLoadingDelegate = void Function(int, List<dynamic>, dynamic);
+
+class PageScrollController {
+  StreamController<int>? _pageScrollStreamController;
+
+  void scrollTo({required int index}) {
+    _pageScrollStreamController?.add(index);
+  }
+}
 
 class ExtWebView extends StatefulWidget {
   final dynamic detailItem;
   final bool isWebDetail;
   final bool imageZoomingEnabled;
+  final ImageLoadingDelegate? onImageLoad;
+  final PageScrollController? scrollController;
 
   const ExtWebView(
       {Key? key,
       required this.detailItem,
       this.isWebDetail = false,
-      this.imageZoomingEnabled = true})
+      this.imageZoomingEnabled = true,
+      this.onImageLoad,
+      this.scrollController})
       : super(key: key);
 
   static openBrowser(BuildContext context, {String? url}) {
@@ -45,7 +54,6 @@ class ExtWebView extends StatefulWidget {
 }
 
 class _ExtWebViewState extends State<ExtWebView> {
-  final GlobalKey _webViewKey = GlobalKey();
   final InAppWebViewGroupOptions _webViewGroupOptions =
       InAppWebViewGroupOptions(
           crossPlatform: InAppWebViewOptions(
@@ -58,18 +66,29 @@ class _ExtWebViewState extends State<ExtWebView> {
           ios: IOSInAppWebViewOptions(
             allowsInlineMediaPlayback: true,
           ));
-  //double _progress = 0;
   late StreamController<double> _progressController;
+  WebMessagePort? _messagePort1;
 
   @override
   void initState() {
+    // progressController
     _progressController = StreamController<double>.broadcast();
+
+    // scrollController
+    widget.scrollController
+        ?._pageScrollStreamController = StreamController<int>.broadcast()
+      ..stream.listen((e) {
+        _messagePort1
+            ?.postMessage(WebMessage(data: '{"event":"scrollTo", "index":$e}'));
+      });
+
     super.initState();
   }
 
   @override
   void dispose() {
     _progressController.close();
+    widget.scrollController?._pageScrollStreamController?.close();
     super.dispose();
   }
 
@@ -83,7 +102,6 @@ class _ExtWebViewState extends State<ExtWebView> {
         child: Stack(
           children: [
             InAppWebView(
-              key: _webViewKey,
               //initialUrlRequest: URLRequest(url: Uri.parse('about:blank')),
               initialData: htmlText.isNotEmpty
                   ? InAppWebViewInitialData(
@@ -136,6 +154,7 @@ class _ExtWebViewState extends State<ExtWebView> {
                         await controller.createWebMessageChannel();
                     var port1 = webMessageChannel!.port1;
                     var port2 = webMessageChannel.port2;
+                    _messagePort1 = port1;
 
                     // set the web message callback for the port1
                     await port1.setWebMessageCallback((message) async {
@@ -143,9 +162,13 @@ class _ExtWebViewState extends State<ExtWebView> {
                           json.decode(message?.trim() ?? '');
                       String node = jsonData['node'] as String? ?? '';
                       String ingSrc = jsonData['src'] as String? ?? '';
-                      if (node == "IMG") {
+                      int index = jsonData['index'] as int? ?? 0;
+                      final imageUrls =
+                          jsonData['imageUrls'] as List? ?? [ingSrc];
+
+                      if (node == "IMG" && imageUrls.isNotEmpty) {
                         log.info('double tap in dart!');
-                        _displayImageDialog(context, src: ingSrc);
+                        widget.onImageLoad?.call(index, imageUrls, null);
                       }
                     });
 
@@ -164,15 +187,11 @@ class _ExtWebViewState extends State<ExtWebView> {
                 if (progress == 100) {
                   //pullToRefreshController.endRefreshing();
                 }
+                _progressController.stream.drain();
                 _progressController.add(progress / 100);
               },
-              onUpdateVisitedHistory: (controller, url, androidIsReload) {
-                // setState(() {
-                // });
-              },
-              onConsoleMessage: (controller, consoleMessage) {
-                //log.info(consoleMessage);
-              },
+              onUpdateVisitedHistory: (controller, url, androidIsReload) {},
+              onConsoleMessage: (controller, consoleMessage) {},
             ),
             StreamBuilder(
                 stream: _progressController.stream,
@@ -190,83 +209,6 @@ class _ExtWebViewState extends State<ExtWebView> {
     return widget.isWebDetail
         ? Wrap(children: [bodyWidget])
         : Expanded(child: bodyWidget);
-  }
-
-  Future<void> _saveNetworkImage({String? src}) async {
-    final urlStr = src ?? '';
-    if (urlStr.isEmpty) {
-      return;
-    }
-    // download tempFile
-    final response = await http.get(Uri.parse(urlStr));
-    final tempDic = Directory.systemTemp.path;
-    final tempUrl = File(urlStr);
-    final filename = basename(tempUrl.path).contains('.')
-        ? basename(tempUrl.path)
-        : '001.jpg';
-    final filePathName = '$tempDic/images/$filename';
-    await Directory('$tempDic/images').create(recursive: true);
-    File tempFile = File(filePathName); //
-    await tempFile.writeAsBytes(response.bodyBytes);
-
-    // Add to Gallery/Cameraroll
-    await ImageGallerySaver.saveFile(tempFile.path);
-    log.info('Image is saved!');
-    tempFile.delete();
-  }
-
-  void _displayImageDialog(BuildContext context, {String? src}) {
-    showGeneralDialog(
-      context: context,
-      barrierDismissible: false,
-      transitionDuration: const Duration(milliseconds: 500),
-      transitionBuilder: (context, animation, secondaryAnimation, child) {
-        return FadeTransition(
-          opacity: animation,
-          child: ScaleTransition(
-            scale: animation,
-            child: child,
-          ),
-        );
-      },
-      pageBuilder: (dialogContext, animation, secondaryAnimation) {
-        return SafeArea(
-          child: Container(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height,
-            padding: const EdgeInsets.all(5),
-            color: Colors.black,
-            child: Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Row(
-                    children: [
-                      TextButton(
-                          onPressed: () {
-                            Navigator.of(dialogContext).pop();
-                          },
-                          child: const Icon(Icons.close_outlined)),
-                      const Spacer(),
-                      TextButton(
-                          onPressed: () {
-                            _saveNetworkImage(src: src)
-                                .then((value) => Navigator.of(context).pop());
-                          },
-                          child: const Icon(Icons.save_alt_sharp)),
-                    ],
-                  ),
-                  Expanded(
-                      child: PhotoView(
-                    imageProvider: CachedNetworkImageProvider(src ?? ''),
-                  )),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
   }
 }
 

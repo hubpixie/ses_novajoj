@@ -1,6 +1,7 @@
 import 'package:ses_novajoj/domain/foundation/bloc/simple_bloc.dart';
 import 'package:ses_novajoj/domain/usecases/favorites_usecase.dart';
 import 'package:ses_novajoj/domain/usecases/favorites_usecase_output.dart';
+import 'package:ses_novajoj/domain/usecases/historio_usecase.dart';
 import 'package:ses_novajoj/foundation/data/user_data.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'favorites_presenter_output.dart';
@@ -26,10 +27,12 @@ abstract class FavoritesPresenter with SimpleBloc<FavoritesPresenterOutput> {
 
 class FavoritesPresenterImpl extends FavoritesPresenter {
   final FavoritesUseCase useCase;
+  final HistorioUseCase hisCseCase;
   final FavoritesRouter router;
 
   FavoritesPresenterImpl({required this.router})
-      : useCase = FavoritesUseCaseImpl();
+      : useCase = FavoritesUseCaseImpl(),
+        hisCseCase = HistorioUseCaseImpl();
 
   @override
   Future<FavoritesPresenterOutput> eventViewReady(
@@ -58,6 +61,8 @@ class FavoritesPresenterImpl extends FavoritesPresenter {
       {required FavoritesPresenterInput input}) async {
     // remove selected favorite
     final itemInfo = input.viewModel?.bookmark.itemInfo;
+    final bodyString =
+        await UserData().readFavoriteData(url: itemInfo?.urlString ?? '');
     void removeAction() {
       useCase.saveBookmark(
           input: FavoritesUseCaseInput(bookmark: input.bookmark));
@@ -66,8 +71,9 @@ class FavoritesPresenterImpl extends FavoritesPresenter {
     router.gotoWebPage(context,
         appBarTitle: input.appBarTitle,
         itemInfo: itemInfo,
-        htmlText:
-            await UserData().readFavoriteData(url: itemInfo?.urlString ?? ''),
+        htmlText: await hisCseCase.fetchHtmlTextWithScript(
+            input: HistorioUseCaseInput(
+                itemInfo: itemInfo, bodyString: bodyString)),
         removeAction: removeAction,
         completeHandler: input.completeHandler);
   }

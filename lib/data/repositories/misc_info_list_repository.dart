@@ -26,17 +26,18 @@ class MiscInfoListRepositoryImpl extends MiscInfoListRepository {
   Future<Result<List<MiscInfoListItem>>> fetchMiscInfoList(
       {required FetchMiscInfoListRepoInput input}) async {
     // prepare to get pref data
-    List<SimpleUrlInfo> miscMyTimes = UserData().miscMyTimes;
-    List<SimpleUrlInfo> miscMyOnlineSites = UserData().miscOnlineSites;
+    List<SimpleUrlInfo> miscMyTimes = await UserData().miscMyTimes;
+    List<SimpleUrlInfo> miscMyOnlineSites = await UserData().miscOnlineSites;
+    List<CityInfo> miscWeatherCities_ = await UserData().miscWeatherCities;
     List<CityInfo> miscWeatherCities = () {
-      final ret = UserData().miscWeatherCities;
+      final ret = miscWeatherCities_;
       if (ret.isEmpty) {
         ret.add(_getLocalCityInfo());
       }
       return ret;
     }();
-    List<HistorioInfo> miscHistorioList = _getHistorioList();
-    List<HistorioInfo> miscBookmarkList = _getBookmarkList();
+    List<HistorioInfo> miscHistorioList = await _getHistorioList();
+    List<HistorioInfo> miscBookmarkList = await _getBookmarkList();
 
     // make return value
     List<MiscInfoListItem> data = await () async {
@@ -199,8 +200,8 @@ class MiscInfoListRepositoryImpl extends MiscInfoListRepository {
     }();
   }
 
-  List<HistorioInfo> _getHistorioList() {
-    final historioStrings = UserData().miscHistorioList;
+  Future<List<HistorioInfo>> _getHistorioList() async {
+    final historioStrings = await UserData().miscHistorioList;
     List<HistorioInfo> list = historioStrings.map((elem) {
       final jsonData = json.decode(elem);
       HistorioItemRes itemRes = HistorioItemRes.fromJson(jsonData);
@@ -209,8 +210,8 @@ class MiscInfoListRepositoryImpl extends MiscInfoListRepository {
     return list;
   }
 
-  List<HistorioInfo> _getBookmarkList() {
-    final bookmarkStrings = UserData().miscFavoritesList;
+  Future<List<HistorioInfo>> _getBookmarkList() async {
+    final bookmarkStrings = await UserData().miscFavoritesList;
     List<HistorioInfo> list = bookmarkStrings.map((elem) {
       final jsonData = json.decode(elem);
       HistorioItemRes itemRes = HistorioItemRes.fromJson(jsonData);

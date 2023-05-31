@@ -44,20 +44,28 @@ class UserData {
   }
   UserData._internal();
 
-  /// variables for properties
-  final List<SimpleUrlInfo> _miscMyTimes = [];
-  final List<SimpleUrlInfo> _miscOnlineSites = [];
-  final List<CityInfo> _miscWeatherCities = [];
-  final List<String> _miscHistorioList = [];
-  final List<String> _miscFavoritesList = [];
-
   final EncryptedSharedPreferences _preferences = EncryptedSharedPreferences();
 
-  List<SimpleUrlInfo> get miscMyTimes => _miscMyTimes;
-  List<SimpleUrlInfo> get miscOnlineSites => _miscOnlineSites;
-  List<CityInfo> get miscWeatherCities => _miscWeatherCities;
-  List<String> get miscHistorioList => _miscHistorioList;
-  List<String> get miscFavoritesList => _miscFavoritesList;
+  Future<List<SimpleUrlInfo>> get miscMyTimes async {
+    return _getSimpleUrlInfoList(key: _UserDataKey.miscMyTimes.name);
+  }
+
+  Future<List<SimpleUrlInfo>> get miscOnlineSites async {
+    return _getSimpleUrlInfoList(key: _UserDataKey.miscOnlineSites.name);
+  }
+
+  Future<List<CityInfo>> get miscWeatherCities async {
+    return _getCityInfoList(key: _UserDataKey.miscWeatherCities.name);
+  }
+
+  Future<List<String>> get miscHistorioList async {
+    return _getHistorioList(key: _UserDataKey.miscHistory.name);
+  }
+
+  Future<List<String>> get miscFavoritesList async {
+    return _getHistorioList(key: _UserDataKey.miscFavorites.name);
+  }
+
   Future<CommentMenuSetting?> get commentMenuSetting async {
     String savedValue =
         await _preferences.getString(_UserDataKey.commentMenuSetting.name);
@@ -71,42 +79,11 @@ class UserData {
   }
 
   ///
-  /// read all keys and their values
-  ///
-  void readValues() {
-    // miscMyTimes
-    _miscMyTimes.clear();
-    _miscMyTimes.addAll(
-        [SimpleUrlInfo(), SimpleUrlInfo(), SimpleUrlInfo(), SimpleUrlInfo()]);
-    _getSimpleUrlInfoList(
-        key: _UserDataKey.miscMyTimes.name, outData: _miscMyTimes);
-
-    // miscOnlineSites
-    _miscOnlineSites.clear();
-    _getSimpleUrlInfoList(
-        key: _UserDataKey.miscOnlineSites.name, outData: _miscOnlineSites);
-
-    // _miscWeatherCities
-    _miscWeatherCities.clear();
-    _getCityInfoList(
-        key: _UserDataKey.miscWeatherCities.name, outData: _miscWeatherCities);
-
-    // _miscHistorioList
-    _miscHistorioList.clear();
-    _getHistorioList(
-        key: _UserDataKey.miscHistory.name, outData: _miscHistorioList);
-
-    // _miscFavoritesList
-    _miscFavoritesList.clear();
-    _getHistorioList(
-        key: _UserDataKey.miscFavorites.name, outData: _miscFavoritesList);
-  }
-
-  ///
   /// getSimpleUrlInfoList
   ///
-  void _getSimpleUrlInfoList(
-      {required String key, required List<SimpleUrlInfo> outData}) async {
+  Future<List<SimpleUrlInfo>> _getSimpleUrlInfoList(
+      {required String key}) async {
+    List<SimpleUrlInfo> outData = [];
     String savedValue = await _preferences.getString(key);
     savedValue =
         savedValue.isEmpty ? '{"$_kDefaultListValueKey":[]}' : savedValue;
@@ -127,13 +104,14 @@ class UserData {
         outData[idx].urlString = value.urlString;
       }
     });
+    return outData;
   }
 
   ///
   /// getCityInfoList
   ///
-  void _getCityInfoList(
-      {required String key, required List<CityInfo> outData}) async {
+  Future<List<CityInfo>> _getCityInfoList({required String key}) async {
+    List<CityInfo> outData = [];
     String savedValue = await _preferences.getString(key);
     savedValue =
         savedValue.isEmpty ? '{"$_kDefaultListValueKey":[]}' : savedValue;
@@ -145,16 +123,17 @@ class UserData {
     list.asMap().forEach((idx, value) {
       outData.add(value);
     });
+    return outData;
   }
 
   ///
   /// _getHistorioList
   ///
-  void _getHistorioList(
-      {required String key, required List<String> outData}) async {
+  Future<List<String>> _getHistorioList({required String key}) async {
+    List<String> outData = [];
     String savedValue = await _preferences.getString(key);
     if (savedValue.isEmpty) {
-      return;
+      return outData;
     }
     savedValue =
         savedValue.isEmpty ? '{"$_kDefaultListValueKey":[]}' : savedValue;
@@ -167,17 +146,24 @@ class UserData {
     list.asMap().forEach((idx, value) {
       outData.add(value);
     });
+    return outData;
   }
 
   ///
   /// saveUserInfoList
   ///
-  bool saveUserInfoList(
+  Future<bool> saveUserInfoList(
       {required dynamic newValue,
       required int order,
       bool allowsRemove = false,
-      required ServiceType serviceType}) {
+      required ServiceType serviceType}) async {
     String key;
+    final miscMyTimes =
+        await _getSimpleUrlInfoList(key: _UserDataKey.miscMyTimes.name);
+    final miscOnlineSites =
+        await _getSimpleUrlInfoList(key: _UserDataKey.miscOnlineSites.name);
+    final miscWeatherCities =
+        await _getCityInfoList(key: _UserDataKey.miscWeatherCities.name);
 
     bool saveIfNeedProc_(dynamic value, List<dynamic> list, bool removed,
         int index, String key) {
@@ -196,7 +182,7 @@ class UserData {
           return false;
         }
       }
-      if (index == -1) {
+      if (index == -1 || list.isEmpty) {
         list.add(value);
       } else {
         list[index] = value;
@@ -209,25 +195,25 @@ class UserData {
       case ServiceType.time:
         key = 'misc_my_times';
         retVal =
-            saveIfNeedProc_(newValue, _miscMyTimes, allowsRemove, order, key);
+            saveIfNeedProc_(newValue, miscMyTimes, allowsRemove, order, key);
         if (retVal) {
-          _saveSimpleUrlInfoList(newValues: _miscMyTimes, key: key);
+          _saveSimpleUrlInfoList(newValues: miscMyTimes, key: key);
         }
         break;
       case ServiceType.audio:
         key = 'misc_online_sites';
         retVal = saveIfNeedProc_(
-            newValue, _miscOnlineSites, allowsRemove, order, key);
+            newValue, miscOnlineSites, allowsRemove, order, key);
         if (retVal) {
-          _saveSimpleUrlInfoList(newValues: _miscOnlineSites, key: key);
+          _saveSimpleUrlInfoList(newValues: miscOnlineSites, key: key);
         }
         break;
       case ServiceType.weather:
         key = 'misc_weather_cities';
         retVal = saveIfNeedProc_(
-            newValue, _miscWeatherCities, allowsRemove, order, key);
+            newValue, miscWeatherCities, allowsRemove, order, key);
         if (retVal) {
-          _saveCityInfoList(newValues: _miscWeatherCities, key: key);
+          _saveCityInfoList(newValues: miscWeatherCities, key: key);
         }
         break;
       default:
@@ -240,11 +226,15 @@ class UserData {
   /// insertHistorio
   ///
   void insertHistorio(
-      {required String historio, String? url, String? htmlText}) {
-    if (_miscHistorioList.contains(historio)) {
+      {required String historio,
+      String? url,
+      String? htmlText,
+      int index = 0}) async {
+    final hisList = await _getHistorioList(key: _UserDataKey.miscHistory.name);
+    if (hisList.contains(historio)) {
       return;
     } else if (url != null &&
-        _miscHistorioList
+        hisList
             .firstWhere((element) => element.contains(url), orElse: () => '')
             .isNotEmpty) {
       return;
@@ -261,22 +251,25 @@ class UserData {
     });
 
     // save list
-    _miscHistorioList.insert(0, historio);
-    _saveHistorioList(
-        newValues: _miscHistorioList, key: _UserDataKey.miscHistory.name);
+    if (index < 0 || index > hisList.length) {
+      hisList.add(historio);
+    } else {
+      hisList.insert(index, historio);
+    }
+    _saveHistorioList(newValues: hisList, key: _UserDataKey.miscHistory.name);
   }
 
   ///
   /// removeHistorio
   ///
-  void removeHistorio({required String url}) {
+  void removeHistorio({required String url}) async {
     int foundIndex = -1;
+    final hisList = await _getHistorioList(key: _UserDataKey.miscHistory.name);
     if (url.isNotEmpty) {
-      foundIndex =
-          _miscHistorioList.indexWhere((element) => element.contains(url));
+      foundIndex = hisList.indexWhere((element) => element.contains(url));
     }
     if (foundIndex >= 0) {
-      _miscHistorioList.removeAt(foundIndex);
+      hisList.removeAt(foundIndex);
       // delete file
       _getDataPath(key: _UserDataKey.miscHistory.name).then((path) {
         File file = File('$path/${url.hashCode}');
@@ -285,14 +278,14 @@ class UserData {
     }
 
     // save list
-    _saveHistorioList(
-        newValues: _miscHistorioList, key: _UserDataKey.miscHistory.name);
+    _saveHistorioList(newValues: hisList, key: _UserDataKey.miscHistory.name);
   }
 
   ///
   /// readHistorioData
   ///
   Future<String> readHistorioData({required String url}) async {
+    log.info('UserData: [url = $url]');
     String path = await _getDataPath(key: _UserDataKey.miscHistory.name);
     String filename = '$path/${url.hashCode}';
     File file = File(filename);
@@ -310,6 +303,7 @@ class UserData {
   /// readFavoriteData
   ///
   Future<String> readFavoriteData({required String url}) async {
+    log.info('UserData: [url = $url]');
     String path = await _getDataPath(key: _UserDataKey.miscFavorites.name);
     String filename = '$path/${url.hashCode}';
     File file = File(filename);
@@ -330,14 +324,15 @@ class UserData {
       {required String bookmark,
       bool bookmarkIsOn = false,
       String? url,
-      String? htmlText}) {
+      String? htmlText}) async {
     int foundIndex = -1;
+    final favorList =
+        await _getHistorioList(key: _UserDataKey.miscFavorites.name);
     if (url != null) {
-      foundIndex =
-          _miscFavoritesList.indexWhere((element) => element.contains(url));
+      foundIndex = favorList.indexWhere((element) => element.contains(url));
     }
     if (foundIndex >= 0) {
-      _miscFavoritesList.removeAt(foundIndex);
+      favorList.removeAt(foundIndex);
       // delete file
       _getDataPath(key: _UserDataKey.miscFavorites.name).then((path) {
         File file = File('$path/${url.hashCode}');
@@ -346,10 +341,10 @@ class UserData {
     }
     // save bookmark if isOn = true
     if (bookmarkIsOn) {
-      if (_miscFavoritesList.isEmpty) {
-        _miscFavoritesList.add(bookmark);
+      if (favorList.isEmpty) {
+        favorList.add(bookmark);
       } else {
-        _miscFavoritesList.insert(0, bookmark);
+        favorList.insert(0, bookmark);
       }
     }
 
@@ -367,7 +362,7 @@ class UserData {
 
     // save list
     _saveHistorioList(
-        newValues: _miscFavoritesList, key: _UserDataKey.miscFavorites.name);
+        newValues: favorList, key: _UserDataKey.miscFavorites.name);
   }
 
   ///

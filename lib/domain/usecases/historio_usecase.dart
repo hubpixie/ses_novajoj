@@ -1,14 +1,21 @@
 import 'package:ses_novajoj/domain/foundation/bloc/simple_bloc.dart';
 import 'package:ses_novajoj/domain/repositories/historio_repository.dart';
 import 'package:ses_novajoj/data/repositories/historio_repository.dart';
+import 'package:ses_novajoj/foundation/data/user_types.dart';
 
 import 'historio_usecase_output.dart';
 
-class HistorioUseCaseInput {}
+class HistorioUseCaseInput {
+  NovaItemInfo? itemInfo;
+  String? bodyString;
+
+  HistorioUseCaseInput({this.itemInfo, this.bodyString});
+}
 
 abstract class HistorioUseCase with SimpleBloc<HistorioUseCaseOutput> {
   Future<HistorioUseCaseOutput> fetchHistorio(
       {required HistorioUseCaseInput input});
+  Future<String> fetchHtmlTextWithScript({required HistorioUseCaseInput input});
 }
 
 class HistorioUseCaseImpl extends HistorioUseCase {
@@ -28,5 +35,13 @@ class HistorioUseCaseImpl extends HistorioUseCase {
         failure: (error) {});
 
     return PresentModel(models: list);
+  }
+
+  @override
+  Future<String> fetchHtmlTextWithScript(
+      {required HistorioUseCaseInput input}) {
+    return repository.fetchHtmlTextWithScript(
+        input: FetchHistorioRepoInput(
+            itemInfo: input.itemInfo, bodyString: input.bodyString));
   }
 }

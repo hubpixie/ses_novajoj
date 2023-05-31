@@ -25,7 +25,7 @@ class DetailItem {
           }       
         </style>
         <script>
-          function double_tap_listen(elm, normal_func_param, double_func_param) {
+          function double_tap_listen(elm, index, imageUrls, normal_func_param, double_func_param) {
             var timeout;
             var lastTap = 0;
             function double_touch_proc(e) {
@@ -34,10 +34,10 @@ class DetailItem {
 
                 e.preventDefault();
                 clearTimeout(timeout);
-                if (tapDiff < 600 && tapDiff >= 100) {
+                if (tapDiff < 800 && tapDiff >= 300) {
                     //Double Tap/Click
                     console.log('double tap!');
-                    double_func_param(elm);
+                    double_func_param(elm, index, imageUrls);
                     timeout = setTimeout(function () {
                         //Single Tap/Click code here
                         console.log('single tap!');
@@ -62,26 +62,35 @@ class DetailItem {
             });
           }
 
-          function normal_tap_func(elm) {
+          function normal_tap_func(elm, index, imageUrls) {
           }
-          function double_tap_func(elm) {
-              port.postMessage(JSON.stringify({node: 'IMG', src: elm.src}));
+          function double_tap_func(elm, index, imageUrls) {
+             port.postMessage(JSON.stringify({node: 'IMG', src: elm.src, index: index, imageUrls: imageUrls}));
           }          
 
           function startLoadImages() {
             // Run your code here
-          var imgs = document.querySelectorAll("img");
-          imgs.forEach(function(elm) {
-              elm.addEventListener('load', function(evt) {
-                  // current image is loaded.
-                  double_tap_listen(elm, normal_tap_func, double_tap_func);
-              });
-              // load a image after a while.
-              setTimeout(function() {
-                elm.src = elm.getAttribute('data-src');
-              }, 100);
+            var imgs = document.querySelectorAll("img");
+
+            // get all image src (url)
+            var imgUrls = [];
+            imgs.forEach(function(elm) {
+                imgUrls.push(elm.getAttribute('data-src'));
             });
+
+            // attach double-tap event into target image.
+            imgs.forEach(function(elm, index) {
+                elm.addEventListener('load', function(evt) {
+                    // current image is loaded.
+                    double_tap_listen(elm, index, imgUrls, normal_tap_func, double_tap_func);
+                });
+                // load a image after a while.
+                setTimeout(function() {
+                  elm.src = elm.getAttribute('data-src');
+                }, 100);
+              });
           }
+
           // DOMContentLoaded, load
           window.addEventListener('DOMContentLoaded', function () {
               startLoadImages()
@@ -120,7 +129,20 @@ class DetailItem {
                       // To listen to messages coming from the Dart side, set the onmessage event listener
                       port.onmessage = function (event) {
                           // event.data contains the message data coming from the Dart side 
-                          console.log(event.data);
+                          //console.log(event.data);
+                          var errorType = "";
+                          try {
+                            const received = JSON.parse(event.data);
+                            if (received.event == "scrollTo") {
+                              errorType = "scrollTo";
+                              const imgs = document.querySelectorAll("img");
+                              const x = imgs[received.index].offsetLeft;
+                              const y = imgs[received.index].offsetTop;
+                              window.scrollTo(x, y - 5);
+                            }
+                          } catch (e) {
+                            console.log(errorType + ' error!');
+                          }
                       };
                   }
               }

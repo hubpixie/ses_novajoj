@@ -5,6 +5,12 @@ import 'package:ses_novajoj/scene/foundation/page/screen_route_enums.dart';
 abstract class BbsDetailRouter {
   void gotoCommentList(Object context,
       {required String appBarTitle, Object? itemInfo});
+  void gotoImageLoader(Object context,
+      {required String appBarTitle,
+      int? imageSrcIndex,
+      List<dynamic>? imageSrcList,
+      dynamic parentViewImage,
+      Object? completeHandler});
 }
 
 class BbsDetailRouterImpl extends BbsDetailRouter {
@@ -19,5 +25,28 @@ class BbsDetailRouterImpl extends BbsDetailRouter {
           CommentListParamKeys.appBarTitle: appBarTitle,
           CommentListParamKeys.itemInfo: itemInfo
         });
+  }
+
+  @override
+  void gotoImageLoader(Object context,
+      {required String appBarTitle,
+      int? imageSrcIndex,
+      List<dynamic>? imageSrcList,
+      dynamic parentViewImage,
+      Object? completeHandler}) {
+    Navigator.pushNamed(
+        context as BuildContext, ScreenRouteName.imageLoader.name,
+        arguments: {
+          ImageLoaderParamKeys.appBarTitle: appBarTitle,
+          ImageLoaderParamKeys.imageIndex: imageSrcIndex,
+          ImageLoaderParamKeys.imageSrcList: imageSrcList,
+          ImageLoaderParamKeys.parentViewImage: parentViewImage
+        }).then((value) {
+      if (completeHandler is Function(int)?) {
+        if (value is int) {
+          completeHandler?.call(value);
+        }
+      }
+    });
   }
 }

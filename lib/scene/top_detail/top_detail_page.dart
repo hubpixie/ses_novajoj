@@ -10,7 +10,6 @@ import 'package:ses_novajoj/scene/foundation/page/page_parameter.dart';
 import 'package:ses_novajoj/scene/root/detail_page.dart';
 import 'package:ses_novajoj/scene/top_detail/top_detail_presenter.dart';
 import 'package:ses_novajoj/scene/top_detail/top_detail_presenter_output.dart';
-
 import 'package:ses_novajoj/scene/widgets/error_view.dart';
 
 class TopDetailPage extends StatefulWidget {
@@ -86,8 +85,19 @@ class _TopDetailPageState extends State<TopDetailPage> {
                   _itemInfo = data.viewModel?.itemInfo;
                   return Column(
                     children: [
-                      _detailPage.buildContentArea(context,
-                          detailItem: data.viewModel)
+                      _detailPage
+                          .buildContentArea(context, detailItem: data.viewModel,
+                              onImageLoad: (int srcIndex, List<dynamic> srcList,
+                                  parentViewImage) {
+                        widget.presenter.eventViewImageLoader(context,
+                            appBarTitle: '',
+                            imageSrcIndex: srcIndex,
+                            imageSrcList: srcList,
+                            parentViewImage: parentViewImage,
+                            completeHandler: (index) {
+                          _detailPage.scrollController.scrollTo(index: index);
+                        });
+                      })
                     ],
                   );
                 } else {

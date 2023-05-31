@@ -95,6 +95,14 @@ class NovaItemInfo {
       this.pageCount = 20});
 }
 
+class NovaImageInfo {
+  String? displayName;
+  late String filename;
+  late double filesize;
+  late double imageWidth;
+  late double imageHeight;
+}
+
 class HistorioInfo {
   late int id;
   late DateTime createdAt;

@@ -1,4 +1,5 @@
 import 'package:ses_novajoj/domain/usecases/favorites_usecase.dart';
+import 'package:ses_novajoj/domain/usecases/historio_usecase.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/foundation/data/user_data.dart';
 import 'package:ses_novajoj/domain/foundation/bloc/simple_bloc.dart';
@@ -41,12 +42,14 @@ abstract class MiscInfoListPresenter
 
 class MiscInfoListPresenterImpl extends MiscInfoListPresenter {
   final MiscInfoListUseCase useCase;
+  final HistorioUseCase hisUseCase;
   final FavoritesUseCase favoriteUseCase;
   final MiscInfoListRouter router;
 
   MiscInfoListPresenterImpl({required this.router})
       : useCase = MiscInfoListUseCaseImpl(),
-        favoriteUseCase = FavoritesUseCaseImpl() {
+        favoriteUseCase = FavoritesUseCaseImpl(),
+        hisUseCase = HistorioUseCaseImpl() {
     useCase.stream.listen((event) {
       if (event is PresentModel) {
         if (event.error == null) {
@@ -92,10 +95,10 @@ class MiscInfoListPresenterImpl extends MiscInfoListPresenter {
       {required MiscInfoListPresenterInput input}) async {
     // remove selected favorite if need
     final itemInfo = input.viewModelList?[input.itemIndex].itemInfo;
-    final htmlText =
+    final bodyString =
         await UserData().readHistorioData(url: itemInfo?.urlString ?? '');
     HistorioInfo? bookmark = input.viewModelList?[input.itemIndex].hisInfo;
-    bookmark?.htmlText = htmlText;
+    bookmark?.htmlText = bodyString;
 
     void changeFavoriteAction() {
       favoriteUseCase.saveBookmark(
@@ -109,8 +112,9 @@ class MiscInfoListPresenterImpl extends MiscInfoListPresenter {
 
     router.gotoHistorioWebPage(context,
         itemInfo: itemInfo,
-        htmlText:
-            await UserData().readHistorioData(url: itemInfo?.urlString ?? ''),
+        htmlText: await hisUseCase.fetchHtmlTextWithScript(
+            input: HistorioUseCaseInput(
+                itemInfo: itemInfo, bodyString: bodyString)),
         changeFavoriteAction:
             itemInfo?.isFavorite == false ? changeFavoriteAction : null,
         removeAction: removeAction,
@@ -132,6 +136,8 @@ class MiscInfoListPresenterImpl extends MiscInfoListPresenter {
       {required MiscInfoListPresenterInput input}) async {
     // remove selected favorite if need
     final itemInfo = input.viewModelList?[input.itemIndex].itemInfo;
+    final bodyString =
+        await UserData().readFavoriteData(url: itemInfo?.urlString ?? '');
     void removeAction() {
       // remove selected favorite
       UserData().saveFavorites(bookmark: '', url: itemInfo?.urlString);
@@ -139,8 +145,9 @@ class MiscInfoListPresenterImpl extends MiscInfoListPresenter {
 
     router.gotoFavoritesWebPage(context,
         itemInfo: itemInfo,
-        htmlText:
-            await UserData().readFavoriteData(url: itemInfo?.urlString ?? ''),
+        htmlText: await hisUseCase.fetchHtmlTextWithScript(
+            input: HistorioUseCaseInput(
+                itemInfo: itemInfo, bodyString: bodyString)),
         removeAction: removeAction,
         appBarTitle: input.appBarTitle,
         completeHandler: input.completeHandler);

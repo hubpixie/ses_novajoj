@@ -53,10 +53,10 @@ class HistorioPresenterImpl extends HistorioPresenter {
       {required HistorioPresenterInput input}) async {
     // remove selected historio
     final itemInfo = input.viewModel?.hisInfo.itemInfo;
-    final htmlText =
+    final bodyString =
         await UserData().readHistorioData(url: itemInfo?.urlString ?? '');
     HistorioInfo? bookmark = input.viewModel?.hisInfo;
-    bookmark?.htmlText = htmlText;
+    bookmark?.htmlText = bodyString;
     void changeFavoriteAction() {
       favoriteUseCase.saveBookmark(
           input: FavoritesUseCaseInput(bookmark: bookmark));
@@ -72,7 +72,9 @@ class HistorioPresenterImpl extends HistorioPresenter {
     router.gotoWebPage(context,
         appBarTitle: input.appBarTitle,
         itemInfo: itemInfo,
-        htmlText: htmlText,
+        htmlText: await useCase.fetchHtmlTextWithScript(
+            input: HistorioUseCaseInput(
+                itemInfo: itemInfo, bodyString: bodyString)),
         changeFavoriteAction:
             itemInfo?.isFavorite == false ? changeFavoriteAction : null,
         removeAction: removeAction,
