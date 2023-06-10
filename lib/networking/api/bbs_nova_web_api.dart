@@ -118,13 +118,7 @@ class BbsNovaWebApi extends BaseNovaWebApi {
 
     // title, urlString
     if (aLink.innerHtml.isNotEmpty) {
-      title = () {
-        String retStr = '${index + 1} ';
-        retStr += aLink.innerHtml;
-        retStr = retStr.replaceAll('&nbsp;', ' ').trim();
-        retStr = retStr.replaceAll('&amp;', '&');
-        return retStr;
-      }();
+      title = aLink.text;
 
       urlString = () {
         String str = aLink.attributes['href'] ?? '';
@@ -191,17 +185,7 @@ class BbsNovaWebApi extends BaseNovaWebApi {
 
     // title, urlString
     if (aLink.innerHtml.isNotEmpty) {
-      title = () {
-        String retStr = '${index + 1} ';
-        retStr +=
-            '☉[${StringUtil().substring(aLink.innerHtml, start: '>[', end: ']<')}]'; //item_source type
-        retStr += StringUtil()
-            .substring(aLink.innerHtml, start: '', end: ' <span')
-            .replaceAll(RegExp(r'^[0-9]*[0-9]{1} +'), '');
-        retStr = retStr.replaceAll('&nbsp;', ' ').trim();
-        retStr = retStr.replaceAll('&amp;', '&');
-        return retStr;
-      }();
+      title = aLink.innerHtml;
 
       urlString = () {
         String str = aLink.attributes['href'] ?? '';

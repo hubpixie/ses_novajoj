@@ -2,9 +2,10 @@ import 'dart:convert';
 import 'dart:async';
 import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:html/dom.dart';
 import 'package:html/parser.dart' as html_parser;
+import 'package:html/dom.dart';
 import 'package:ses_novajoj/foundation//log_util.dart';
+import 'package:ses_novajoj/foundation/data/date_util.dart';
 import 'package:ses_novajoj/foundation/data/string_util.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/foundation/data/result.dart';
@@ -14,6 +15,7 @@ import 'package:ses_novajoj/networking/request/nova_item_parameter.dart';
 import 'package:ses_novajoj/networking/response/comment_list_item_response.dart';
 import 'package:ses_novajoj/networking/response/misc_info_select_item_response.dart';
 import 'package:ses_novajoj/networking/response/nova_detalo_item_response.dart';
+import 'package:ses_novajoj/networking/response/nova_list_response.dart';
 
 class BaseNovaWebApi {
   static const String kSampleUrlStr =
@@ -438,6 +440,162 @@ class BaseNovaWebApi {
     } on Exception catch (error) {
       return Result.failure(error: AppError.fromException(error));
     }
+  }
+
+  ///
+  ////api name: fetchSearchedResult
+  ///
+  Future<Result<List<NovaListItemRes>>> fetchSearchedResult(
+      {required NovaItemParameter parameter}) async {
+    ///send request for fetching searched result.
+    try {
+      // check network state
+      final networkState = await BaseApiClient.connectivityState();
+      if (networkState == ConnectivityResult.none) {
+        throw const SocketException('Network is unavailable!');
+      }
+
+      // send request for fetching nova list.
+      final response =
+          await BaseApiClient.client.get(Uri.parse(parameter.targetUrl));
+      if (response.statusCode >= HttpStatus.badRequest) {
+        return Result.failure(
+            error: AppError.fromStatusCode(response.statusCode));
+      }
+
+      // prepares to parse nova list from response.body.
+      // final document = html_parser.parse(response.body);
+      // List<NovaListItemRes> retArr = [];
+      // return Result.success(data: retArr);
+      final document = html_parser.parse(response.body);
+      return _parseSearchedItems(
+          parameter: parameter,
+          rootElement: document.getElementsByClassName('dc_bar2').first);
+    } on AppError catch (error) {
+      return Result.failure(error: error);
+    } on Exception catch (error) {
+      log.severe('$error');
+      return Result.failure(error: AppError.fromException(error));
+    }
+  }
+
+  ///	<table width=998 align=center bgcolor=#FFFFFF class=dc_bar2>
+  ///			<tr>
+  ///				<td>
+  ///					<b style='margin-right:60px;'><span style="color:red;">文本</span> 搜索结果:</b>
+  ///					[<a
+  ///						href='index.php?action=search&bbsdr=life6&act=threadsearch&app=forum&keywords=%E5%A7%91%E5%A8%98&first=1'>只看社区主贴</a>]
+  ///					<hr>
+  ///					<div class="t_l" style="margin-left:5px;margin-top:15px;">
+  ///						<span class="t_subject"><img src="./public/list_style/li_3.gif"
+  ///								style='vertical-align:middle;margin-left:25px;margin-right:10px;' /><a
+  ///								href="index.php?app=forum&act=threadview&tid=13978907"><span class='keyword'>文</span><span
+  ///									class='keyword'>本</span>的搜索结果的搜索结果</a></span> -
+  ///						<span class="t_author">ming98</span>
+  ///						<span class="t_dateline"><i>08/24/22</i></span>
+  ///					</div>
+  ///	...
+  ///					<div class="t_l" style="margin-left:5px;margin-top:15px;">
+  ///						<span class="t_subject"><img src="./public/list_style/li_3.gif"
+  ///								style='vertical-align:middle;margin-left:25px;margin-right:10px;' /><a
+  ///								href="index.php?app=forum&act=threadview&tid=13861518">O<span class='keyword'>姑</span><span
+  ///									class='keyword'>娘</span> XXXXXXXXXX</a></span> -
+  ///						<span class="t_author">O姑娘</span>
+  ///						<span class="t_dateline"><i>03/09/15</i></span>
+  ///					</div>
+  ///				</td>
+  ///			</tr>
+  ///		</table>
+  Future<Result<List<NovaListItemRes>>> _parseSearchedItems(
+      {required NovaItemParameter parameter, Element? rootElement}) async {
+    try {
+      List<NovaListItemRes> retArr = [];
+
+      if (rootElement?.children == null || rootElement?.localName != 'table') {
+        log.severe('rootElement?.children');
+        throw AppError(
+            type: AppErrorType.dataError,
+            reason: FailureReason.missingRootNode);
+      }
+      final divElememts = rootElement?.getElementsByClassName('t_l');
+
+      if (divElememts?.isEmpty ?? true) {
+        log.severe('divElememts?.isEmpty');
+        throw AppError(
+            type: AppErrorType.dataError,
+            reason: FailureReason.missingListNode);
+      }
+      String parentUrl = _parentUrl(url: parameter.targetUrl);
+      int index = 0;
+      for (Element divRow in divElememts ?? []) {
+        NovaListItemRes? novaListItemRes;
+        String title = '';
+        String urlString = '';
+        DateTime createdAt;
+        String author = '';
+        String source = '';
+        //
+        // subject
+        //
+        final subjectElems = divRow.getElementsByClassName('t_subject');
+        if (subjectElems.isEmpty) {
+          continue;
+        }
+        final alink = subjectElems.first.children.firstWhere(
+            (elem) => elem.localName == 'a',
+            orElse: () => Element.tag('a'));
+        if (alink.attributes['href'] == null) {
+          continue;
+        }
+        // urlString
+        urlString = '$parentUrl/${alink.attributes['href'] ?? ''}';
+
+        // title
+        title = alink.text;
+
+        // author
+        author = () {
+          final elems = divRow.getElementsByClassName('t_author');
+          if (elems.isEmpty) {
+            return '';
+          }
+          return elems.first.innerHtml;
+        }();
+
+        // createdAt
+        createdAt = () {
+          final elems = divRow.getElementsByClassName('t_dateline');
+          if (elems.isEmpty) {
+            return DateTime.now();
+          }
+          final str = elems.first.innerHtml;
+          return DateUtil().fromString(str, format: 'MM/dd/yy') ??
+              DateTime.now();
+        }();
+
+        novaListItemRes = NovaListItemRes(
+            itemInfo: NovaItemInfo(
+                id: index,
+                title: title,
+                urlString: urlString,
+                author: author,
+                createAt: createdAt,
+                source: source));
+        retArr.add(novaListItemRes);
+        index++;
+      }
+
+      return Result.success(data: retArr);
+    } on AppError catch (error) {
+      return Result.failure(error: error);
+    } on Exception catch (error) {
+      return Result.failure(error: AppError.fromException(error));
+    }
+  }
+
+  String _parentUrl({required String url}) {
+    int lastIndex = url.lastIndexOf('/');
+    return url.substring(0, lastIndex);
   }
 }
 

@@ -40,8 +40,6 @@ class BbsNovaSelectListRepositoryImpl extends BbsNovaSelectListRepository {
     }
 
     if (targetUrl.contains('{{keywords}}')) {
-      // TODO: Keyword Search API
-      /*
       targetUrl = targetUrl.replaceAll('{{keywords}}', input.searchedKeyword);
       final result = await _api.fetchSearchedResult(
           parameter:
@@ -51,7 +49,6 @@ class BbsNovaSelectListRepositoryImpl extends BbsNovaSelectListRepository {
       }, failure: (error) {
         ret = Result.failure(error: error);
       });
-      */
     } else {
       final result = await _api.fetchSelectList(
           parameter:

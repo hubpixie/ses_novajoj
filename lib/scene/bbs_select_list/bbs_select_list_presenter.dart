@@ -32,17 +32,25 @@ class BbsSelectListPresenterImpl extends BbsSelectListPresenter {
   final BbsSelectListUseCase useCase;
   final BbsSelectListRouter router;
   late bool _isProcessing;
-  List<BbsSelectListRowViewModel>? _viewModelList;
+
+  String _searchedKeyword = '';
+  List<BbsSelectListRowViewModel>? _prevViewModelList;
 
   BbsSelectListPresenterImpl({required this.router})
       : useCase = BbsSelectListUseCaseImpl() {
     useCase.stream.listen((event) {
       if (event is PresentModel) {
         if (event.error == null) {
-          _viewModelList = event.model
+          // set fetched result.
+          final list = event.model
               ?.map((model) => BbsSelectListRowViewModel(model))
               .toList();
-          streamAdd(ShowBbsSelectListPageModel(viewModelList: _viewModelList));
+          streamAdd(ShowBbsSelectListPageModel(viewModelList: list));
+
+          // keep bbs select result not search result
+          if (_searchedKeyword.isEmpty) {
+            _prevViewModelList = list;
+          }
         } else {
           streamAdd(ShowBbsSelectListPageModel(error: event.error));
         }
@@ -58,8 +66,9 @@ class BbsSelectListPresenterImpl extends BbsSelectListPresenter {
 
   @override
   void eventViewReady({required BbsSelectListPresenterInput input}) {
+    _searchedKeyword = input.searchedKeyword;
     if (input.searchResultIsCleared) {
-      streamAdd(ShowBbsSelectListPageModel(viewModelList: _viewModelList));
+      streamAdd(ShowBbsSelectListPageModel(viewModelList: _prevViewModelList));
       return;
     }
     _isProcessing = true;
