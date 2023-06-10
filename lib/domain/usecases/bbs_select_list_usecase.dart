@@ -8,9 +8,12 @@ import 'bbs_select_list_usecase_output.dart';
 
 class BbsSelectListUseCaseInput {
   String targetUrl;
+  String searchedKeyword;
   int targetPageIndex;
   BbsSelectListUseCaseInput(
-      {required this.targetUrl, this.targetPageIndex = 1});
+      {required this.targetUrl,
+      this.searchedKeyword = '',
+      this.targetPageIndex = 1});
 }
 
 abstract class BbsSelectListUseCase
@@ -27,6 +30,7 @@ class BbsSelectListUseCaseImpl extends BbsSelectListUseCase {
     final result = await repository.fetchBbsNovaSelectList(
         input: FetchBbsNovaSelectListRepoInput(
             targetUrl: input.targetUrl,
+            searchedKeyword: input.searchedKeyword,
             pageIndex: input.targetPageIndex,
             docType: NovaDocType.bbsSelect));
 

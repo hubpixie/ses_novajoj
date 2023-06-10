@@ -4,11 +4,15 @@ import 'package:ses_novajoj/foundation/data/result.dart';
 
 class FetchBbsNovaSelectListRepoInput {
   String targetUrl;
+  String searchedKeyword;
   int pageIndex;
   NovaDocType docType;
 
   FetchBbsNovaSelectListRepoInput(
-      {required this.targetUrl, this.pageIndex = 1, required this.docType});
+      {required this.targetUrl,
+      this.searchedKeyword = '',
+      this.pageIndex = 1,
+      required this.docType});
 }
 
 abstract class BbsNovaSelectListRepository {

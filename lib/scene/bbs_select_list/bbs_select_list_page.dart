@@ -74,11 +74,8 @@ class _BbsSelectListPageState extends State<BbsSelectListPage> {
         child: StreamBuilder<BbsSelectListPresenterOutput>(
             stream: widget.presenter.stream,
             builder: (context, snapshot) {
-              if (snapshot.connectionState ==
-                      ConnectionState
-                          .waiting /*||
-                  widget.presenter.isProcessing*/
-                  ) {
+              if (snapshot.connectionState == ConnectionState.waiting ||
+                  widget.presenter.isProcessing) {
                 if (_waitingCount == 0 && _searchedKeyword.isNotEmpty) {
                   _waitingCount++;
                   return Container();
@@ -377,7 +374,7 @@ class _BbsSelectListPageState extends State<BbsSelectListPage> {
       _appBarTitle =
           _parameters?[BbsSelectListParamKeys.appBarTitle] as String? ?? '';
       _targetUrl = _parameters?[BbsSelectListParamKeys.targetUrl] as String?;
-      //TODO: _searchedUrl =
+      //TODO:  _searchedUrl =
       //     _parameters?[BbsSelectListParamKeys.searchedUrl] as String?;
 
       //
@@ -403,8 +400,8 @@ class _BbsSelectListPageState extends State<BbsSelectListPage> {
           input: BbsSelectListPresenterInput(
         targetUrl: searchedKeyword.isEmpty ? _targetUrl! : _searchedUrl!,
         targetPageIndex: _currentPageIndex,
-        // searchedKeyword: searchedKeyword,
-        // searchResultIsCleared: searchResultIsCleared,
+        searchedKeyword: searchedKeyword,
+        searchResultIsCleared: searchResultIsCleared,
       ));
 
       Future.delayed(Duration.zero, () {
