@@ -3,6 +3,7 @@ class BbsNovaMenuItem {
   late String sectionTitle;
   late String title;
   late String urlString;
+  late String searchUrlString;
   late bool accessFlag;
 
   BbsNovaMenuItem({
@@ -10,6 +11,7 @@ class BbsNovaMenuItem {
     required this.sectionTitle,
     required this.title,
     required this.urlString,
+    required this.searchUrlString,
     required this.accessFlag,
   });
 
@@ -18,6 +20,7 @@ class BbsNovaMenuItem {
     sectionTitle = json['section_title'] ?? '';
     title = json['title'] ?? '';
     urlString = json['url_string'] ?? '';
+    searchUrlString = json['search_url_string'] ?? '';
     accessFlag = (json['access_flag'] ?? 0) == 0 ? false : true;
   }
 }

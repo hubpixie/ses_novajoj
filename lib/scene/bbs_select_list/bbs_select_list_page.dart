@@ -374,8 +374,8 @@ class _BbsSelectListPageState extends State<BbsSelectListPage> {
       _appBarTitle =
           _parameters?[BbsSelectListParamKeys.appBarTitle] as String? ?? '';
       _targetUrl = _parameters?[BbsSelectListParamKeys.targetUrl] as String?;
-      //TODO:  _searchedUrl =
-      //     _parameters?[BbsSelectListParamKeys.searchedUrl] as String?;
+      _searchedUrl =
+          _parameters?[BbsSelectListParamKeys.searchedUrl] as String?;
 
       //
       // FA

@@ -14,6 +14,7 @@ class BbsMenuListRowViewModel {
   String sectionTitle;
   String title;
   String urlString;
+  String searchUrlString;
   bool accessFlag;
 
   BbsMenuListRowViewModel(BbsNovaMenuUseCaseRowModel model)
@@ -21,5 +22,6 @@ class BbsMenuListRowViewModel {
         sectionTitle = model.sectionTitle,
         title = model.title,
         urlString = model.urlString,
+        searchUrlString = model.searchUrlString,
         accessFlag = model.accessFlag;
 }

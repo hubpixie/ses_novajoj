@@ -14,6 +14,7 @@ class BbsNovaMenuUseCaseRowModel {
   String sectionTitle;
   String title;
   String urlString;
+  String searchUrlString;
   bool accessFlag;
 
   BbsNovaMenuUseCaseRowModel(BbsNovaMenuItem entity)
@@ -21,5 +22,6 @@ class BbsNovaMenuUseCaseRowModel {
         sectionTitle = entity.sectionTitle,
         title = entity.title,
         urlString = entity.urlString,
+        searchUrlString = entity.searchUrlString,
         accessFlag = entity.accessFlag;
 }

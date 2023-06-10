@@ -12,6 +12,7 @@ abstract class BbsMenuPresenter with SimpleBloc<BbsMenuPresenterOutput> {
   void eventSelectNextList(Object context,
       {required String appBarTitle,
       Object? targetUrl,
+      Object? searchedUrl,
       Object? completeHandler});
 }
 
@@ -45,10 +46,12 @@ class BbsMenuPresenterImpl extends BbsMenuPresenter {
   void eventSelectNextList(Object context,
       {required String appBarTitle,
       Object? targetUrl,
+      Object? searchedUrl,
       Object? completeHandler}) {
     router.gotoBbsSelectList(context,
         appBarTitle: appBarTitle,
         targetUrl: targetUrl,
+        searchedUrl: searchedUrl,
         completeHandler: completeHandler);
   }
 }
