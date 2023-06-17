@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
     return FutureBuilder(future: () async {
       final firApp = kIsWeb ? null : await Firebase.initializeApp();
       await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(
-          AppState.isdDebugEnabled ? true : !kDebugMode);
+          AppState.isDebugEnabled ? true : !kDebugMode);
       FlutterError.onError = (FlutterErrorDetails details) {
         //this line prints the default flutter gesture caught exception in console
         log.severe("Error Library:${details.library}...");

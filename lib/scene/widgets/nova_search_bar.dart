@@ -38,6 +38,7 @@ class NovaSearchBarState extends State<NovaSearchBar> {
       title: SizedBox(
         height: 40,
         child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          const Spacer(),
           Container(
             decoration: BoxDecoration(
               color: Colors.white,
@@ -76,7 +77,6 @@ class NovaSearchBarState extends State<NovaSearchBar> {
                   ),
                 )),
           ),
-          const Spacer(),
           TextButton(
               onPressed: () => widget.cancelAction?.call(),
               child: Text(
