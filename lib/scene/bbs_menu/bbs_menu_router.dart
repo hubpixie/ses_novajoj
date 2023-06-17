@@ -6,6 +6,7 @@ abstract class BbsMenuRouter {
   void gotoBbsSelectList(Object context,
       {required String appBarTitle,
       Object? targetUrl,
+      Object? searchedUrl,
       Object? completeHandler});
 }
 
@@ -16,13 +17,15 @@ class BbsMenuRouterImpl extends BbsMenuRouter {
   void gotoBbsSelectList(Object context,
       {required String appBarTitle,
       Object? targetUrl,
+      Object? searchedUrl,
       Object? completeHandler}) {
     DateTime startDate = DateTime.now();
     Navigator.pushNamed(
         context as BuildContext, ScreenRouteName.bbsSelectList.name,
         arguments: {
           BbsSelectListParamKeys.appBarTitle: appBarTitle,
-          BbsSelectListParamKeys.targetUrl: targetUrl
+          BbsSelectListParamKeys.targetUrl: targetUrl,
+          BbsSelectListParamKeys.searchedUrl: searchedUrl
         }).then((value) {
       if (completeHandler != null && completeHandler is Function) {
         DateTime endDate = DateTime.now();

@@ -3,6 +3,8 @@
     
     "cancelButtonTitle":"取消",
     "deleteButtonTitle":"删除",
+    "searchedHintTitle":"输入关键词",
+    "searchedResultTitle":"搜索结果",
     "requiredLabelOfTextField": "[必须]",
 
     "appBarIconNameLatest": "即",

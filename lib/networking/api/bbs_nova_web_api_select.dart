@@ -221,23 +221,7 @@ extension BbsNovaWebApiSelect on BbsNovaWebApi {
 
     // title, urlString
     if (liCount > 0 && liSubElements[0].localName == 'a') {
-      title = () {
-        Element titleElement = liSubElements[0];
-        if (liSubElements[0].children.isNotEmpty) {
-          for (final elem in liSubElements[0].children) {
-            if (elem.children.isEmpty) {
-              titleElement = elem;
-              break;
-            } else if (elem.children.first.children.isEmpty) {
-              titleElement = elem.children.first;
-            }
-          }
-        }
-        String retStr = titleElement.innerHtml;
-        retStr = retStr.replaceAll('&nbsp;', ' ').trim();
-        retStr = retStr.replaceAll('&amp;', '&');
-        return retStr;
-      }();
+      title = liSubElements[0].text;
       urlString = () {
         String retStr = liSubElements[0].attributes["href"] ?? "";
         if (!retStr.contains(RegExp(r'http(s)*:\/\/'))) {
@@ -375,23 +359,7 @@ extension BbsNovaWebApiSelect on BbsNovaWebApi {
     // title, urlString
     if (td.children.isNotEmpty && alink.localName == 'a') {
       // title
-      title = () {
-        Element titleElement = alink;
-        if (alink.children.isNotEmpty) {
-          for (final elem in alink.children) {
-            if (elem.children.isEmpty) {
-              titleElement = elem;
-              break;
-            } else if (elem.children.first.children.isEmpty) {
-              titleElement = elem.children.first;
-            }
-          }
-        }
-        String retStr = titleElement.innerHtml;
-        retStr = retStr.replaceAll('&nbsp;', ' ').trim();
-        retStr = retStr.replaceAll('&amp;', '&');
-        return retStr;
-      }();
+      title = alink.text;
 
       // urlString
       urlString = () {

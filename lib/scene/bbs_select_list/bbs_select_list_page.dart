@@ -1,13 +1,15 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/foundation/log_util.dart';
 import 'package:ses_novajoj/foundation/firebase_util.dart';
 import 'package:ses_novajoj/domain/foundation/bloc/bloc_provider.dart';
-import 'package:ses_novajoj/scene/foundation/color_def.dart';
 import 'package:ses_novajoj/scene/foundation/use_l10n.dart';
 import 'package:ses_novajoj/scene/foundation/page/page_parameter.dart';
 import 'package:ses_novajoj/scene/bbs_select_list/bbs_select_list_presenter.dart';
 import 'package:ses_novajoj/scene/bbs_select_list/bbs_select_list_presenter_output.dart';
+import 'package:ses_novajoj/scene/root/search_page.dart';
 
 class BbsSelectListPage extends StatefulWidget {
   final BbsSelectListPresenter presenter;
@@ -25,6 +27,12 @@ class _BbsSelectListPageState extends State<BbsSelectListPage> {
   late String? _targetUrl;
   final ScrollController _scrollController = ScrollController();
   int _currentPageIndex = 1;
+  int _waitingCount = 0;
+
+  late String? _searchedUrl;
+  final SearchPage _searchPage = SearchPage();
+  String _currentSearchedKeyword = '';
+  String _prevSearchedKeyword = '';
 
   @override
   void initState() {
@@ -36,18 +44,43 @@ class _BbsSelectListPageState extends State<BbsSelectListPage> {
     _parseRouteParameter();
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(_appBarTitle),
-        backgroundColor: ColorDef.appBarBackColor2,
-        foregroundColor: ColorDef.appBarTitleColor,
-        centerTitle: true,
-      ),
+      appBar: _searchPage.buildAppBar(context,
+          appBarTitle: _appBarTitle,
+          automaticallyImplyLeading: true,
+          searchAction: (keyword) {
+            _currentSearchedKeyword = keyword;
+            if (keyword.isNotEmpty) {
+              _loadData(searchedKeyword: keyword);
+            }
+          },
+          cancelAction: (isSearched) {
+            if (isSearched) {
+              _loadData(searchResultIsCleared: true);
+            } else {
+              setState(
+                () {},
+              );
+            }
+            _currentSearchedKeyword = '';
+          },
+          openSearchAction: () => setState(
+                () {},
+              ),
+          refreshAction: () {
+            _loadData(searchedKeyword: _currentSearchedKeyword);
+          }),
       body: BlocProvider<BbsSelectListPresenter>(
         bloc: widget.presenter,
         child: StreamBuilder<BbsSelectListPresenterOutput>(
             stream: widget.presenter.stream,
             builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
+              if (snapshot.connectionState == ConnectionState.waiting ||
+                  widget.presenter.isProcessing) {
+                if (_waitingCount == 0 && _currentSearchedKeyword.isNotEmpty) {
+                  _waitingCount++;
+                  return Container();
+                }
+                _waitingCount++;
                 return Center(
                     child: CircularProgressIndicator(
                         color: Colors.amber,
@@ -77,6 +110,9 @@ class _BbsSelectListPageState extends State<BbsSelectListPage> {
 
   List<Widget> _buildForYouList(BuildContext context,
       {required List<BbsSelectListRowViewModel> dataList}) {
+    if (_currentSearchedKeyword.isNotEmpty) {
+      return [];
+    }
     List<BbsSelectListRowViewModel> foryouList =
         dataList.where((element) => element.itemInfo.id < 100).toList();
     if (foryouList.isEmpty) {
@@ -111,8 +147,9 @@ class _BbsSelectListPageState extends State<BbsSelectListPage> {
 
   List<Widget> _buildLatestList(BuildContext context,
       {required List<BbsSelectListRowViewModel> dataList}) {
-    List<BbsSelectListRowViewModel> latestList =
-        dataList.where((element) => element.itemInfo.id >= 100).toList();
+    List<BbsSelectListRowViewModel> latestList = _currentSearchedKeyword.isEmpty
+        ? dataList.where((element) => element.itemInfo.id >= 100).toList()
+        : dataList;
     if (latestList.isEmpty) {
       return [];
     }
@@ -132,7 +169,9 @@ class _BbsSelectListPageState extends State<BbsSelectListPage> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(left: 20, top: 10),
-                    child: Text(UseL10n.of(context)?.bbsSelectListLatest ?? ''),
+                    child: Text(_currentSearchedKeyword.isEmpty
+                        ? UseL10n.of(context)?.bbsSelectListLatest ?? ''
+                        : UseL10n.of(context)?.searchedResultTitle ?? ''),
                   )
                 ],
               ),
@@ -167,7 +206,7 @@ class _BbsSelectListPageState extends State<BbsSelectListPage> {
           widget.presenter.eventSelectDetail(context,
               appBarTitle: _appBarTitle,
               itemInfo: dataList[row].itemInfo, completeHandler: () {
-            _loadData();
+            _loadData(searchedKeyword: _currentSearchedKeyword);
           });
         });
   }
@@ -195,7 +234,7 @@ class _BbsSelectListPageState extends State<BbsSelectListPage> {
                             appBarTitle: _appBarTitle,
                             itemInfo: dataList[row].itemInfo,
                             completeHandler: () {
-                          _loadData();
+                          _loadData(searchedKeyword: _currentSearchedKeyword);
                         });
                       },
                     ),
@@ -256,7 +295,7 @@ class _BbsSelectListPageState extends State<BbsSelectListPage> {
           widget.presenter.eventSelectDetail(context,
               appBarTitle: _appBarTitle,
               itemInfo: itemInfo, completeHandler: () {
-            _loadData();
+            _loadData(searchedKeyword: _currentSearchedKeyword);
           });
         });
   }
@@ -275,7 +314,9 @@ class _BbsSelectListPageState extends State<BbsSelectListPage> {
                   ? null
                   : () {
                       _currentPageIndex = targetPageIndex;
-                      _loadData(isReloaded: true);
+                      _loadData(
+                          isReloaded: true,
+                          searchedKeyword: _currentSearchedKeyword);
                     },
               icon: Icon(iconData)));
     }
@@ -335,6 +376,8 @@ class _BbsSelectListPageState extends State<BbsSelectListPage> {
       _appBarTitle =
           _parameters?[BbsSelectListParamKeys.appBarTitle] as String? ?? '';
       _targetUrl = _parameters?[BbsSelectListParamKeys.targetUrl] as String?;
+      _searchedUrl =
+          _parameters?[BbsSelectListParamKeys.searchedUrl] as String?;
 
       //
       // FA
@@ -347,11 +390,24 @@ class _BbsSelectListPageState extends State<BbsSelectListPage> {
     }
   }
 
-  void _loadData({bool isReloaded = false}) {
+  void _loadData(
+      {bool isReloaded = false,
+      String searchedKeyword = '',
+      bool searchResultIsCleared = false}) {
+    if (_prevSearchedKeyword != _currentSearchedKeyword) {
+      _prevSearchedKeyword = _currentSearchedKeyword;
+      _currentPageIndex = 1;
+    }
+    _waitingCount = 0;
+
     if (_targetUrl != null) {
       widget.presenter.eventViewReady(
           input: BbsSelectListPresenterInput(
-              targetUrl: _targetUrl ?? '', targetPageIndex: _currentPageIndex));
+        targetUrl: searchedKeyword.isEmpty ? _targetUrl! : _searchedUrl!,
+        targetPageIndex: _currentPageIndex,
+        searchedKeyword: searchedKeyword,
+        searchResultIsCleared: searchResultIsCleared,
+      ));
 
       Future.delayed(Duration.zero, () {
         setState(() {});

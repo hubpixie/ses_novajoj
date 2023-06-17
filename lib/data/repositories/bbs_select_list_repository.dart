@@ -6,6 +6,8 @@ import 'package:ses_novajoj/domain/repositories/bbs_select_list_repository.dart'
 
 class BbsNovaSelectListRepositoryImpl extends BbsNovaSelectListRepository {
   final BbsNovaWebApi _api;
+  int _estimatedPageCnt = 10;
+  String _prevSearchedKeyword = '';
 
   // sigleton
   static final BbsNovaSelectListRepositoryImpl _instance =
@@ -18,26 +20,71 @@ class BbsNovaSelectListRepositoryImpl extends BbsNovaSelectListRepository {
       {required FetchBbsNovaSelectListRepoInput input}) async {
     String targetUrl =
         input.targetUrl.replaceAll('{{page}}', '${input.pageIndex}');
-    final result = await _api.fetchSelectList(
-        parameter:
-            NovaItemParameter(targetUrl: targetUrl, docType: input.docType));
+
     List<BbsNovaSelectListItem> list = [];
     late Result<List<BbsNovaSelectListItem>> ret;
 
-    result.when(success: (response) {
-      for (var item in response) {
-        BbsNovaSelectListItem retItem = BbsNovaSelectListItem(
-          itemInfo: item.itemInfo,
-        );
-        retItem.itemInfo.pageCount =
-            targetUrl == input.targetUrl ? 1 : 10; //default
-        retItem.itemInfo.pageNumber = input.pageIndex;
-        list.add(retItem);
+    Result<List<BbsNovaSelectListItem>> setReturnVal<T>(
+        T response, bool searched) {
+      if (response is List) {
+        for (var item in response) {
+          BbsNovaSelectListItem retItem = BbsNovaSelectListItem(
+            itemInfo: item.itemInfo,
+          );
+          retItem.itemInfo.pageCount = () {
+            int retCnt =
+                targetUrl == input.targetUrl ? 1 : _estimatedPageCnt; //default
+            if (searched) {
+              if (response.length > 90) {
+                retCnt = input.pageIndex + 1;
+              } else {
+                retCnt = 1;
+              }
+              _estimatedPageCnt = retCnt;
+            }
+            retCnt = _estimatedPageCnt > retCnt ? _estimatedPageCnt : retCnt;
+            return retCnt;
+          }();
+          retItem.itemInfo.pageNumber = input.pageIndex;
+          list.add(retItem);
+        }
+        return Result.success(data: list);
+      } else {
+        return const Result.success(data: []);
       }
-      ret = Result.success(data: list);
-    }, failure: (error) {
-      ret = Result.failure(error: error);
-    });
+    }
+
+    if (targetUrl.contains('{{keywords}}')) {
+      if (_prevSearchedKeyword.isEmpty) {
+        _prevSearchedKeyword = input.searchedKeyword;
+      }
+      // if targetUrl is different from previos one except '&p99', reset _estimatedPageCnt as default.
+      if (_prevSearchedKeyword != input.searchedKeyword) {
+        _prevSearchedKeyword = input.searchedKeyword;
+        _estimatedPageCnt = 10; // defalut value
+      }
+      // fetch next page data
+      targetUrl = targetUrl.replaceAll('{{keywords}}', input.searchedKeyword);
+      final result = await _api.fetchSearchedResult(
+          parameter:
+              NovaItemParameter(targetUrl: targetUrl, docType: input.docType));
+      result.when(success: (response) {
+        ret = setReturnVal(response, true);
+      }, failure: (error) {
+        ret = Result.failure(error: error);
+      });
+    } else {
+      _estimatedPageCnt = 10; // defalut value
+      // fetch next page data
+      final result = await _api.fetchSelectList(
+          parameter:
+              NovaItemParameter(targetUrl: targetUrl, docType: input.docType));
+      result.when(success: (response) {
+        ret = setReturnVal(response, false);
+      }, failure: (error) {
+        ret = Result.failure(error: error);
+      });
+    }
 
     return ret;
   }

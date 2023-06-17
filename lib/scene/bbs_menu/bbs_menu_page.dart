@@ -114,6 +114,7 @@ class _BbsMenuPageState extends State<BbsMenuPage>
               appBarTitle:
                   "${widget.pageState.subPageTitle}[${menuDataList[row].title}]",
               targetUrl: menuDataList[row].urlString,
+              searchedUrl: menuDataList[row].searchUrlString,
               completeHandler: () {});
         });
   }

@@ -3,6 +3,8 @@
 
   "cancelButtonTitle":"Cancel",
   "deleteButtonTitle":"Delete",
+  "searchedHintTitle":"Search...",
+  "searchedResultTitle":"Searched Result",
   "requiredLabelOfTextField": "[Required]",
   
   "appBarIconNameLatest": "L",

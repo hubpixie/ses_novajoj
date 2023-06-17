@@ -4,7 +4,7 @@ enum ThreadDetailParamKeys { appBarTitle, itemInfo }
 
 enum BbsDetailParamKeys { appBarTitle, itemInfo }
 
-enum BbsSelectListParamKeys { appBarTitle, targetUrl }
+enum BbsSelectListParamKeys { appBarTitle, targetUrl, searchedUrl }
 
 enum CitySelectParamKeys { appBarTitle, itemInfo, sourceRoute }
 

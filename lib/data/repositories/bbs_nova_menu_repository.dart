@@ -65,6 +65,7 @@ class BbsNovaMenuRepositoryImpl extends BbsNovaMenuRepository {
         .toList();
     menuList_?.asMap().forEach((index, value) {
       langItemList_?[index].urlString = menuList_[index].urlString;
+      langItemList_?[index].searchUrlString = menuList_[index].searchUrlString;
       if (langItemList_?[index] != null) {
         if (AppState.isLogined) {
           if (menuList_[index].urlString != '-') {

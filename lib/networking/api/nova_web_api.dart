@@ -297,12 +297,7 @@ class NovaWebApi extends BaseNovaWebApi {
       tdSubElements = trSubElements[1].children;
       tdCount = tdSubElements.length;
       if (tdCount > 0 && tdSubElements[0].localName == 'a') {
-        title = () {
-          String retStr = tdSubElements[0].innerHtml;
-          retStr = retStr.replaceAll('&nbsp;', ' ').trim();
-          retStr = retStr.replaceAll('&amp;', '&');
-          return retStr;
-        }();
+        title = tdSubElements[0].text;
         urlString = tdSubElements[0].attributes["href"] ?? "";
         if (!urlString.contains(parentUrl)) {
           return retNovaItem;
