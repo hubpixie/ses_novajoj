@@ -96,6 +96,21 @@ class _BbsDetailPageState extends State<BbsDetailPage> {
                           completeHandler: (index) {
                         _detailPage.scrollController.scrollTo(index: index);
                       });
+                    }, onInnerLink: (index, href, innerTitle) {
+                      _itemInfo?.innerUrlString = _itemInfo?.urlString;
+                      _itemInfo?.urlString = href;
+                      _itemInfo?.isInnerLink = true;
+                      widget.presenter.eventSelectInnerDetail(context,
+                          appBarTitle: innerTitle,
+                          itemInfo: _itemInfo, completeHandler: () {
+                        if (_itemInfo?.isInnerLink ?? false) {
+                          log.info('jump to inner link detail!');
+                          _itemInfo?.urlString = _itemInfo!.innerUrlString!;
+                          _itemInfo?.innerUrlString = '';
+                          _itemInfo?.isInnerLink = false;
+                        }
+                        //_detailPage.scrollController.scrollTo(index: index);
+                      });
                     })
                   ]);
                 } else {

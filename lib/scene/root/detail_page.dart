@@ -11,12 +11,14 @@ class DetailPage {
       {dynamic detailItem,
       bool isWebDetail = false,
       bool imageZommingEnabled = true,
-      ImageLoadingDelegate? onImageLoad}) {
+      ImageLoadingDelegate? onImageLoad,
+      InnerLinkDelegate? onInnerLink}) {
     return ExtWebView(
       detailItem: detailItem,
       isWebDetail: isWebDetail,
       imageZoomingEnabled: imageZommingEnabled,
       onImageLoad: onImageLoad,
+      onInnerLink: onInnerLink,
       scrollController: scrollController,
     );
   }
