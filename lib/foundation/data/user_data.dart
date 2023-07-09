@@ -1,7 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:path/path.dart' as path_lib;
+import 'package:uuid/uuid.dart';
 import 'package:encrypted_shared_preferences/encrypted_shared_preferences.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:ses_novajoj/foundation/data/app_state.dart';
 import 'package:ses_novajoj/foundation/log_util.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/foundation/data/user_types_descript.dart';
@@ -45,6 +48,7 @@ class UserData {
   UserData._internal();
 
   final EncryptedSharedPreferences _preferences = EncryptedSharedPreferences();
+  final Uuid _uuid = const Uuid();
 
   Future<List<SimpleUrlInfo>> get miscMyTimes async {
     return _getSimpleUrlInfoList(key: _UserDataKey.miscMyTimes.name);
@@ -59,7 +63,11 @@ class UserData {
   }
 
   Future<List<String>> get miscHistorioList async {
-    return _getHistorioList(key: _UserDataKey.miscHistory.name);
+    if (AppState.isHistorioEnabled) {
+      return _getHistorioList(key: _UserDataKey.miscHistory.name);
+    } else {
+      return [];
+    }
   }
 
   Future<List<String>> get miscFavoritesList async {
@@ -76,6 +84,18 @@ class UserData {
     return jsonData != null
         ? CommentMenuSettingDescript.fromJson(jsonData)
         : null;
+  }
+
+  ///
+  /// _getUuidFileName
+  ///
+  Future<String> _getUuidFileName({required String key}) async {
+    String fileName = await _preferences.getString(key);
+    if (fileName.isEmpty) {
+      fileName = _uuid.v4();
+      _preferences.setString(key, fileName);
+    }
+    return fileName;
   }
 
   ///
@@ -131,7 +151,18 @@ class UserData {
   ///
   Future<List<String>> _getHistorioList({required String key}) async {
     List<String> outData = [];
-    String savedValue = await _preferences.getString(key);
+    // fileName
+    String fileName = await _getUuidFileName(key: key);
+    String path = await _getDataPath(key: key);
+    String filePth = '$path/$fileName';
+
+    // return empty list if no file
+    File file = File(filePth);
+    if (!(await file.exists())) {
+      return [];
+    }
+    // read file content and parse
+    String savedValue = await file.readAsString();
     if (savedValue.isEmpty) {
       return outData;
     }
@@ -228,33 +259,52 @@ class UserData {
   void insertHistorio(
       {required String historio,
       String? url,
+      String? innerUrl,
       String? htmlText,
       int index = 0}) async {
-    final hisList = await _getHistorioList(key: _UserDataKey.miscHistory.name);
-    if (hisList.contains(historio)) {
-      return;
-    } else if (url != null &&
-        hisList
-            .firstWhere((element) => element.contains(url), orElse: () => '')
-            .isNotEmpty) {
+    if (!AppState.isHistorioEnabled) {
       return;
     }
 
+    final hisList = await _getHistorioList(key: _UserDataKey.miscHistory.name);
+    int fndIndex = -1;
+    if (hisList.contains(historio)) {
+      return;
+    } else if (url != null && hisList.isNotEmpty) {
+      fndIndex = hisList.indexWhere((element) => element.contains(url));
+      if ((innerUrl != null && fndIndex < 0) ||
+          (innerUrl == null && fndIndex >= 0)) {
+        return;
+      }
+    }
+
     // save file
-    _getDataPath(key: _UserDataKey.miscHistory.name).then((path) {
+    _getDataPath(
+            key: _UserDataKey.miscHistory.name,
+            subKey: innerUrl == null ? '' : '${url.hashCode}')
+        .then((path) {
       // encode
       Codec<String, String> codec = utf8.fuse(base64);
       final encoded = codec.encode(htmlText ?? '');
       // save
-      File file = File('$path/${url.hashCode}');
+      File file;
+      if (innerUrl == null) {
+        file = File('$path/${url.hashCode}');
+      } else {
+        file = File('$path/${innerUrl.hashCode}');
+      }
       file.writeAsBytes(encoded.codeUnits);
     });
 
     // save list
-    if (index < 0 || index > hisList.length) {
-      hisList.add(historio);
+    if (innerUrl == null) {
+      if (index < 0 || index > hisList.length) {
+        hisList.add(historio);
+      } else {
+        hisList.insert(index, historio);
+      }
     } else {
-      hisList.insert(index, historio);
+      hisList[fndIndex] = historio;
     }
     _saveHistorioList(newValues: hisList, key: _UserDataKey.miscHistory.name);
   }
@@ -272,8 +322,12 @@ class UserData {
       hisList.removeAt(foundIndex);
       // delete file
       _getDataPath(key: _UserDataKey.miscHistory.name).then((path) {
-        File file = File('$path/${url.hashCode}');
-        file.delete();
+        Directory dir = Directory('$path/index${url.hashCode}');
+        if (dir.existsSync()) {
+          dir.delete(recursive: true);
+          File file = File('$path/${url.hashCode}');
+          file.delete();
+        }
       });
     }
 
@@ -284,10 +338,15 @@ class UserData {
   ///
   /// readHistorioData
   ///
-  Future<String> readHistorioData({required String url}) async {
+  Future<String> readHistorioData(
+      {required String url, String innerUrl = ''}) async {
     log.info('UserData: [url = $url]');
-    String path = await _getDataPath(key: _UserDataKey.miscHistory.name);
-    String filename = '$path/${url.hashCode}';
+    String path = await _getDataPath(
+        key: _UserDataKey.miscHistory.name,
+        subKey: innerUrl.isEmpty ? '' : '${url.hashCode}');
+    String filename = innerUrl.isEmpty
+        ? '$path/${url.hashCode}'
+        : '$path/${innerUrl.hashCode}';
     File file = File(filename);
     if (await file.exists()) {
       final str = file.readAsStringSync();
@@ -302,10 +361,15 @@ class UserData {
   ///
   /// readFavoriteData
   ///
-  Future<String> readFavoriteData({required String url}) async {
+  Future<String> readFavoriteData(
+      {required String url, String innerUrl = ''}) async {
     log.info('UserData: [url = $url]');
-    String path = await _getDataPath(key: _UserDataKey.miscFavorites.name);
-    String filename = '$path/${url.hashCode}';
+    String path = await _getDataPath(
+        key: _UserDataKey.miscFavorites.name,
+        subKey: innerUrl.isEmpty ? '' : '${url.hashCode}');
+    String filename = innerUrl.isEmpty
+        ? '$path/${url.hashCode}'
+        : '$path/${innerUrl.hashCode}';
     File file = File(filename);
     if (await file.exists()) {
       final str = file.readAsStringSync();
@@ -324,7 +388,32 @@ class UserData {
       {required String bookmark,
       bool bookmarkIsOn = false,
       String? url,
+      String? innerUrl,
       String? htmlText}) async {
+    // copy subFlolder
+    void copySubFolder(String destPath) {
+      _getDataPath(key: _UserDataKey.miscHistory.name).then((sourcePath) {
+        Directory dir = Directory('$sourcePath/index${url.hashCode}');
+        Directory toDir = Directory('$destPath/index${url.hashCode}');
+        // check if fromPath is existed
+        if (dir.existsSync()) {
+          // check if toPath is existed
+          if (!toDir.existsSync()) {
+            toDir.createSync(recursive: true);
+          }
+          // copy every file from source path to dest path.
+          Directory(sourcePath).list(recursive: true).forEach((entity) {
+            if (entity is File) {
+              String toFilePath =
+                  '${toDir.path}/${path_lib.basename(entity.path)}';
+              entity.copy(toFilePath);
+            }
+          });
+        }
+      });
+    }
+
+    // find the target favorite item
     int foundIndex = -1;
     final favorList =
         await _getHistorioList(key: _UserDataKey.miscFavorites.name);
@@ -332,30 +421,50 @@ class UserData {
       foundIndex = favorList.indexWhere((element) => element.contains(url));
     }
     if (foundIndex >= 0) {
-      favorList.removeAt(foundIndex);
-      // delete file
-      _getDataPath(key: _UserDataKey.miscFavorites.name).then((path) {
-        File file = File('$path/${url.hashCode}');
-        file.delete();
-      });
+      if (innerUrl == null || !bookmarkIsOn) {
+        favorList.removeAt(foundIndex);
+        // delete file
+        _getDataPath(key: _UserDataKey.miscFavorites.name).then((path) {
+          Directory dir = Directory('$path/index${url.hashCode}');
+          if (dir.existsSync()) {
+            dir.delete(recursive: true);
+            File file = File('$path/${url.hashCode}');
+            file.delete();
+          }
+        });
+      }
     }
     // save bookmark if isOn = true
     if (bookmarkIsOn) {
-      if (favorList.isEmpty) {
-        favorList.add(bookmark);
+      if (innerUrl == null) {
+        if (favorList.isEmpty) {
+          favorList.add(bookmark);
+        } else {
+          favorList.insert(0, bookmark);
+        }
       } else {
-        favorList.insert(0, bookmark);
+        favorList[foundIndex] = bookmark;
       }
     }
 
     // save file
     if ((htmlText ?? '').isNotEmpty) {
-      _getDataPath(key: _UserDataKey.miscFavorites.name).then((path) {
+      _getDataPath(
+              key: _UserDataKey.miscFavorites.name,
+              subKey: innerUrl == null ? '' : '${url.hashCode}')
+          .then((path) {
         // encode
         Codec<String, String> codec = utf8.fuse(base64);
         final encoded = codec.encode(htmlText ?? '');
         // save
-        File file = File('$path/${url.hashCode}');
+        File file;
+        if (innerUrl == null) {
+          file = File('$path/${url.hashCode}');
+          // copy every file from source path to dest path.
+          copySubFolder(path);
+        } else {
+          file = File('$path/${innerUrl.hashCode}');
+        }
         file.writeAsBytes(encoded.codeUnits);
       });
     }
@@ -402,7 +511,8 @@ class UserData {
   /// _saveHistorioList
   ///
   void _saveHistorioList(
-      {required List<String> newValues, required String key}) {
+      {required List<String> newValues, required String key}) async {
+    // encode jsonData
     final jsonList = newValues;
     final Map<String, dynamic> jsonData = <String, dynamic>{};
     jsonData[_kDefaultListValueKey] = jsonList;
@@ -410,11 +520,11 @@ class UserData {
     Codec<String, String> codec = utf8.fuse(base64);
     final encoded2 = codec.encode(encoded);
 
-    _preferences.setString(key, encoded2).then((succeeded) {
-      if (!succeeded) {
-        log.warning('Cannot save $key info SharedPref!');
-      }
-    });
+    // save jsonData into fileName
+    String fileName = await _getUuidFileName(key: key);
+    String path = await _getDataPath(key: key);
+    String filePth = '$path/$fileName';
+    File(filePth).writeAsString(encoded2);
   }
 
   ///
@@ -437,12 +547,20 @@ class UserData {
   ///
   /// _saveCityInfoList
   ///
-  Future<String> _getDataPath({required String key}) async {
+  Future<String> _getDataPath({required String key, String subKey = ''}) async {
     final tempDic = await getApplicationDocumentsDirectory();
-    final filePathName = '${tempDic.path}/$key';
-    Directory dir = Directory(filePathName);
+    String filePathName = '${tempDic.path}/$key';
+    Directory dir;
+    dir = Directory(filePathName);
     if (!(await dir.exists())) {
       await dir.create(recursive: true);
+    }
+    if (subKey.isNotEmpty) {
+      filePathName = '$filePathName/index$subKey';
+      dir = Directory(filePathName);
+      if (!(await dir.exists())) {
+        await dir.create(recursive: true);
+      }
     }
     return filePathName;
   }

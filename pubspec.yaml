@@ -58,6 +58,7 @@ dependencies:
   path_provider: ^2.0.11
   scroll_to_index:
   share_plus:
+  uuid:
   wakelock:
   
   # The following adds the Cupertino Icons font to your application.

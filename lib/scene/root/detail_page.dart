@@ -54,7 +54,9 @@ class DetailPage {
                             ''),
                   ),
                 );
-              } else if (element == DetailMenuItem.favorite && action != null) {
+              } else if (element == DetailMenuItem.favorite &&
+                  action != null &&
+                  itemInfo.isInnerLink != true) {
                 retMenus.add(
                   PopupMenuItem<DetailMenuItem>(
                     value: DetailMenuItem.favorite,

@@ -71,11 +71,18 @@ class HistorioRepositoryImpl extends HistorioRepository {
       HistorioItemRes historioItemRes = HistorioItemRes.as(info: historioInfo);
       final json = historioItemRes.toJson();
       final encoded = jsonEncode(json);
-
-      UserData().insertHistorio(
-          historio: encoded,
-          url: historioInfo.itemInfo.urlString,
-          htmlText: detailItem.bodyString);
+      if (input.isUpdate) {
+        UserData().insertHistorio(
+            historio: encoded,
+            url: historioInfo.itemInfo.previousUrlString,
+            innerUrl: historioInfo.itemInfo.urlString,
+            htmlText: detailItem.bodyString);
+      } else {
+        UserData().insertHistorio(
+            historio: encoded,
+            url: historioInfo.itemInfo.urlString,
+            htmlText: detailItem.bodyString);
+      }
     }
   }
 }

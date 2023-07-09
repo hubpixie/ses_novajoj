@@ -23,7 +23,7 @@ class BaseNovaWebApi {
   //'aHR0cHM6Ly93ZWIuNnBhcmtiYnMuY29tL3B1Yl9wYWdlL2hvbWVfbG9naW4ucGhw';
   static const String kSampleUrlParams = 'cGljaG82cGFya0A6d2FoYWhhQF8=';
   static const String kSampleReplacedPkCode =
-      'Pihjb29sMTh8NnBhcmspXC5jb208Ly8+IDw=@@';
+      'Pihccyl7MCx9KHd3d1wuKXswLH0oY29vbDE4fDZwYXJrKVwuY29tKFxzKXswLH08Ly8+IDw=@@';
   static bool _logined = false;
   static const String kBbsMenuSettingUrl =
       'https://qczkbaujyxmh9zzbl82kzq.on.drv.tw/www2.pixie.net/www/apps/ses_novajoj/assets/json/bbs_menu.json.txt';
@@ -162,11 +162,12 @@ class BaseNovaWebApi {
 
     ///reshape other tags
     Codec<String, String> codec = utf8.fuse(base64);
-    final codes = codec
+    String retStr = inElement?.innerHtml ?? '';
+    // code ssample
+    var codes = codec
         .decode(kSampleReplacedPkCode.substring(
             0, kSampleReplacedPkCode.length - 2))
         .split('//');
-    String retStr = inElement?.innerHtml ?? '';
     retStr = retStr.replaceAll(RegExp(r'' + codes.first), codes.last);
     return retStr;
   }

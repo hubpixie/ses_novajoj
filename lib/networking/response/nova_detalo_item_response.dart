@@ -35,6 +35,8 @@ extension NovaItemInfoRes on NovaItemInfo {
           ServiceTypeDescript.fromString(data['service_type']);
       itemInfo.title = data['title'];
       itemInfo.urlString = data['url_string'];
+      itemInfo.innerLinks =
+          (data['inner_links'] as List?)?.map((e) => '$e').toList();
       itemInfo.thunnailUrlString = data['thunnail_url_string'];
       itemInfo.title = data['title'];
       itemInfo.source = data['source'];
@@ -58,7 +60,8 @@ extension NovaItemInfoRes on NovaItemInfo {
     data['id'] = id;
     data['service_type'] = serviceType.stringClass;
     data['title'] = title;
-    data['url_string'] = urlString;
+    data['url_string'] = !isInnerLink ? urlString : previousUrlString;
+    data['inner_links'] = innerLinks;
     data['thunnail_url_string'] = thunnailUrlString;
     data['source'] = source;
     data['author'] = author;

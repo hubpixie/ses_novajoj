@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 //import 'package:ses_novajoj/foundation/log_util.dart';
 //import 'package:ses_novajoj/foundation/firebase_util.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
+import 'package:ses_novajoj/foundation/log_util.dart';
 import 'package:ses_novajoj/scene/foundation/color_def.dart';
 import 'package:ses_novajoj/scene/foundation/page/page_parameter.dart';
 import 'package:ses_novajoj/scene/root/web/web_presenter.dart';
@@ -72,6 +73,21 @@ class _WebPageState extends State<WebPage> {
               imageSrcList: srcList,
               parentViewImage: parentViewImage, completeHandler: (index) {
             _detailPage.scrollController.scrollTo(index: index);
+          });
+        }, onInnerLink: (index, href, innerTitle) {
+          _itemInfo?.innerLinkDetail?.call(href).then((htmlText) {
+            _itemInfo?.isInnerLink = true;
+            widget.presenter.eventSelectInnerDetail(context,
+                appBarTitle: innerTitle,
+                itemInfo: _itemInfo,
+                htmlText: htmlText, completeHandler: () {
+              if (_itemInfo?.isInnerLink ?? false) {
+                log.info('jump to inner link detail!');
+                _itemInfo?.urlString = _itemInfo!.previousUrlString!;
+                _itemInfo?.previousUrlString = '';
+                _itemInfo?.isInnerLink = false;
+              }
+            });
           });
         }));
   }

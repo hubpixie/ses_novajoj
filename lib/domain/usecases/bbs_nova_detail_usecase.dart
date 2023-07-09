@@ -19,6 +19,8 @@ class BbsNovaDetailUseCaseInput {
 abstract class BbsNovaDetailUseCase
     with SimpleBloc<BbsNovaDetailUseCaseOutput> {
   void fetchBbsNovaDetail({required BbsNovaDetailUseCaseInput input});
+  Future<BbsNovaDetailUseCaseOutput> fetchBbsNovaInnerDetail(
+      {required BbsNovaDetailUseCaseInput input});
   bool saveBookmark({required BbsNovaDetailUseCaseInput input});
 }
 
@@ -39,18 +41,75 @@ class BbsNovaDetailUseCaseImpl extends BbsNovaDetailUseCase {
 
     result.when(success: (value) {
       // set result
-      streamAdd(PresentModel(
+      streamAdd(BbsNovaDetaiPresentModel(
           model:
               BbsNovaDetailUseCaseModel(value.itemInfo, value.toHtmlString())));
       // save history
-      historioRepository.saveNovaDetailHistory(
-          input: FetchHistorioRepoInput(
-              itemInfo: value.itemInfo,
-              bodyString: value.bodyString,
-              category: 'bbs'));
+      bool savedFlg = true;
+      if (input.itemInfo.isInnerLink) {
+        List<String> innerLinks = value.itemInfo.innerLinks ?? [];
+        if (!innerLinks.contains(input.itemInfo.urlString)) {
+          innerLinks.add(input.itemInfo.urlString);
+          value.itemInfo.innerLinks = innerLinks;
+        } else {
+          savedFlg = false;
+        }
+      }
+      if (savedFlg) {
+        historioRepository.saveNovaDetailHistory(
+            input: FetchHistorioRepoInput(
+                itemInfo: value.itemInfo,
+                bodyString: value.bodyString,
+                category: 'bbs',
+                isUpdate: input.itemInfo.isInnerLink));
+      }
     }, failure: (error) {
-      streamAdd(PresentModel(error: error));
+      streamAdd(BbsNovaDetaiPresentModel(error: error));
     });
+  }
+
+  @override
+  Future<BbsNovaDetailUseCaseOutput> fetchBbsNovaInnerDetail(
+      {required BbsNovaDetailUseCaseInput input}) async {
+    final result = await repository.fetchBbsNovaDetail(
+        input: FetchBbsNovaDetailRepoInput(
+            itemInfo: input.itemInfo, docType: NovaDocType.detail));
+
+    late BbsNovaDetaiPresentModel output;
+    result.when(success: (value) {
+      // set result
+      output = BbsNovaDetaiPresentModel(
+          model:
+              BbsNovaDetailUseCaseModel(value.itemInfo, value.toHtmlString()));
+      List<String> innerLinks = value.itemInfo.innerLinks ?? [];
+      if (!innerLinks.contains(input.itemInfo.urlString)) {
+        innerLinks.add(input.itemInfo.urlString);
+        value.itemInfo.innerLinks = innerLinks;
+        if (input.itemInfo.isFavorite) {
+          HistorioInfo bookmark = HistorioInfo();
+          {
+            bookmark.id = bookmark.hashCode;
+            bookmark.category = "bbs";
+            bookmark.itemInfo = value.itemInfo;
+            bookmark.htmlText = input.htmlText;
+            bookmark.createdAt = DateTime.now();
+          }
+          favoriteRepository.saveBookmark(
+              input: FetchFavoritesRepoInput(bookmark: bookmark));
+        } else {
+          // save history
+          historioRepository.saveNovaDetailHistory(
+              input: FetchHistorioRepoInput(
+                  itemInfo: value.itemInfo,
+                  bodyString: value.bodyString,
+                  category: 'bbs',
+                  isUpdate: true));
+        }
+      }
+    }, failure: (error) {
+      output = BbsNovaDetaiPresentModel(error: error);
+    });
+    return output;
   }
 
   @override

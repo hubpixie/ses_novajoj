@@ -9,6 +9,11 @@ abstract class WebRouter {
       List<dynamic>? imageSrcList,
       dynamic parentViewImage,
       Object? completeHandler});
+  void gotoInnerDetail(Object context,
+      {required String appBarTitle,
+      Object? itemInfo,
+      String? htmlText,
+      Object? completeHandler});
 }
 
 class WebRouterImpl extends WebRouter {
@@ -33,6 +38,24 @@ class WebRouterImpl extends WebRouter {
         if (value is int) {
           completeHandler?.call(value);
         }
+      }
+    });
+  }
+
+  @override
+  void gotoInnerDetail(Object context,
+      {required String appBarTitle,
+      Object? itemInfo,
+      String? htmlText,
+      Object? completeHandler}) {
+    Navigator.pushNamed(context as BuildContext, ScreenRouteName.webPage.name,
+        arguments: {
+          WebPageParamKeys.appBarTitle: appBarTitle,
+          WebPageParamKeys.itemInfo: itemInfo,
+          WebPageParamKeys.htmlText: htmlText
+        }).then((value) {
+      if (completeHandler != null && completeHandler is Function) {
+        completeHandler.call();
       }
     });
   }

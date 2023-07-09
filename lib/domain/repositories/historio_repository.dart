@@ -6,8 +6,10 @@ class FetchHistorioRepoInput {
   NovaItemInfo? itemInfo;
   String? bodyString;
   String? category;
+  bool isUpdate;
 
-  FetchHistorioRepoInput({this.itemInfo, this.bodyString, this.category});
+  FetchHistorioRepoInput(
+      {this.itemInfo, this.bodyString, this.category, this.isUpdate = false});
 }
 
 abstract class HistorioRepository {

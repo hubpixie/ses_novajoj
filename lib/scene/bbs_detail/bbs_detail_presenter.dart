@@ -34,7 +34,7 @@ class BbsDetailPresenterImpl extends BbsDetailPresenter {
   BbsDetailPresenterImpl({required this.router})
       : useCase = BbsNovaDetailUseCaseImpl() {
     useCase.stream.listen((event) {
-      if (event is PresentModel) {
+      if (event is BbsNovaDetaiPresentModel) {
         if (event.error == null) {
           streamAdd(ShowBbsDetailPageModel(
               viewModel: BbsDetailViewModel(event.model!)));

@@ -1,3 +1,5 @@
+import 'package:ses_novajoj/domain/usecases/bbs_nova_detail_usecase.dart';
+import 'package:ses_novajoj/domain/usecases/bbs_nova_detail_usecase_output.dart';
 import 'package:ses_novajoj/domain/usecases/favorites_usecase.dart';
 import 'package:ses_novajoj/domain/usecases/historio_usecase.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
@@ -44,12 +46,14 @@ class MiscInfoListPresenterImpl extends MiscInfoListPresenter {
   final MiscInfoListUseCase useCase;
   final HistorioUseCase hisUseCase;
   final FavoritesUseCase favoriteUseCase;
+  final BbsNovaDetailUseCase bbsNovaDetailUseCase;
   final MiscInfoListRouter router;
 
   MiscInfoListPresenterImpl({required this.router})
       : useCase = MiscInfoListUseCaseImpl(),
         favoriteUseCase = FavoritesUseCaseImpl(),
-        hisUseCase = HistorioUseCaseImpl() {
+        hisUseCase = HistorioUseCaseImpl(),
+        bbsNovaDetailUseCase = BbsNovaDetailUseCaseImpl() {
     useCase.stream.listen((event) {
       if (event is PresentModel) {
         if (event.error == null) {
@@ -95,6 +99,17 @@ class MiscInfoListPresenterImpl extends MiscInfoListPresenter {
       {required MiscInfoListPresenterInput input}) async {
     // remove selected favorite if need
     final itemInfo = input.viewModelList?[input.itemIndex].itemInfo;
+
+    // set innerLinkDetail closure into the itemInfo
+    itemInfo?.innerLinkDetail = (innerLinkUrl) async {
+      return await _fetchInnerDetailInfo(
+          itemInfo: itemInfo,
+          innerUrl: innerLinkUrl,
+          cateory:
+              input.viewModelList?[input.itemIndex].hisInfo?.category ?? '',
+          isFavorite: false);
+    };
+
     final bodyString =
         await UserData().readHistorioData(url: itemInfo?.urlString ?? '');
     HistorioInfo? bookmark = input.viewModelList?[input.itemIndex].hisInfo;
@@ -134,14 +149,27 @@ class MiscInfoListPresenterImpl extends MiscInfoListPresenter {
   @override
   void eventViewFavoritesWebPage(Object context,
       {required MiscInfoListPresenterInput input}) async {
-    // remove selected favorite if need
+    // get itemInfo
     final itemInfo = input.viewModelList?[input.itemIndex].itemInfo;
-    final bodyString =
-        await UserData().readFavoriteData(url: itemInfo?.urlString ?? '');
+
+    // set innerLinkDetail closure into the itemInfo
+    itemInfo?.innerLinkDetail = (innerLinkUrl) async {
+      return await _fetchInnerDetailInfo(
+          itemInfo: itemInfo,
+          innerUrl: innerLinkUrl,
+          cateory:
+              input.viewModelList?[input.itemIndex].bookmark?.category ?? '',
+          isFavorite: true);
+    };
+
+    // remove selected favorite if need
     void removeAction() {
       // remove selected favorite
       UserData().saveFavorites(bookmark: '', url: itemInfo?.urlString);
     }
+
+    final bodyString =
+        await UserData().readFavoriteData(url: itemInfo?.urlString ?? '');
 
     router.gotoFavoritesWebPage(context,
         itemInfo: itemInfo,
@@ -212,5 +240,38 @@ class MiscInfoListPresenterImpl extends MiscInfoListPresenter {
               : removeAction,
           completeHandler: input.completeHandler);
     }
+  }
+
+  Future<String> _fetchInnerDetailInfo(
+      {required NovaItemInfo itemInfo,
+      required String innerUrl,
+      required String cateory,
+      bool isFavorite = false}) async {
+    itemInfo.previousUrlString = itemInfo.urlString;
+    itemInfo.urlString = innerUrl;
+    itemInfo.isInnerLink = true;
+    if ((itemInfo.innerLinks ?? []).contains(innerUrl)) {
+      String bodyString;
+      if (isFavorite) {
+        bodyString = await UserData().readFavoriteData(
+            url: itemInfo.previousUrlString ?? '', innerUrl: innerUrl);
+      } else {
+        bodyString = await UserData().readHistorioData(
+            url: itemInfo.previousUrlString ?? '', innerUrl: innerUrl);
+      }
+      return await hisUseCase.fetchHtmlTextWithScript(
+          input:
+              HistorioUseCaseInput(itemInfo: itemInfo, bodyString: bodyString));
+    } else {
+      if (cateory == 'bbs') {
+        BbsNovaDetailUseCaseOutput output =
+            await bbsNovaDetailUseCase.fetchBbsNovaInnerDetail(
+                input: BbsNovaDetailUseCaseInput(itemInfo: itemInfo));
+        if (output is BbsNovaDetaiPresentModel) {
+          return output.model?.htmlText ?? '';
+        }
+      }
+    }
+    return '';
   }
 }

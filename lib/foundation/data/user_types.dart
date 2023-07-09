@@ -54,8 +54,9 @@ class NovaItemInfo {
   String thunnailUrlString;
   String title;
   String urlString;
-  String? innerTitle;
-  String? innerUrlString;
+  List<String>? innerLinks;
+  String? previousUrlString;
+  Future<String> Function(String innerLinkUrl)? innerLinkDetail;
   String source;
   String author;
   DateTime createAt;
@@ -80,8 +81,9 @@ class NovaItemInfo {
       this.thunnailUrlString = '',
       required this.title,
       required this.urlString,
-      this.innerTitle,
-      this.innerUrlString,
+      this.innerLinks,
+      this.previousUrlString,
+      this.innerLinkDetail,
       this.source = '',
       this.author = '',
       required this.createAt,
