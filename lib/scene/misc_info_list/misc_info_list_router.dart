@@ -33,10 +33,12 @@ abstract class MiscInfoListRouter {
   void gotoHistorioPage(Object context,
       {required String appBarTitle,
       dynamic itemInfos,
+      Object? innerDetailAction,
       Object? completeHandler});
   void gotoFavoritesPage(Object context,
       {required String appBarTitle,
       dynamic itemInfos,
+      Object? innerDetailAction,
       Object? completeHandler});
 }
 
@@ -290,11 +292,13 @@ class MiscInfoListRouterImpl extends MiscInfoListRouter {
   void gotoHistorioPage(Object context,
       {required String appBarTitle,
       dynamic itemInfos,
+      Object? innerDetailAction,
       Object? completeHandler}) {
     Navigator.pushNamed(context as BuildContext, ScreenRouteName.historio.name,
         arguments: {
           HistorioParamKeys.appBarTitle: appBarTitle,
-          HistorioParamKeys.itemInfos: itemInfos
+          HistorioParamKeys.itemInfos: itemInfos,
+          HistorioParamKeys.innerDetailAction: innerDetailAction
         }).then((value) {
       if (completeHandler != null && completeHandler is Function) {
         completeHandler.call();
@@ -306,11 +310,13 @@ class MiscInfoListRouterImpl extends MiscInfoListRouter {
   void gotoFavoritesPage(Object context,
       {required String appBarTitle,
       dynamic itemInfos,
+      Object? innerDetailAction,
       Object? completeHandler}) {
     Navigator.pushNamed(context as BuildContext, ScreenRouteName.favorites.name,
         arguments: {
           FavoritesParamKeys.appBarTitle: appBarTitle,
-          FavoritesParamKeys.itemInfos: itemInfos
+          FavoritesParamKeys.itemInfos: itemInfos,
+          FavoritesParamKeys.innerDetailAction: innerDetailAction
         }).then((value) {
       if (completeHandler != null && completeHandler is Function) {
         completeHandler.call();

@@ -12,8 +12,10 @@ import 'bbs_nova_detail_usecase_output.dart';
 class BbsNovaDetailUseCaseInput {
   NovaItemInfo itemInfo;
   String? htmlText;
+  bool favoriteIsEnabled;
 
-  BbsNovaDetailUseCaseInput({required this.itemInfo, this.htmlText});
+  BbsNovaDetailUseCaseInput(
+      {required this.itemInfo, this.htmlText, this.favoriteIsEnabled = false});
 }
 
 abstract class BbsNovaDetailUseCase
@@ -85,13 +87,13 @@ class BbsNovaDetailUseCaseImpl extends BbsNovaDetailUseCase {
       if (!innerLinks.contains(input.itemInfo.urlString)) {
         innerLinks.add(input.itemInfo.urlString);
         value.itemInfo.innerLinks = innerLinks;
-        if (input.itemInfo.isFavorite) {
+        if (input.favoriteIsEnabled) {
           HistorioInfo bookmark = HistorioInfo();
           {
             bookmark.id = bookmark.hashCode;
             bookmark.category = "bbs";
             bookmark.itemInfo = value.itemInfo;
-            bookmark.htmlText = input.htmlText;
+            bookmark.htmlText = value.bodyString;
             bookmark.createdAt = DateTime.now();
           }
           favoriteRepository.saveBookmark(

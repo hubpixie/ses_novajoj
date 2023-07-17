@@ -36,6 +36,7 @@ class FavoritesRepositoryImpl extends FavoritesRepository {
   }
 
   void _saveBookmark({HistorioInfo? bookmark}) async {
+    String htmlText = bookmark?.htmlText ?? '';
     if (bookmark != null) {
       HistorioInfo historioInfo = () {
         HistorioInfo info = HistorioInfo();
@@ -54,8 +55,13 @@ class FavoritesRepositoryImpl extends FavoritesRepository {
       UserData().saveFavorites(
           bookmark: encoded,
           bookmarkIsOn: historioInfo.itemInfo.isFavorite,
-          url: historioInfo.itemInfo.urlString,
-          htmlText: bookmark.htmlText);
+          url: !historioInfo.itemInfo.isInnerLink
+              ? historioInfo.itemInfo.urlString
+              : historioInfo.itemInfo.previousUrlString,
+          innerUrl: historioInfo.itemInfo.isInnerLink
+              ? historioInfo.itemInfo.urlString
+              : null,
+          htmlText: htmlText);
     }
   }
 }

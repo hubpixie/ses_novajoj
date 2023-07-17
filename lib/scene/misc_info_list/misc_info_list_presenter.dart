@@ -90,8 +90,13 @@ class MiscInfoListPresenterImpl extends MiscInfoListPresenter {
       {required MiscInfoListPresenterInput input}) {
     router.gotoHistorioPage(context,
         itemInfos: input.viewModelList,
-        appBarTitle: input.appBarTitle,
-        completeHandler: input.completeHandler);
+        appBarTitle: input.appBarTitle, innerDetailAction:
+            (NovaItemInfo? itemInfo, String? innerUrl, String? category) {
+      if (itemInfo != null && innerUrl != null && category != null) {
+        return _fetchInnerDetailInfo(
+            itemInfo: itemInfo, innerUrl: innerUrl, cateory: category);
+      }
+    }, completeHandler: input.completeHandler);
   }
 
   @override
@@ -107,7 +112,7 @@ class MiscInfoListPresenterImpl extends MiscInfoListPresenter {
           innerUrl: innerLinkUrl,
           cateory:
               input.viewModelList?[input.itemIndex].hisInfo?.category ?? '',
-          isFavorite: false);
+          favoriteIsEnabled: false);
     };
 
     final bodyString =
@@ -142,8 +147,16 @@ class MiscInfoListPresenterImpl extends MiscInfoListPresenter {
       {required MiscInfoListPresenterInput input}) {
     router.gotoFavoritesPage(context,
         itemInfos: input.viewModelList,
-        appBarTitle: input.appBarTitle,
-        completeHandler: input.completeHandler);
+        appBarTitle: input.appBarTitle, innerDetailAction:
+            (NovaItemInfo? itemInfo, String? innerUrl, String? category) {
+      if (itemInfo != null && innerUrl != null && category != null) {
+        return _fetchInnerDetailInfo(
+            itemInfo: itemInfo,
+            innerUrl: innerUrl,
+            cateory: category,
+            favoriteIsEnabled: true);
+      }
+    }, completeHandler: input.completeHandler);
   }
 
   @override
@@ -159,7 +172,7 @@ class MiscInfoListPresenterImpl extends MiscInfoListPresenter {
           innerUrl: innerLinkUrl,
           cateory:
               input.viewModelList?[input.itemIndex].bookmark?.category ?? '',
-          isFavorite: true);
+          favoriteIsEnabled: true);
     };
 
     // remove selected favorite if need
@@ -246,18 +259,32 @@ class MiscInfoListPresenterImpl extends MiscInfoListPresenter {
       {required NovaItemInfo itemInfo,
       required String innerUrl,
       required String cateory,
-      bool isFavorite = false}) async {
+      bool favoriteIsEnabled = false}) async {
     itemInfo.previousUrlString = itemInfo.urlString;
     itemInfo.urlString = innerUrl;
     itemInfo.isInnerLink = true;
+
     if ((itemInfo.innerLinks ?? []).contains(innerUrl)) {
       String bodyString;
-      if (isFavorite) {
+      if (favoriteIsEnabled) {
         bodyString = await UserData().readFavoriteData(
             url: itemInfo.previousUrlString ?? '', innerUrl: innerUrl);
       } else {
         bodyString = await UserData().readHistorioData(
             url: itemInfo.previousUrlString ?? '', innerUrl: innerUrl);
+      }
+      if (bodyString.isEmpty) {
+        itemInfo.innerLinks?.remove(innerUrl);
+        if (cateory == 'bbs') {
+          BbsNovaDetailUseCaseOutput output =
+              await bbsNovaDetailUseCase.fetchBbsNovaInnerDetail(
+                  input: BbsNovaDetailUseCaseInput(
+                      itemInfo: itemInfo,
+                      favoriteIsEnabled: favoriteIsEnabled));
+          if (output is BbsNovaDetaiPresentModel) {
+            return output.model?.htmlText ?? '';
+          }
+        }
       }
       return await hisUseCase.fetchHtmlTextWithScript(
           input:
@@ -266,7 +293,8 @@ class MiscInfoListPresenterImpl extends MiscInfoListPresenter {
       if (cateory == 'bbs') {
         BbsNovaDetailUseCaseOutput output =
             await bbsNovaDetailUseCase.fetchBbsNovaInnerDetail(
-                input: BbsNovaDetailUseCaseInput(itemInfo: itemInfo));
+                input: BbsNovaDetailUseCaseInput(
+                    itemInfo: itemInfo, favoriteIsEnabled: favoriteIsEnabled));
         if (output is BbsNovaDetaiPresentModel) {
           return output.model?.htmlText ?? '';
         }

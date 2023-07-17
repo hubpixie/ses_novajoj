@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/scene/foundation/color_def.dart';
 import 'package:ses_novajoj/scene/foundation/page/page_parameter.dart';
 import 'package:ses_novajoj/scene/historio/historio_presenter.dart';
@@ -18,6 +19,7 @@ class _HistorioPageState extends State<HistorioPage> {
 
   late String _appBarTitle;
   Map? _parameters;
+  Future<String>? Function(NovaItemInfo?, String?, String?)? _innerDetailAction;
   //NovaItemInfo? _itemInfo;
 
   @override
@@ -54,6 +56,14 @@ class _HistorioPageState extends State<HistorioPage> {
                   itemBuilder: (context, index) => HistorioCell(
                       viewModel: viewModels![index],
                       onCellSelecting: (selIndex) {
+                        viewModels[selIndex].hisInfo.itemInfo.innerLinkDetail =
+                            (innerLink) async {
+                          return await _innerDetailAction?.call(
+                                  viewModels[selIndex].hisInfo.itemInfo,
+                                  innerLink,
+                                  viewModels[selIndex].hisInfo.category) ??
+                              '';
+                        };
                         widget.presenter.eventViewWebPage(context,
                             input: HistorioPresenterInput(
                                 appBarTitle: _appBarTitle,
@@ -93,6 +103,10 @@ class _HistorioPageState extends State<HistorioPage> {
     //
     _parameters = ModalRoute.of(context)?.settings.arguments as Map?;
     _appBarTitle = _parameters?[HistorioParamKeys.appBarTitle] as String? ?? '';
+    if (_parameters?[HistorioParamKeys.innerDetailAction] is Future<String>?
+        Function(NovaItemInfo?, String?, String?)?) {
+      _innerDetailAction = _parameters?[HistorioParamKeys.innerDetailAction];
+    }
     // _itemInfo = _parameters?[HistorioParamKeys.itemInfos] as NovaItemInfo?;
 
     //

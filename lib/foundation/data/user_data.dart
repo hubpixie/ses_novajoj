@@ -421,7 +421,7 @@ class UserData {
       foundIndex = favorList.indexWhere((element) => element.contains(url));
     }
     if (foundIndex >= 0) {
-      if (innerUrl == null || !bookmarkIsOn) {
+      if (innerUrl == null && !bookmarkIsOn) {
         favorList.removeAt(foundIndex);
         // delete file
         _getDataPath(key: _UserDataKey.miscFavorites.name).then((path) {
@@ -435,7 +435,7 @@ class UserData {
       }
     }
     // save bookmark if isOn = true
-    if (bookmarkIsOn) {
+    if (bookmarkIsOn || innerUrl != null) {
       if (innerUrl == null) {
         if (favorList.isEmpty) {
           favorList.add(bookmark);
