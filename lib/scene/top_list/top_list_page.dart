@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:bubble_tab_indicator/bubble_tab_indicator.dart';
 import 'package:ses_novajoj/scene/foundation/color_def.dart';
 import 'package:ses_novajoj/scene/top_list/top_sub_page.dart';
+import 'package:ses_novajoj/scene/root/search_page.dart';
 import 'package:ses_novajoj/scene/foundation/use_l10n.dart';
 import 'package:ses_novajoj/foundation/firebase_util.dart';
 import 'package:ses_novajoj/scene/top_list/top_list_presenter.dart';
@@ -19,7 +20,7 @@ class _TopListPageState extends State<TopListPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   int _selectedTitleIndex = 0;
-  late StreamController<bool> _reloadedController;
+  late StreamController<TopSearchKeyItem> _reloadedController;
 
   late final List<String> _appBarTitleList = [
     UseL10n.of(context)?.appBarFullNameLatest ?? '',
@@ -33,6 +34,13 @@ class _TopListPageState extends State<TopListPage>
       UseL10n.of(context)?.todayPopularNews ?? '';
 
   final List<String> _tabNames = ['・', '・', '・', '・', '・'];
+  int _waitingCount = 0;
+
+  // searchbar
+  late String? _searchedUrl;
+  final SearchPage _searchPage = SearchPage();
+  String _currentSearchedKeyword = '';
+  String _prevSearchedKeyword = '';
 
   @override
   void initState() {
@@ -42,7 +50,7 @@ class _TopListPageState extends State<TopListPage>
         _selectedTitleIndex = _tabController.index;
       });
     });
-    _reloadedController = StreamController<bool>.broadcast();
+    _reloadedController = StreamController<TopSearchKeyItem>.broadcast();
 
     // send viewEvent
     FirebaseUtil().sendViewEvent(route: AnalyticsRoute.topList);
@@ -59,7 +67,7 @@ class _TopListPageState extends State<TopListPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      /*appBar: AppBar(
         backgroundColor: ColorDef.appBarBackColor2,
         foregroundColor: ColorDef.appBarTitleColor,
         automaticallyImplyLeading: false,
@@ -72,7 +80,41 @@ class _TopListPageState extends State<TopListPage>
         titleSpacing: 0,
         leadingWidth: 10,
         actions: _buildAppBarActionArea(context),
-      ),
+      ),*/
+      appBar: _searchPage.buildAppBar(context,
+          appBarTitle: _appBarTitleList[_selectedTitleIndex],
+          automaticallyImplyLeading: false,
+          searchAction: _selectedTitleIndex == 0
+              ? (keyword) {
+                  _currentSearchedKeyword = keyword;
+                  if (keyword.isNotEmpty) {
+                    _reloadedController
+                        .add(TopSearchKeyItem(searchedKey: keyword));
+                  }
+                }
+              : null,
+          cancelAction: _selectedTitleIndex == 0
+              ? (isSearched) {
+                  if (isSearched) {
+                    _reloadedController
+                        .add(TopSearchKeyItem(searchResultIsCleared: true));
+                  } else {
+                    setState(
+                      () {},
+                    );
+                  }
+                  _currentSearchedKeyword = '';
+                }
+              : null,
+          openSearchAction: () => setState(
+                () {},
+              ),
+          refreshAction: _selectedTitleIndex == 0
+              ? () {
+                  _reloadedController.add(
+                      TopSearchKeyItem(searchedKey: _currentSearchedKeyword));
+                }
+              : null),
       body: DefaultTabController(
         length: _tabNames.length,
         initialIndex: 0,
@@ -146,7 +188,7 @@ class _TopListPageState extends State<TopListPage>
           child: IconButton(
               padding: const EdgeInsets.all(0.0),
               onPressed: () {
-                _reloadedController.add(true);
+                _reloadedController.add(TopSearchKeyItem(searchedKey: ''));
               },
               icon: const Icon(Icons.refresh_rounded))),
       SizedBox(

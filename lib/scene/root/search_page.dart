@@ -13,8 +13,9 @@ class SearchPage {
       Function(bool)? cancelAction,
       Function()? openSearchAction,
       Function()? refreshAction}) {
-    return !_searchIsEnabled
+    return !_searchIsEnabled || searchAction == null
         ? AppBar(
+            automaticallyImplyLeading: automaticallyImplyLeading,
             leadingWidth: 25,
             title: Text(appBarTitle),
             backgroundColor: ColorDef.appBarBackColor2,
@@ -28,7 +29,7 @@ class SearchPage {
             automaticallyImplyLeading: automaticallyImplyLeading,
             searchAction: (keyword) {
               _isSearched = true;
-              searchAction?.call(keyword);
+              searchAction.call(keyword);
             },
             cancelAction: () {
               _searchIsEnabled = false;
@@ -51,8 +52,8 @@ class SearchPage {
               },
               icon: const Icon(Icons.search_rounded))),
       SizedBox(
-          width: 45,
-          height: 45,
+          width: 40,
+          height: 40,
           child: IconButton(
               padding: const EdgeInsets.only(top: 5),
               onPressed: refreshAction,
