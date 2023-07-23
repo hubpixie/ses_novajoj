@@ -74,7 +74,7 @@ class BbsNovaSelectListRepositoryImpl extends BbsNovaSelectListRepository {
         ret = Result.failure(error: error);
       });
     } else {
-      _estimatedPageCnt = 10; // defalut value
+      _estimatedPageCnt = 10; // default value
       // fetch next page data
       final result = await _api.fetchSelectList(
           parameter:

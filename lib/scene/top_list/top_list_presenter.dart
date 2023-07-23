@@ -11,6 +11,8 @@ abstract class TopListPresenter with SimpleBloc<TopListPresenterOutput> {
 
   void eventViewReady(
       {required int targetUrlIndex,
+      String searchedKeyword,
+      bool searchResultIsCleared,
       String? prefixTitle,
       int? pageIndex,
       bool isReloaded = false});
@@ -23,6 +25,7 @@ class TopListPresenterImpl extends TopListPresenter {
   final NewsListUseCase useCase;
   final TopListRouter router;
   late StreamSubscription<NovaListUseCaseOutput> _streamSubscription;
+  List<NovaListRowViewModel>? _viewModelList;
   bool _isProcessing = false;
 
   TopListPresenterImpl({required this.router}) : useCase = NewsListUseCase() {
@@ -35,9 +38,17 @@ class TopListPresenterImpl extends TopListPresenter {
   @override
   void eventViewReady(
       {required int targetUrlIndex,
+      String searchedKeyword = '',
+      bool searchResultIsCleared = false,
       String? prefixTitle,
       int? pageIndex,
       bool isReloaded = false}) async {
+    if (searchResultIsCleared) {
+      streamAdd(ShowListPageModel(
+        viewModelList: _viewModelList,
+      ));
+      return;
+    }
     _isProcessing = true;
     if (isReloaded) {
       await _streamSubscription.cancel();
@@ -45,6 +56,7 @@ class TopListPresenterImpl extends TopListPresenter {
     }
     useCase.fetchNewsList(
         targetUrlIndex: targetUrlIndex,
+        searchedKeyword: searchedKeyword,
         targetPageIndex: pageIndex,
         prefixTitle: prefixTitle);
   }
@@ -68,10 +80,10 @@ class TopListPresenterImpl extends TopListPresenter {
   StreamSubscription<NovaListUseCaseOutput> _addStreamListener() {
     return useCase.stream.listen((event) {
       if (event is PresentModel) {
+        _viewModelList =
+            event.model?.map((row) => NovaListRowViewModel(row)).toList();
         streamAdd(ShowListPageModel(
-            viewModelList:
-                event.model?.map((row) => NovaListRowViewModel(row)).toList(),
-            error: event.error));
+            viewModelList: _viewModelList, error: event.error));
         _isProcessing = false;
       }
     });
