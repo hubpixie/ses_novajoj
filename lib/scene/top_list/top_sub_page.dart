@@ -89,7 +89,7 @@ class _TopSubPageState extends State<TopSubPage>
                           index: index,
                           onPageChanged: (pageIndex) {
                             _currentPageIndex = pageIndex;
-                            _loadData();
+                            _loadData(searchedKeyword: _prevSearchedKeyword);
                           },
                           pageEnd: true,
                           onScrollToTop: () {
@@ -108,7 +108,9 @@ class _TopSubPageState extends State<TopSubPage>
                               appBarTitle: widget.appBarTitle,
                               itemInfo: data.viewModelList![selIndex].itemInfo,
                               completeHandler: () {
-                            _loadData(isReloaded: true);
+                            _loadData(
+                                isReloaded: true,
+                                searchedKeyword: _prevSearchedKeyword);
                           });
                         },
                         onThumbnailShowing: (thumbIndex) async {

@@ -36,10 +36,10 @@ class NovaListRepositoryImpl extends NovaListRepository {
             int retCnt =
                 targetUrl == input.targetUrl ? 1 : _estimatedPageCnt; //default
             if (searched) {
-              if (response.length > 90) {
-                retCnt = input.pageIndex + 1;
+              if (response.length >= 100) {
+                retCnt = 10;
               } else {
-                retCnt = 1;
+                retCnt = input.pageIndex;
               }
               _estimatedPageCnt = retCnt;
             }
