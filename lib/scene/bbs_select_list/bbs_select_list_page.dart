@@ -394,8 +394,8 @@ class _BbsSelectListPageState extends State<BbsSelectListPage> {
       {bool isReloaded = false,
       String searchedKeyword = '',
       bool searchResultIsCleared = false}) {
-    if (_prevSearchedKeyword != _currentSearchedKeyword) {
-      _prevSearchedKeyword = _currentSearchedKeyword;
+    if (_prevSearchedKeyword != searchedKeyword) {
+      _prevSearchedKeyword = searchedKeyword;
       _currentPageIndex = 1;
     }
     _waitingCount = 0;

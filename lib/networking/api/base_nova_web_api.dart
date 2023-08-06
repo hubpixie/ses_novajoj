@@ -468,9 +468,15 @@ class BaseNovaWebApi {
       // List<NovaListItemRes> retArr = [];
       // return Result.success(data: retArr);
       final document = html_parser.parse(response.body);
-      return _parseSearchedItems(
-          parameter: parameter,
-          rootElement: document.getElementsByClassName('dc_bar2').first);
+      if (parameter.docType == NovaDocType.list) {
+        return _parseSearchedDivItems(
+            parameter: parameter,
+            rootElement: document.getElementById('d_list'));
+      } else {
+        return _parseSearchedTableItems(
+            parameter: parameter,
+            rootElement: document.getElementsByClassName('dc_bar2').first);
+      }
     } on AppError catch (error) {
       return Result.failure(error: error);
     } on Exception catch (error) {
@@ -506,7 +512,7 @@ class BaseNovaWebApi {
   ///				</td>
   ///			</tr>
   ///		</table>
-  Future<Result<List<NovaListItemRes>>> _parseSearchedItems(
+  Future<Result<List<NovaListItemRes>>> _parseSearchedTableItems(
       {required NovaItemParameter parameter, Element? rootElement}) async {
     try {
       List<NovaListItemRes> retArr = [];
@@ -581,6 +587,112 @@ class BaseNovaWebApi {
                 author: author,
                 createAt: createdAt,
                 source: source));
+        retArr.add(novaListItemRes);
+        index++;
+      }
+
+      return Result.success(data: retArr);
+    } on AppError catch (error) {
+      return Result.failure(error: error);
+    } on Exception catch (error) {
+      return Result.failure(error: AppError.fromException(error));
+    }
+  }
+
+  /// <div id="d_list" class="main_right_margin">
+  /// 	<p><span style='font-weight:bolder;color:red;'>美女 </span>搜索结果</p>
+  /// 	<ul>
+  /// 		<li><a href="view.php?app=news&act=view&nid=617350">美国女足世界杯首战惹争议!8人拒唱国歌,黑人背着手(图)</a> - 译言网 -
+  /// 			<i>07/22/23</i> (48993 reads) <a href='index.php?act=newsreply&nid=617350' target='_blank'><img
+  /// 					src='./public/img/reply.png' />35</a></li>
+  ///     ...
+  /// 		<li><a href="view.php?app=news&act=view&nid=612728">崇洋女演员定居美国:将华人分等 只和富人交流(多图)</a> - 娱乐圈哔哔King -
+  /// 			<i>06/23/23</i> (45512 reads) <a href='index.php?act=newsreply&nid=612728' target='_blank'><img
+  /// 					src='./public/img/reply.png' />45</a></li>
+  /// 	</ul>
+  /// </div>
+  Future<Result<List<NovaListItemRes>>> _parseSearchedDivItems(
+      {required NovaItemParameter parameter, Element? rootElement}) async {
+    try {
+      List<NovaListItemRes> retArr = [];
+
+      if (rootElement?.children == null || rootElement?.localName != 'div') {
+        log.severe('rootElement?.children');
+        throw AppError(
+            type: AppErrorType.dataError,
+            reason: FailureReason.missingRootNode);
+      }
+      final liElememts = rootElement?.getElementsByTagName('li');
+
+      if (liElememts?.isEmpty ?? true) {
+        log.severe('liElememts?.isEmpty');
+        throw AppError(
+            type: AppErrorType.dataError,
+            reason: FailureReason.missingListNode);
+      }
+      String parentUrl = _parentUrl(url: parameter.targetUrl);
+      int index = 0;
+      for (Element liRow in liElememts ?? []) {
+        NovaListItemRes? novaListItemRes;
+        String title = '';
+        String urlString = '';
+        DateTime createdAt;
+        String author = '';
+        String source = '';
+        int reads = 0;
+        //
+        // subject
+        //
+        final subjectElems = liRow.getElementsByTagName('a');
+        if (subjectElems.isEmpty) {
+          continue;
+        }
+        final alink = subjectElems.first;
+        if (alink.attributes['href'] == null) {
+          continue;
+        }
+
+        // urlString
+        urlString = '$parentUrl/${alink.attributes['href'] ?? ''}';
+
+        // title
+        title = alink.text;
+
+        // source
+        source = () {
+          final ret =
+              StringUtil().substring(liRow.text, start: ' - ', end: ' - ');
+          return ret;
+        }();
+
+        // reads
+        reads = () {
+          final ret =
+              StringUtil().substring(liRow.text, start: ' (', end: ' reads) ');
+          return int.tryParse(ret) ?? 0;
+        }();
+
+        // createdAt
+        createdAt = () {
+          final elems = liRow.getElementsByTagName('i');
+          if (elems.isEmpty) {
+            return DateTime.now();
+          }
+          final str = elems.first.innerHtml;
+          return DateUtil().fromString(str, format: 'MM/dd/yy') ??
+              DateTime.now();
+        }();
+
+        novaListItemRes = NovaListItemRes(
+          itemInfo: NovaItemInfo(
+              id: index,
+              title: title,
+              urlString: urlString,
+              author: author,
+              createAt: createdAt,
+              source: source,
+              reads: reads),
+        );
         retArr.add(novaListItemRes);
         index++;
       }

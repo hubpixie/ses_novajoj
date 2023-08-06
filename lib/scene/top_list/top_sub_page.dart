@@ -8,12 +8,22 @@ import 'package:ses_novajoj/scene/top_list/top_list_presenter_output.dart';
 import 'package:ses_novajoj/scene/widgets/nova_list_cell.dart';
 import 'package:ses_novajoj/scene/widgets/error_view.dart';
 
+class TopSearchKeyItem {
+  bool isReload;
+  bool searchResultIsCleared;
+  String searchedKey;
+  TopSearchKeyItem(
+      {this.isReload = true,
+      this.searchResultIsCleared = false,
+      this.searchedKey = ''});
+}
+
 class TopSubPage extends StatefulWidget {
   final TopListPresenter presenter;
   final int tabIndex;
   final String prefixTitle;
   final String appBarTitle;
-  final StreamController<bool> reloadedController;
+  final StreamController<TopSearchKeyItem> reloadedController;
 
   const TopSubPage(
       {Key? key,
@@ -32,6 +42,7 @@ class _TopSubPageState extends State<TopSubPage>
     with AutomaticKeepAliveClientMixin<TopSubPage> {
   final ScrollController _scrollController = ScrollController();
   int _currentPageIndex = 1;
+  String _prevSearchedKeyword = '';
 
   @override
   bool get wantKeepAlive => true;
@@ -39,8 +50,8 @@ class _TopSubPageState extends State<TopSubPage>
   @override
   void initState() {
     widget.reloadedController.stream.listen((event) {
-      if (event) {
-        _loadData();
+      if (event.isReload) {
+        _loadData(searchedKeyword: event.searchedKey);
       }
     });
     _loadData();
@@ -78,7 +89,7 @@ class _TopSubPageState extends State<TopSubPage>
                           index: index,
                           onPageChanged: (pageIndex) {
                             _currentPageIndex = pageIndex;
-                            _loadData();
+                            _loadData(searchedKeyword: _prevSearchedKeyword);
                           },
                           pageEnd: true,
                           onScrollToTop: () {
@@ -97,7 +108,9 @@ class _TopSubPageState extends State<TopSubPage>
                               appBarTitle: widget.appBarTitle,
                               itemInfo: data.viewModelList![selIndex].itemInfo,
                               completeHandler: () {
-                            _loadData(isReloaded: true);
+                            _loadData(
+                                isReloaded: true,
+                                searchedKeyword: _prevSearchedKeyword);
                           });
                         },
                         onThumbnailShowing: (thumbIndex) async {
@@ -136,10 +149,19 @@ class _TopSubPageState extends State<TopSubPage>
     );
   }
 
-  void _loadData({bool isReloaded = false}) {
+  void _loadData(
+      {bool isReloaded = false,
+      String searchedKeyword = '',
+      bool searchResultIsCleared = false}) {
+    if (_prevSearchedKeyword != searchedKeyword) {
+      _prevSearchedKeyword = searchedKeyword;
+      _currentPageIndex = 1;
+    }
     // fetch data
     widget.presenter.eventViewReady(
         targetUrlIndex: widget.tabIndex,
+        searchedKeyword: searchedKeyword,
+        searchResultIsCleared: searchResultIsCleared,
         pageIndex: _currentPageIndex,
         prefixTitle: widget.prefixTitle,
         isReloaded: isReloaded);
