@@ -26,9 +26,9 @@ class BaseNovaWebApi {
       'Pihccyl7MCx9KHd3d1wuKXswLH0oY29vbDE4fDZwYXJrKVwuY29tKFxzKXswLH08Ly8+IDw=@@';
   static bool _logined = false;
   static const String kBbsMenuSettingUrl =
-      'https://qczkbaujyxmh9zzbl82kzq.on.drv.tw/www2.pixie.net/www/apps/ses_novajoj/assets/json/bbs_menu.json.txt';
+      'https://qczkbaujyxmh9zzbl82kzz.on.drv.tw/www2.pixie.net/www/apps/ses_novajoj/assets/json/bbs_menu.json.txt';
   static const String kMiscInfoSelectSettingUrl =
-      'https://qczkbaujyxmh9zzbl82kzq.on.drv.tw/www2.pixie.net/www/apps/ses_novajoj/assets/json/misc_info_select.json.txt';
+      'https://qczkbaujyxmh9zzbl82kzz.on.drv.tw/www2.pixie.net/www/apps/ses_novajoj/assets/json/misc_info_select.json.txt';
 
   ///
   ////api name: fetchNovaItemThumbUrl

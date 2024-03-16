@@ -23,8 +23,12 @@ class MyApp extends StatelessWidget {
           AppState.isDebugEnabled ? true : !kDebugMode);
       FlutterError.onError = (FlutterErrorDetails details) {
         //this line prints the default flutter gesture caught exception in console
+        final exDetail = '${details.exception}';
+        if (exDetail.contains(RegExp(r'file:\/\/\/.*\.[A-z]{3,}'))) {
+          return;
+        }
         log.severe("Error Library:${details.library}...");
-        log.severe("Error :  ${details.exception}");
+        log.severe("Error :  $exDetail");
         log.severe("StackTrace :  ${details.stack}");
         log.severe("----------------------");
 
