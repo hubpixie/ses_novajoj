@@ -74,7 +74,9 @@ class MiscInfoListRouterImpl extends MiscInfoListRouter {
           CitySelectParamKeys.itemInfo: itemInfo
         }).then((value) {
       if (completeHandler != null && completeHandler is Function) {
-        completeHandler.call();
+        Future.delayed(const Duration(seconds: 2), () {
+          completeHandler.call();
+        });
       }
     });
   }
@@ -107,6 +109,11 @@ class MiscInfoListRouterImpl extends MiscInfoListRouter {
               Navigator.of(context_).pop();
               if (removeAction is Function) {
                 removeAction.call();
+                if (completeHandler != null && completeHandler is Function) {
+                  Future.delayed(const Duration(seconds: 2), () {
+                    completeHandler.call();
+                  });
+                }
               }
             }
     ];
@@ -154,6 +161,11 @@ class MiscInfoListRouterImpl extends MiscInfoListRouter {
               Navigator.of(context_).pop();
               if (removeAction is Function) {
                 removeAction.call();
+                if (completeHandler != null && completeHandler is Function) {
+                  Future.delayed(const Duration(seconds: 2), () {
+                    completeHandler.call();
+                  });
+                }
               }
             },
       () {
@@ -203,6 +215,11 @@ class MiscInfoListRouterImpl extends MiscInfoListRouter {
               Navigator.of(context_).pop();
               if (removeAction is Function) {
                 removeAction.call();
+                if (completeHandler != null && completeHandler is Function) {
+                  Future.delayed(const Duration(seconds: 2), () {
+                    completeHandler.call();
+                  });
+                }
               }
             },
       () {
@@ -267,6 +284,11 @@ class MiscInfoListRouterImpl extends MiscInfoListRouter {
               Navigator.of(context_).pop();
               if (removeAction is Function) {
                 removeAction.call();
+                if (completeHandler != null && completeHandler is Function) {
+                  Future.delayed(const Duration(seconds: 3), () {
+                    completeHandler.call();
+                  });
+                }
               }
             }
     ];

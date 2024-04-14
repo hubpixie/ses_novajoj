@@ -154,10 +154,10 @@ class UserData {
     // fileName
     String fileName = await _getUuidFileName(key: key);
     String path = await _getDataPath(key: key);
-    String filePth = '$path/$fileName';
+    String filePath = '$path/$fileName';
 
     // return empty list if no file
-    File file = File(filePth);
+    File file = File(filePath);
     if (!(await file.exists())) {
       return [];
     }

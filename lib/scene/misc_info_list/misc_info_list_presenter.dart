@@ -248,9 +248,7 @@ class MiscInfoListPresenterImpl extends MiscInfoListPresenter {
       router.gotoWebPage(context,
           appBarTitle: input.appBarTitle,
           itemInfo: itemInfo,
-          removeAction: [ServiceType.audio].contains(input.serviceType)
-              ? null
-              : removeAction,
+          removeAction: removeAction,
           completeHandler: input.completeHandler);
     }
   }

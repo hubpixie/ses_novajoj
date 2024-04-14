@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:async';
 import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:html/parser.dart' as html_parser;
 import 'package:html/dom.dart';
 import 'package:ses_novajoj/foundation//log_util.dart';
@@ -25,10 +26,8 @@ class BaseNovaWebApi {
   static const String kSampleReplacedPkCode =
       'Pihccyl7MCx9KHd3d1wuKXswLH0oY29vbDE4fDZwYXJrKVwuY29tKFxzKXswLH08Ly8+IDw=@@';
   static bool _logined = false;
-  static const String kBbsMenuSettingUrl =
-      'https://qczkbaujyxmh9zzbl82kzz.on.drv.tw/www2.pixie.net/www/apps/ses_novajoj/assets/json/bbs_menu.json.txt';
-  static const String kMiscInfoSelectSettingUrl =
-      'https://qczkbaujyxmh9zzbl82kzz.on.drv.tw/www2.pixie.net/www/apps/ses_novajoj/assets/json/misc_info_select.json.txt';
+
+  final FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.instance;
 
   ///
   ////api name: fetchNovaItemThumbUrl
@@ -644,17 +643,21 @@ extension BaseNovaWebApiForAuth on BaseNovaWebApi {
 extension BaseNovaWebSettings on BaseNovaWebApi {
   Future<Result<String>> fetchBbsMenuSettings() async {
     try {
+      await remoteConfig.setConfigSettings(RemoteConfigSettings(
+        fetchTimeout: const Duration(seconds: 60),
+        minimumFetchInterval: Duration.zero,
+      ));
+      await remoteConfig.fetchAndActivate();
+
       ///fetch bbs munu settings
-      final response = await BaseApiClient.client
-          .get(Uri.parse(BaseNovaWebApi.kBbsMenuSettingUrl));
-      if (response.statusCode >= HttpStatus.badRequest) {
+      final configValue = remoteConfig.getString("bbs_menu");
+      if (configValue.isEmpty) {
         return Result.failure(
-            error: AppError.fromStatusCode(response.statusCode));
+            error: AppError.fromException(Exception("bbs_menu is not set")));
       }
 
-      ///set result from response.body.
-
-      return Result.success(data: utf8.decode(response.bodyBytes));
+      ///set result from remoteConfig.
+      return Result.success(data: configValue);
     } on AppError catch (error) {
       return Result.failure(error: error);
     } on Exception catch (error) {
@@ -665,24 +668,30 @@ extension BaseNovaWebSettings on BaseNovaWebApi {
   Future<Result<List<MiscInfoSelectItemItemRes>>>
       fetchMiscInfoSelectSettings() async {
     try {
-      ///fetch bbs munu settings
-      final response = await BaseApiClient.client
-          .get(Uri.parse(BaseNovaWebApi.kMiscInfoSelectSettingUrl));
-      if (response.statusCode >= HttpStatus.badRequest) {
+      await remoteConfig.setConfigSettings(RemoteConfigSettings(
+        fetchTimeout: const Duration(seconds: 60),
+        minimumFetchInterval: Duration.zero,
+      ));
+      await remoteConfig.fetchAndActivate();
+
+      ///fetch misc info select settings
+      final configValue = remoteConfig.getString("misc_info_select");
+      if (configValue.isEmpty) {
         return Result.failure(
-            error: AppError.fromStatusCode(response.statusCode));
+            error: AppError.fromException(
+                Exception("misc_info_select is not set")));
       }
 
-      ///set result from response.body.
+      ///set result from remoteConfig.
       final ret = (dynamic res) {
-        final parsed = jsonDecode(utf8.decode(res));
+        final parsed = jsonDecode(res);
         final list = parsed?['misc_select_menu'] as List?;
         return list != null
             ? list
                 .map((elem) => MiscInfoSelectItemItemRes.fromJson(elem))
                 .toList()
             : <MiscInfoSelectItemItemRes>[];
-      }(response.bodyBytes);
+      }(configValue);
 
       return Result.success(data: ret);
     } on AppError catch (error) {

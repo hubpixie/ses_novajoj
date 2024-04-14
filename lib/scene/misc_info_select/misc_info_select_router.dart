@@ -36,7 +36,8 @@ class MiscInfoSelectRouterImpl extends MiscInfoSelectRouter {
       WebPageParamKeys.itemInfo: itemInfo,
       WebPageParamKeys.menuItems: [
         DetailMenuItem.openOriginal,
-        DetailMenuItem.changeSettings
+        DetailMenuItem.changeSettings,
+        DetailMenuItem.removeSettings
       ],
       WebPageParamKeys.menuActions: menuActions
     }).then((value) {
