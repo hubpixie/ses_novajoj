@@ -69,10 +69,12 @@ class NovaWebApi extends BaseNovaWebApi {
   ///        <font color="#990000">◇<a href="https://www.6parknews.com/newspark/view.php?app=news&act=view&nid=532605">[最新评论新闻] 新闻新闻新闻新闻新闻新闻</a> ◇ <a href="index.php?act=newsreply&nid=532605">-->查看评论 [目前共226个评论]</a> ◇ <a href="index.php?act=gonggao">--> 新闻公告 <--</a>◇</font>
   ///       </center>
   /// 		</div>
+  ///     <!-- <div class="news_linst"><div id="nlist"> -->
   /// 		<ul>
   /// 			<li><a href="https://www.6parknews.com/newspark/view.php?app=news&act=view&nid=532639">新闻新闻新闻新闻新闻新闻新闻新闻新闻新闻(组图)</a> - 阑夕  (12224 bytes)  - <i>02/13/22</i>  (108 reads)</li>
   ///       <li><a href="https://www.6parknews.com/newspark/view.php?app=news&act=view&nid=532638">新闻新闻新闻新闻新闻新闻新闻新闻新闻新闻新闻新闻新闻(图)</a> - 加拿大留学生问吧  (5348 bytes)  - <i>02/13/22</i>  (2099 reads)  <a class='list_reimg' href='index.php?act=newsreply&nid=532638'>1</a></li>
   ///     </ul>
+  ///     <!-- </div></div> -->
   /// </div>
   Future<Result<List<NovaListItemRes>>> _parseLiItems(
       {required NovaItemParameter parameter, Element? rootElement}) async {
@@ -85,8 +87,27 @@ class NovaWebApi extends BaseNovaWebApi {
             type: AppErrorType.dataError,
             reason: FailureReason.missingRootNode);
       }
-      final ulElement = rootElement?.children
-          .firstWhere((element) => element.localName == 'ul');
+
+      //
+      // fetch ul emment
+      //
+      final ulElement = (Element? inElement) {
+        // <div class="news_list">
+        Element? nlistDiv = inElement?.children.firstWhere(
+            (element) => (element.attributes['class'] ?? "") == "news_list",
+            orElse: () => inElement);
+        // <div id="nlist">
+        Element? nlistSubDiv = nlistDiv != null && nlistDiv.children.isNotEmpty
+            ? nlistDiv.children.firstWhere(
+                (element) => (element.attributes['id'] ?? "") == "nlist",
+                orElse: () => nlistDiv)
+            : nlistDiv;
+        // ul
+        Element? retElem = nlistSubDiv?.children.firstWhere(
+            (element) => element.localName == 'ul',
+            orElse: () => Element.tag('ul'));
+        return retElem;
+      }(rootElement);
 
       if (ulElement?.children == null) {
         log.severe('ulElement?.children');
@@ -132,6 +153,7 @@ class NovaWebApi extends BaseNovaWebApi {
     String parentUrl = _parentUrl(url: url);
 
     // title, urlString
+    dynamic detailResponsedBody;
     if (liCount > 0 && liSubElements[0].localName == 'a') {
       title = liSubElements[0].innerHtml;
       urlString = liSubElements[0].attributes["href"] ?? "";
@@ -139,10 +161,13 @@ class NovaWebApi extends BaseNovaWebApi {
         return retNovaItem;
       }
       // thumbUrlString
+      detailResponsedBody ??=
+          await BaseApiClient.client.get(Uri.parse(urlString));
       if (urlString.isNotEmpty && index < _kThumbLimit) {
         Result<String> thumbUrlResult = await fetchNovaItemThumbUrl(
             parameter: NovaItemParameter(
-                targetUrl: urlString, docType: NovaDocType.thumb));
+                targetUrl: urlString, docType: NovaDocType.thumb),
+            httpBody: detailResponsedBody);
         thumbUrlResult.when(
             success: (value) {
               thunnailUrlString = value;
@@ -154,6 +179,20 @@ class NovaWebApi extends BaseNovaWebApi {
     // createAt
     if (liCount > 1 && liSubElements[1].localName == 'i') {
       createAt = DateUtil().fromString(liSubElements[1].innerHtml);
+    }
+    if (createAt == null) {
+      detailResponsedBody ??=
+          await BaseApiClient.client.get(Uri.parse(urlString));
+      Result<String> createdAtStrRes = await fetchNovaItemCreatedAt(
+          parameter: NovaItemParameter(
+              targetUrl: urlString, docType: NovaDocType.thumb),
+          httpBody: detailResponsedBody);
+      createdAtStrRes.when(
+          success: (value) {
+            createAt =
+                DateUtil().fromString(value, format: "yyyy-MM-dd HH:mm:ss");
+          },
+          failure: (value) {});
     }
 
     // commentUrlString, commentCount
@@ -167,12 +206,14 @@ class NovaWebApi extends BaseNovaWebApi {
 
     // source, reads
     if (li.innerHtml.isNotEmpty) {
-      source =
-          StringUtil().substring(li.innerHtml, start: "</a> - ", end: "  (");
+      String liInnerHtml = li.innerHtml;
+      source = StringUtil().substring(liInnerHtml, start: "</a> - ", end: " (");
 
-      String readsStr = StringUtil()
-          .substring(li.innerHtml, start: "</i>  (", end: " reads)");
-      reads = NumberUtil().parseInt(string: readsStr) ?? 0;
+      String readsStr = liInnerHtml.contains("</i>  (")
+          ? StringUtil()
+              .substring(liInnerHtml, start: "</i>  (", end: " reads)")
+          : StringUtil().substring(liInnerHtml, start: " (", end: " reads)");
+      reads = NumberUtil().parseInt(string: readsStr.trim()) ?? 0;
     }
 
     NovaItemInfo itemInfo = NovaItemInfo(

@@ -1,3 +1,4 @@
+import 'package:ses_novajoj/foundation/data/string_util.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/foundation/data/date_util.dart';
 
@@ -195,7 +196,8 @@ class DetailItem {
     String html = _kHtmlTemplateString.replaceAll(r'{{title}}', itemInfo.title);
     html = html.replaceAll(r'{{itemSource}}', itemInfo.source);
     if (itemInfo.reads > 0) {
-      html = html.replaceAll('{{reads}}', "(${itemInfo.reads}&nbsp;reads)");
+      html = html.replaceAll('{{reads}}',
+          "(${StringUtil().thousandFormat(itemInfo.reads)}&nbsp;reads)");
     } else {
       html = html.replaceAll('{{reads}}', "");
     }

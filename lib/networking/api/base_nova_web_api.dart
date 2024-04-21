@@ -56,17 +56,24 @@ class BaseNovaWebApi {
   ////      </div>
   ///
   Future<Result<String>> fetchNovaItemThumbUrl(
-      {required NovaItemParameter parameter}) async {
+      {required NovaItemParameter parameter, dynamic httpBody}) async {
     try {
       ///send request for fetching nova item's thumb url.
-      final response =
-          await BaseApiClient.client.get(Uri.parse(parameter.targetUrl));
-      if (response.statusCode >= HttpStatus.badRequest) {
+      dynamic response;
+      if (httpBody != null) {
+        response = httpBody;
+      } else {
+        response =
+            await BaseApiClient.client.get(Uri.parse(parameter.targetUrl));
+      }
+      if (response == null) {
+        return Result.failure(error: AppError.fromStatusCode(404));
+      } else if (response.statusCode >= HttpStatus.badRequest) {
         return Result.failure(
             error: AppError.fromStatusCode(response.statusCode));
       }
 
-      ///prepares to parse nova list from response.body.
+      ///prepares to parse nova detail `created time` from response.body.
       final document = html_parser.parse(response.body);
       final imgElements = document.getElementsByTagName('img');
       if (imgElements.isEmpty) {
@@ -129,6 +136,52 @@ class BaseNovaWebApi {
       retStr = retStr.replaceAll('&nbsp;', ' ').trim();
       retStr = retStr.replaceAll('&amp;', '&');
 
+      return Result.success(data: retStr);
+    } on AppError catch (error) {
+      return Result.failure(error: error);
+    } on Exception catch (error) {
+      return Result.failure(error: AppError.fromException(error));
+    }
+  }
+
+  ////api name: fetchNovaItemCreatedAt
+  ///
+  ///<div class="td3" id="newscontent_2">
+  ///		<p style="padding:5px;">
+  ///		新闻来源: XXXXX 于2024-04-19 22:03:06
+  ///		<span style="FONT-SIZE: 11px"><button onclick="changefont(this)">大字阅读</button>&nbsp;<b>提示:</b>新闻观点不代表本网立场
+  ///		</span>
+  ///		</p>...</div>
+  ///
+  Future<Result<String>> fetchNovaItemCreatedAt(
+      {required NovaItemParameter parameter, dynamic httpBody}) async {
+    try {
+      dynamic response;
+      if (httpBody != null) {
+        response = httpBody;
+      } else {
+        response =
+            await BaseApiClient.client.get(Uri.parse(parameter.targetUrl));
+      }
+      if (response == null) {
+        return Result.failure(error: AppError.fromStatusCode(404));
+      } else if (response.statusCode >= HttpStatus.badRequest) {
+        return Result.failure(
+            error: AppError.fromStatusCode(response.statusCode));
+      }
+
+      ///prepares to parse nova list from response.body.
+      String retStr = '';
+      final document = html_parser.parse(response.body);
+      final titleElement = document
+          .getElementById("newscontent_2")
+          ?.children
+          ?.firstWhere((element) => element.localName == 'p',
+              orElse: () => Element.tag('p'));
+      if (titleElement != null) {
+        retStr = titleElement.text;
+      }
+      retStr = StringUtil().substring(retStr, start: " \u4e8e", end: "").trim();
       return Result.success(data: retStr);
     } on AppError catch (error) {
       return Result.failure(error: error);
