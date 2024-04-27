@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ses_novajoj/scene/foundation/color_def.dart';
+import 'package:ses_novajoj/scene/root/search_page.dart';
 import 'package:ses_novajoj/scene/thread_list/thread_sub_page.dart';
 import 'package:ses_novajoj/scene/foundation/use_l10n.dart';
 import 'package:ses_novajoj/scene/thread_list/thread_list_presenter.dart';
@@ -12,8 +13,22 @@ class ThreadListPage extends StatefulWidget {
   State<ThreadListPage> createState() => _ThreadListPageState();
 }
 
-class _ThreadListPageState extends State<ThreadListPage> {
+class _ThreadListPageState extends State<ThreadListPage>
+    with TickerProviderStateMixin {
   List<String> _tabNames = [];
+  final Map<int, List<String>> _pickedTabsInfoList = {};
+
+  double _scrollOffset = 0;
+  bool _scrollTextStateChanged = false;
+  TabController? _tabController;
+  late ScrollController _scrollController;
+  AnimationController? _animationController;
+
+  // searchbar
+  late String? _searchedUrl;
+  final SearchPage _searchPage = SearchPage();
+  String _currentSearchedKeyword = '';
+  String _prevSearchedKeyword = '';
 
   @override
   void initState() {
@@ -23,48 +38,51 @@ class _ThreadListPageState extends State<ThreadListPage> {
   @override
   Widget build(BuildContext context) {
     _initTabNames(context);
+    _tabController ??= TabController(length: _tabNames.length, vsync: this);
 
-    return DefaultTabController(
-      length: _tabNames.length,
-      child: Scaffold(
-          appBar: AppBar(
-            backgroundColor: ColorDef.appBarBackColor2,
-            foregroundColor: ColorDef.appBarTitleColor,
+    return Scaffold(
+        appBar: _searchPage.buildAppBar(context,
+            appBarTitle: _buildAppBarTitleArea(context),
             automaticallyImplyLeading: false,
-            leading: const SizedBox(width: 0),
-            centerTitle: false,
-            bottom: PreferredSize(
-                preferredSize: const Size.fromHeight(0.0),
+            bottomBar: PreferredSize(
+                preferredSize: const Size.fromHeight(32.0),
                 child: _buildAppBarTabArea(context)),
-            titleSpacing: 0,
-            leadingWidth: 10,
-          ),
-          body: _buildTabPage(context)),
-    );
+            searchAction: (keyword) {},
+            cancelAction: (isSearched) {
+              if (isSearched) {
+                //   _reloadedController
+                //       .add(TopSearchKeyItem(searchResultIsCleared: true));
+              } else {
+                setState(
+                  () {},
+                );
+              }
+              _currentSearchedKeyword = '';
+            },
+            openSearchAction: () => setState(
+                  () {},
+                ),
+            refreshAction: () {
+              // _reloadedController.add(
+              //     TopSearchKeyItem(searchedKey: _currentSearchedKeyword));
+            }),
+        body: _buildTabPage(context));
   }
 
   // ignore: unused_element
   Widget _buildAppBarTitleArea(BuildContext context) {
-    return SizedBox(
-        width: 265,
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(
-              width: 125,
-              height: 35,
-            ),
-            SizedBox(
-                width: 140,
-                height: 35,
-                child: IconButton(
-                    padding: const EdgeInsets.only(left: 5),
-                    onPressed: null,
-                    icon: Text(
-                        UseL10n.of(context)?.hotThreadListAppBarTitle ?? "",
-                        style: const TextStyle(fontWeight: FontWeight.bold)))),
-          ],
-        ));
+    return Container(
+      margin: const EdgeInsets.only(top: 8),
+      padding: const EdgeInsets.only(left: 0, right: 20),
+      height: 30.0,
+      child: DecoratedBox(
+        decoration: const BoxDecoration(
+            boxShadow: [BoxShadow(blurRadius: 1, color: Colors.grey)],
+            color: Colors.white,
+            shape: BoxShape.rectangle),
+        child: Container(),
+      ),
+    );
   }
 
   Widget _buildAppBarTabArea(BuildContext context) {
@@ -74,8 +92,10 @@ class _ThreadListPageState extends State<ThreadListPage> {
         child: Text(name),
       ));
     }
+    _tabController ??= TabController(length: tabs.length, vsync: this);
 
     return TabBar(
+        controller: _tabController,
         isScrollable: true,
         unselectedLabelColor: ColorDef.tabLabelColor.withOpacity(0.6),
         indicatorColor: ColorDef.tabLabelColor.withOpacity(0.4),
@@ -87,13 +107,13 @@ class _ThreadListPageState extends State<ThreadListPage> {
     List<Widget> pages = [];
     _tabNames.asMap().forEach((int index, String value) {
       pages.add(ThreadSubPage(
-        presenter: widget.presenters[index],
-        tabIndex: index,
-        appBarTitle: value,
-      ));
+          presenter: widget.presenters[index],
+          tabIndex: index,
+          appBarTitle: value));
     });
 
     return TabBarView(
+      controller: _tabController,
       children: pages,
     );
   }

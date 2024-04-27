@@ -82,7 +82,7 @@ class _TopListPageState extends State<TopListPage>
         actions: _buildAppBarActionArea(context),
       ),*/
       appBar: _searchPage.buildAppBar(context,
-          appBarTitle: _appBarTitleList[_selectedTitleIndex],
+          appBarTitle: Text(_appBarTitleList[_selectedTitleIndex]),
           automaticallyImplyLeading: false,
           searchAction: _selectedTitleIndex == 0
               ? (keyword) {
@@ -106,15 +106,14 @@ class _TopListPageState extends State<TopListPage>
                   _currentSearchedKeyword = '';
                 }
               : null,
-          openSearchAction: () => setState(
-                () {},
-              ),
-          refreshAction: _selectedTitleIndex == 0
-              ? () {
-                  _reloadedController.add(
-                      TopSearchKeyItem(searchedKey: _currentSearchedKeyword));
-                }
-              : null),
+          openSearchAction: _selectedTitleIndex == 0
+              ? () => setState(
+                    () {},
+                  )
+              : null, refreshAction: () {
+        _reloadedController
+            .add(TopSearchKeyItem(searchedKey: _currentSearchedKeyword));
+      }),
       body: DefaultTabController(
         length: _tabNames.length,
         initialIndex: 0,
