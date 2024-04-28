@@ -1,3 +1,5 @@
+import 'package:ses_novajoj/foundation/data/user_types.dart';
+
 import 'thread_list_page.dart';
 import 'thread_list_presenter.dart';
 import 'thread_list_router.dart';
@@ -14,7 +16,8 @@ class ThreadListPageBuilder {
     for (var idx = 0; idx < subPages; idx++) {
       presenters.add(ThreadListPresenterImpl(router: router));
     }
-    final page = ThreadListPage(presenters: presenters);
+    final page = ThreadListPage(
+        presenters: presenters, pageLoadingState: PageLoadingState());
 
     return ThreadListPageBuilder._(page);
   }
