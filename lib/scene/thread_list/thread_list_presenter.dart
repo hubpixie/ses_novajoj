@@ -9,12 +9,16 @@ import 'thread_list_router.dart';
 class ThreadListPresenterInput {
   int itemIndex;
   String itemUrl;
+  String searchedKeyword;
+  bool searchResultIsCleared;
   int pageIndex;
   bool isReloaded;
 
   ThreadListPresenterInput(
       {required this.itemIndex,
       this.itemUrl = "",
+      this.searchedKeyword = "",
+      this.searchResultIsCleared = false,
       this.pageIndex = 1,
       this.isReloaded = false});
 }
@@ -29,6 +33,9 @@ abstract class ThreadListPresenter with SimpleBloc<ThreadListPresenterOutput> {
 class ThreadListPresenterImpl extends ThreadListPresenter {
   final ThreadNovaListUseCase useCase;
   final ThreadListRouter router;
+  late bool _isProcessing;
+  List<ThreadNovaListRowViewModel>? _viewModelList;
+
   late StreamSubscription<ThreadNovaListUseCaseOutput> _streamSubscription;
 
   ThreadListPresenterImpl({required this.router})
@@ -38,13 +45,23 @@ class ThreadListPresenterImpl extends ThreadListPresenter {
 
   @override
   void eventViewReady({required ThreadListPresenterInput input}) async {
+    if (input.searchResultIsCleared) {
+      streamAdd(ShowThreadListPageModel(viewModelList: _viewModelList));
+      return;
+    }
+    _isProcessing = true;
+
     if (input.isReloaded) {
       await _streamSubscription.cancel();
       _streamSubscription = _addStreamListener();
     }
     useCase.fetchThreadNovaList(
         input: ThreadNovaListUseCaseInput(
-            itemIndex: input.itemIndex, targetPageIndex: input.pageIndex));
+      itemIndex: input.itemIndex,
+      targetPageIndex: input.pageIndex,
+      itemUrl: input.itemUrl,
+      searchedKeyword: input.searchedKeyword,
+    ));
   }
 
   @override
@@ -69,12 +86,18 @@ class ThreadListPresenterImpl extends ThreadListPresenter {
   StreamSubscription<ThreadNovaListUseCaseOutput> _addStreamListener() {
     return useCase.stream.listen((event) {
       if (event is PresentModel) {
+        _viewModelList = event.model
+            ?.map((model) => ThreadNovaListRowViewModel(model))
+            .toList();
         streamAdd(ShowThreadListPageModel(
-            viewModelList: event.model
-                ?.map((row) => ThreadNovaListRowViewModel(row))
-                .toList(),
-            error: event.error));
+            viewModelList: _viewModelList, error: event.error));
       }
+      _isProcessing = false;
     });
+  }
+
+  @override
+  bool get isProcessing {
+    return _isProcessing;
   }
 }

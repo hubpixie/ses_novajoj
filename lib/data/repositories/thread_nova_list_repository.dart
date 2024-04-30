@@ -7,6 +7,8 @@ import 'package:ses_novajoj/domain/repositories/thread_nova_list_repository.dart
 
 class ThreadNovaListRepositoryImpl extends ThreadNovaListRepository {
   final ThreadNovaWebApi _api;
+  int _estimatedPageCnt = 50;
+  String _prevSearchedKeyword = '';
 
   // sigleton
   static final ThreadNovaListRepositoryImpl _instance =
@@ -17,28 +19,74 @@ class ThreadNovaListRepositoryImpl extends ThreadNovaListRepository {
   @override
   Future<Result<List<ThreadNovaListItem>>> fetchThreadNovaList(
       {required FetchThreadNovaListRepoInput input}) async {
-    String targetUrl =
-        input.targetUrl.replaceAll('{{page}}', '${input.pageIndex}');
-    Result<List<ThreadNovaListItemRes>> result = await _api.fetchNovaList(
-        parameter:
-            NovaItemParameter(targetUrl: targetUrl, docType: input.docType));
+    String targetUrl = input.searchedKeyword.isNotEmpty
+        ? input.searchedUrl.replaceAll('{{page}}', '${input.pageIndex}')
+        : input.targetUrl.replaceAll('{{page}}', '${input.pageIndex}');
 
+    List<ThreadNovaListItem> list = [];
     late Result<List<ThreadNovaListItem>> ret;
-    List<ThreadNovaListItem> novaItems = <ThreadNovaListItem>[];
-    result.when(success: (response) {
-      for (var item in response) {
-        ThreadNovaListItem retItem = ThreadNovaListItem(
-          itemInfo: item.itemInfo,
-        );
-        retItem.itemInfo.pageCount =
-            targetUrl == input.targetUrl ? 1 : 10; //default
-        retItem.itemInfo.pageNumber = input.pageIndex;
-        novaItems.add(retItem);
+
+    Result<List<ThreadNovaListItem>> setReturnVal<T>(
+        T response, bool searched) {
+      if (response is List) {
+        for (var item in response) {
+          ThreadNovaListItem retItem = ThreadNovaListItem(
+            itemInfo: item.itemInfo,
+          );
+          retItem.itemInfo.pageCount = () {
+            int retCnt =
+                targetUrl == input.targetUrl ? 1 : _estimatedPageCnt; //default
+            if (searched) {
+              if (response.length >= 100) {
+                retCnt = 10;
+              } else {
+                retCnt = input.pageIndex;
+              }
+              _estimatedPageCnt = retCnt;
+            }
+            retCnt = _estimatedPageCnt > retCnt ? _estimatedPageCnt : retCnt;
+            return retCnt;
+          }();
+          retItem.itemInfo.pageNumber = input.pageIndex;
+          list.add(retItem);
+        }
+        return Result.success(data: list);
+      } else {
+        return const Result.success(data: []);
       }
-      ret = Result.success(data: novaItems);
-    }, failure: (error) {
-      ret = Result.failure(error: error);
-    });
+    }
+
+    if (targetUrl.contains('{{keywords}}')) {
+      if (_prevSearchedKeyword.isEmpty) {
+        _prevSearchedKeyword = input.searchedKeyword;
+      }
+      // if targetUrl is different from previos one except '&p99', reset _estimatedPageCnt as default.
+      if (_prevSearchedKeyword != input.searchedKeyword) {
+        _prevSearchedKeyword = input.searchedKeyword;
+        _estimatedPageCnt = 10; // default value
+      }
+      // fetch next page data
+      targetUrl = targetUrl.replaceAll('{{keywords}}', input.searchedKeyword);
+      final result = await _api.fetchSearchedResult(
+          parameter:
+              NovaItemParameter(targetUrl: targetUrl, docType: input.docType));
+      result.when(success: (response) {
+        ret = setReturnVal(response, true);
+      }, failure: (error) {
+        ret = Result.failure(error: error);
+      });
+    } else {
+      _estimatedPageCnt = 50; // default value
+      // fetch next page data
+      Result<List<ThreadNovaListItemRes>> result = await _api.fetchNovaList(
+          parameter:
+              NovaItemParameter(targetUrl: targetUrl, docType: input.docType));
+      result.when(success: (response) {
+        ret = setReturnVal(response, false);
+      }, failure: (error) {
+        ret = Result.failure(error: error);
+      });
+    }
 
     return ret;
   }

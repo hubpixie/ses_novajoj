@@ -4,11 +4,17 @@ import 'package:ses_novajoj/foundation/data/result.dart';
 
 class FetchThreadNovaListRepoInput {
   String targetUrl;
+  String searchedUrl;
+  String searchedKeyword;
   int pageIndex;
   NovaDocType docType;
 
   FetchThreadNovaListRepoInput(
-      {required this.targetUrl, this.pageIndex = 1, required this.docType});
+      {required this.targetUrl,
+      required this.searchedUrl,
+      this.searchedKeyword = '',
+      this.pageIndex = 1,
+      required this.docType});
 }
 
 abstract class ThreadNovaListRepository {

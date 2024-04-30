@@ -10,9 +10,13 @@ class ThreadNovaListUseCaseInput {
   int itemIndex;
   int targetPageIndex;
   String itemUrl;
+  String searchedKeyword;
 
   ThreadNovaListUseCaseInput(
-      {required this.itemIndex, this.targetPageIndex = 1, this.itemUrl = ""});
+      {required this.itemIndex,
+      this.targetPageIndex = 1,
+      this.itemUrl = "",
+      this.searchedKeyword = ""});
 }
 
 abstract class ThreadNovaListUseCase
@@ -27,71 +31,100 @@ class ThreadNovaListUseCaseImpl extends ThreadNovaListUseCase {
 
   static final List<FetchThreadNovaListRepoInput> _inputUrlData = [
     FetchThreadNovaListRepoInput(
-        // Hots
+        // Hots (searched: false)
         targetUrl: "https://club.6parkbbs.com/index.php",
+        searchedUrl: "",
         docType: NovaDocType.threadList),
     FetchThreadNovaListRepoInput(
-        // Kidding
+        // Kidding (searched: true)
         targetUrl:
             "https://club.6parkbbs.com/enter1/index.php?app=forum&act=cachepage&cp=tree{{page}}",
+        searchedUrl:
+            "https://club.6parkbbs.com/enter1/index.php?action=search&bbsdr=life6&act=threadsearch&app=forum&keywords={{keywords}}&p={{page}}",
         docType: NovaDocType.list),
     FetchThreadNovaListRepoInput(
-        // LifeStyle
+        // LifeStyle (searched: false)
         targetUrl:
             "https://club.6parkbbs.com/life2/index.php?app=forum&act=cachepage&cp=tree{{page}}",
+        searchedUrl:
+            "https://club.6parkbbs.com/life2/index.php?action=search&bbsdr=life6&act=threadsearch&app=forum&keywords={{keywords}}&p={{page}}",
         docType: NovaDocType.list),
     FetchThreadNovaListRepoInput(
-        // ChatIdly
+        // ChatIdly (searched: false)
         targetUrl:
             "https://club.6parkbbs.com/pk/index.php?app=forum&act=cachepage&cp=tree{{page}}",
+        searchedUrl:
+            "https://club.6parkbbs.com/pk/index.php?action=search&bbsdr=life6&act=threadsearch&app=forum&keywords={{keywords}}&p={{page}}",
         docType: NovaDocType.list),
     FetchThreadNovaListRepoInput(
-        // MarriageLife
+        // MarriageLife (searched: false)
         targetUrl:
             "https://club.6parkbbs.com/life9/index.php?app=forum&act=cachepage&cp=tree{{page}}",
+        searchedUrl:
+            "https://club.6parkbbs.com/life9/index.php?action=search&bbsdr=life6&act=threadsearch&app=forum&keywords={{keywords}}&p={{page}}  ",
         docType: NovaDocType.list),
     FetchThreadNovaListRepoInput(
-        // TalkHistory
+        // TalkHistory (searched: false)
         targetUrl:
             "https://club.6parkbbs.com/chan1/index.php?app=forum&act=cachepage&cp=tree{{page}}",
+        searchedUrl:
+            "https://club.6parkbbs.com/chan1/index.php?action=search&bbsdr=life6&act=threadsearch&app=forum&keywords={{keywords}}&p={{page}}",
         docType: NovaDocType.list),
     FetchThreadNovaListRepoInput(
-        // Entertainment
+        // Entertainment (searched: false)
         targetUrl:
             "https://club.6parkbbs.com/enter8/index.php?app=forum&act=cachepage&cp=tree{{page}}",
+        searchedUrl:
+            "https://club.6parkbbs.com/enter8/index.php?action=search&bbsdr=life6&act=threadsearch&app=forum&keywords={{keywords}}&p={{page}}",
         docType: NovaDocType.list),
     FetchThreadNovaListRepoInput(
-        // TalkArmchair
+        // TalkArmchair (searched: false)
         targetUrl:
             "https://club.6parkbbs.com/military/index.php?app=forum&act=cachepage&cp=tree{{page}}",
+        searchedUrl:
+            "https://club.6parkbbs.com/military/index.php?action=search&bbsdr=life6&act=threadsearch&app=forum&keywords={{keywords}}&p={{page}}",
         docType: NovaDocType.list),
     FetchThreadNovaListRepoInput(
-        // Economics
+        // Economics (searched: false)
         targetUrl:
             "https://club.6parkbbs.com/finance/index.php?app=forum&act=cachepage&cp=tree{{page}}",
+        searchedUrl:
+            "https://club.6parkbbs.com/finance/index.php?action=search&bbsdr=life6&act=threadsearch&app=forum&keywords={{keywords}}&p={{page}}",
         docType: NovaDocType.list),
     FetchThreadNovaListRepoInput(
-        // Dissertation
+        // Dissertation (searched: false)
         targetUrl:
             "https://club.6parkbbs.com/bolun/index.php?app=forum&act=cachepage&cp=tree{{page}}",
+        searchedUrl:
+            "https://club.6parkbbs.com/bolun/index.php?action=search&bbsdr=life6&act=threadsearch&app=forum&keywords={{keywords}}&p={{page}}",
         docType: NovaDocType.list),
     FetchThreadNovaListRepoInput(
-        // Gourmet
+        // Gourmet (searched: false)
         targetUrl:
             "https://club.6parkbbs.com/life6/index.php?app=forum&act=cachepage&cp=tree{{page}}",
+        searchedUrl:
+            "https://club.6parkbbs.com/life6/index.php?action=search&bbsdr=life6&act=threadsearch&app=forum&keywords={{keywords}}&p={{page}}",
         docType: NovaDocType.list),
     FetchThreadNovaListRepoInput(
-        // Travel
+        // Travel (searched: false)
         targetUrl:
             "https://club.6parkbbs.com/life7/index.php?app=forum&act=cachepage&cp=tree{{page}}",
+        searchedUrl:
+            "https://club.6parkbbs.com/life7/index.php?action=search&bbsdr=life6&act=threadsearch&app=forum&keywords={{keywords}}&p={{page}}",
         docType: NovaDocType.list),
   ];
 
   @override
   void fetchThreadNovaList({required ThreadNovaListUseCaseInput input}) async {
     _inputUrlData[input.itemIndex].pageIndex = input.targetPageIndex;
-    final result = await repository.fetchThreadNovaList(
-        input: _inputUrlData[input.itemIndex]);
+    final result = await repository.fetchThreadNovaList(input: () {
+      FetchThreadNovaListRepoInput input_ = _inputUrlData[input.itemIndex];
+      input_.searchedKeyword = input.searchedKeyword;
+      input_.docType = input.searchedKeyword.isNotEmpty
+          ? NovaDocType.threadList
+          : NovaDocType.list;
+      return input_;
+    }());
 
     result.when(success: (value) {
       List<ThreadNovaListItem> list = value;
@@ -109,7 +142,9 @@ class ThreadNovaListUseCaseImpl extends ThreadNovaListUseCase {
       {required ThreadNovaListUseCaseInput input}) async {
     final result = await repository.fetchThumbUrl(
         input: FetchThreadNovaListRepoInput(
-            targetUrl: input.itemUrl, docType: NovaDocType.thumb));
+            targetUrl: input.itemUrl,
+            searchedUrl: "",
+            docType: NovaDocType.thumb));
     String retUrl = '';
     result.when(
         success: (value) {
