@@ -30,12 +30,11 @@ class _ThreadListPageState extends State<ThreadListPage>
   late ScrollController _scrollController;
   AnimationController? _animationController;
   StreamController<ThreadSubInfo>? _pickedInfoList;
+  late StreamController<ThreadSearchKeyItem> _reloadedController;
 
   // searchbar
-  late String? _searchedUrl;
   final SearchPage _searchPage = SearchPage();
   String _currentSearchedKeyword = '';
-  String _prevSearchedKeyword = '';
 
   @override
   void initState() {
@@ -43,6 +42,7 @@ class _ThreadListPageState extends State<ThreadListPage>
 
     // init some variables
     _pickedInfoList = StreamController<ThreadSubInfo>.broadcast();
+    _reloadedController = StreamController<ThreadSearchKeyItem>.broadcast();
 
     _scrollController = ScrollController();
     Future.delayed(const Duration(milliseconds: 1500), () {
@@ -56,17 +56,35 @@ class _ThreadListPageState extends State<ThreadListPage>
         int tabIndex = _tabController?.index ?? 0;
         String firstText = "🟠${_tabNames[tabIndex]}";
         List<String> infos = _pickedTabsInfoList[tabIndex] ?? [];
+        //  add scroll to readint text
         if (infos.isEmpty) {
           infos.add(firstText);
         }
         if (!infos.contains(firstText)) {
+          _addListenerOntoAnimationController();
           infos.insert(0, firstText);
         }
         _pickedTabsInfoList[tabIndex] = infos;
         _scrollOffset = 0;
-        setState(() {});
+        if (_animationController == null && _animationController!.isAnimating) {
+          _addListenerOntoAnimationController();
+        }
+        //_tabIndexController.add(tabIndex);
+        if (tabIndex > 0) {
+          _reloadedController.add(ThreadSearchKeyItem(
+              tabIndex: tabIndex, searchedKey: _currentSearchedKeyword));
+        }
+
+        //setState(() {});
       });
     });
+  }
+
+  @override
+  void dispose() {
+    _pickedInfoList?.close();
+    _reloadedController.close();
+    super.dispose();
   }
 
   @override
@@ -82,19 +100,32 @@ class _ThreadListPageState extends State<ThreadListPage>
                 preferredSize: const Size.fromHeight(40.0),
                 child: _buildAppBarTabArea(context)),
             searchAction: (keyword) {
-              //_prevPickedTitleList = _pickedTitleList;
+              // _prevPickedTitleList = _pickedTitleList;
 
-              // _currentSearchedKeyword = keyword;
-              // if (keyword.isNotEmpty) {
-              //   _reloadedController
-              //       .add(TopSearchKeyItem(searchedKey: keyword));
-              // }
+              _currentSearchedKeyword = keyword;
+              if (keyword.isNotEmpty) {
+                _reloadedController.add(ThreadSearchKeyItem(
+                    tabIndex: _tabController!.index, searchedKey: keyword));
+              }
             },
             cancelAction: (isSearched) {
-              if (isSearched) {
-                //   _reloadedController
-                //       .add(TopSearchKeyItem(searchResultIsCleared: true));
-              } else {
+              int deleyedInterval = 0;
+              if (isSearched || _currentSearchedKeyword.isNotEmpty) {
+                _currentSearchedKeyword = '';
+                _reloadedController.add(ThreadSearchKeyItem(
+                    isReload: true,
+                    searchResultIsCleared: true,
+                    tabIndex: _tabController!.index,
+                    searchedKey: _currentSearchedKeyword));
+
+                // set deleyedInterval
+                deleyedInterval = 2000;
+              }
+              Future.delayed(Duration(milliseconds: deleyedInterval), () {
+                _reloadedController.add(ThreadSearchKeyItem(
+                    isReload: true,
+                    tabIndex: _tabController!.index,
+                    searchedKey: _currentSearchedKeyword));
                 setState(
                   () {
                     Future.delayed(const Duration(milliseconds: 2000), () {
@@ -111,18 +142,20 @@ class _ThreadListPageState extends State<ThreadListPage>
                     });
                   },
                 );
-              }
-              _currentSearchedKeyword = '';
+              });
             },
-            openSearchAction: () => setState(
-                  () {
-                    // remove animationController listner
-                    _removeListenerFromAnimationController();
-                  },
-                ),
+            openSearchAction: _tabController!.index != 0
+                ? () => setState(
+                      () {
+                        // remove animationController listner
+                        _removeListenerFromAnimationController();
+                      },
+                    )
+                : null,
             refreshAction: () {
-              // _reloadedController.add(
-              //     TopSearchKeyItem(searchedKey: _currentSearchedKeyword));
+              _reloadedController.add(ThreadSearchKeyItem(
+                  tabIndex: _tabController!.index,
+                  searchedKey: _currentSearchedKeyword));
             }),
         body: _buildTabPage(context));
   }
@@ -133,12 +166,11 @@ class _ThreadListPageState extends State<ThreadListPage>
     }
     _scrollOffset = 0;
     _animationController = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 1000))
+        vsync: this, duration: const Duration(milliseconds: 1500))
       ..addListener(() {
-        _scrollOffset += 20.0;
+        _scrollOffset += 6.0;
         if (_animationController!.isCompleted) {
           _animationController!.repeat();
-          //_scrollOffset = 0;
         }
         if (!_scrollTextStateChanged) {
           _scrollTextStateChanged = true;
@@ -149,11 +181,16 @@ class _ThreadListPageState extends State<ThreadListPage>
                 _scrollOffset = 0.0;
               }
               try {
-                _scrollController.jumpTo(_scrollOffset);
+                if (_scrollController.position.outOfRange) {
+                  log.severe(
+                      "_scrollController.jumpTo error:position.outOfRange");
+                  _removeListenerFromAnimationController();
+                  return;
+                } else {
+                  _scrollController.jumpTo(_scrollOffset);
+                }
               } catch (error) {
-                //log.severe("_scrollController.jumpTo error=$error");
-                _scrollOffset = 0.0;
-                // _scrollController.jumpTo(offset);
+                log.severe("_scrollController.jumpTo error=$error");
               }
             });
           });
@@ -241,29 +278,6 @@ class _ThreadListPageState extends State<ThreadListPage>
     );
   }
 
-  Widget _buildAppBarTitleArea2(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.only(left: 20, right: 70),
-      height: 30.0,
-      child: DecoratedBox(
-        decoration: const BoxDecoration(
-            boxShadow: [BoxShadow(blurRadius: 4, color: Colors.grey)],
-            color: Colors.white,
-            shape: BoxShape.rectangle),
-        child: ListView(
-          controller: _scrollController,
-          scrollDirection: Axis.horizontal,
-          children: const <Widget>[
-            Text(" testA testB testC testD ",
-                style: TextStyle(color: Colors.grey, fontSize: 18.0)),
-            Text(" testA testB testC testD ",
-                style: TextStyle(color: Colors.grey, fontSize: 18.0)),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildAppBarTabArea(BuildContext context) {
     List<Tab> tabs = [];
     for (final name in _tabNames) {
@@ -286,11 +300,11 @@ class _ThreadListPageState extends State<ThreadListPage>
     List<Widget> pages = [];
     _tabNames.asMap().forEach((int index, String value) {
       pages.add(ThreadSubPage(
-        presenter: widget.presenters[index],
-        tabIndex: index,
-        appBarTitle: value,
-        pickedInfoList: _pickedInfoList,
-      ));
+          presenter: widget.presenters[index],
+          tabIndex: index,
+          appBarTitle: value,
+          pickedInfoList: _pickedInfoList,
+          reloadedController: _reloadedController));
     });
 
     return TabBarView(
@@ -310,7 +324,7 @@ class _ThreadListPageState extends State<ThreadListPage>
               color: Colors.white,
               onPressed: () {
                 // reload data
-                //_loadData(isReloaded: true);
+                // _loadData(isReloaded: true);
               },
               icon: const Icon(Icons.refresh_rounded))),
       SizedBox(

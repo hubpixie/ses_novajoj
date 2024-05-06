@@ -96,7 +96,6 @@ class ThreadListPresenterImpl extends ThreadListPresenter {
     });
   }
 
-  @override
   bool get isProcessing {
     return _isProcessing;
   }

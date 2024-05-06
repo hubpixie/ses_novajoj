@@ -14,18 +14,33 @@ class ThreadSubInfo {
   ThreadSubInfo({required this.index, required this.infos});
 }
 
+class ThreadSearchKeyItem {
+  int tabIndex;
+  bool isReload;
+  bool searchResultIsCleared;
+  String searchedKey;
+
+  ThreadSearchKeyItem(
+      {required this.tabIndex,
+      this.isReload = true,
+      this.searchResultIsCleared = false,
+      this.searchedKey = ''});
+}
+
 class ThreadSubPage extends StatefulWidget {
   final ThreadListPresenter presenter;
   final int tabIndex;
   final String appBarTitle;
   final StreamController<ThreadSubInfo>? pickedInfoList;
+  final StreamController<ThreadSearchKeyItem> reloadedController;
 
   const ThreadSubPage(
       {Key? key,
       required this.presenter,
       required this.tabIndex,
       this.appBarTitle = "",
-      this.pickedInfoList})
+      this.pickedInfoList,
+      required this.reloadedController})
       : super(key: key);
 
   @override
@@ -36,6 +51,8 @@ class _ThreadSubPageState extends State<ThreadSubPage>
     with AutomaticKeepAliveClientMixin<ThreadSubPage> {
   final ScrollController _scrollController = ScrollController();
   int _currentPageIndex = 1;
+  DateTime? _searchedTime;
+  static String _gCurrSearchedKeyword = '';
 
   @override
   bool get wantKeepAlive => true;
@@ -43,7 +60,30 @@ class _ThreadSubPageState extends State<ThreadSubPage>
   @override
   void initState() {
     super.initState();
-    _loadData();
+    widget.reloadedController.stream.listen((event) {
+      if (_searchedTime != null &&
+          (DateTime.now().millisecondsSinceEpoch -
+                  _searchedTime!.millisecondsSinceEpoch) <
+              2000) {
+        _searchedTime = DateTime.now();
+        return;
+      }
+      _searchedTime = DateTime.now();
+      print(
+          '[${DateTime.now().toIso8601String()}]thread_sub_page: widget.reloadedController.stream.listen: ${event.tabIndex},searchResultIsCleared = ${event.searchResultIsCleared},searchedKey=${event.searchedKey}, isReload=${event.isReload}{${DateTime.now().difference(_searchedTime!).inMilliseconds}}');
+      if (event.searchedKey.isNotEmpty) {
+        _gCurrSearchedKeyword = event.searchedKey;
+      }
+      if (event.searchResultIsCleared) {
+        _gCurrSearchedKeyword = "";
+      }
+      _loadData(
+          isReloaded: event.isReload,
+          searchedKeyword: event.searchedKey,
+          searchResultIsCleared: event.searchResultIsCleared);
+    });
+
+    _loadData(searchedKeyword: _gCurrSearchedKeyword);
   }
 
   @override
@@ -83,12 +123,8 @@ class _ThreadSubPageState extends State<ThreadSubPage>
                     [widget.appBarTitle];
                 infos.insert(0, firstText);
 
-                // Future.delayed(const Duration(milliseconds: 3800), () {
-                print(
-                    "subPage pickedInfoList.index=${widget.tabIndex}, infos=${infos.first}");
                 widget.pickedInfoList
                     ?.add(ThreadSubInfo(index: widget.tabIndex, infos: infos));
-                // });
 
                 // return a listView
                 return ListView.builder(
@@ -172,14 +208,22 @@ class _ThreadSubPageState extends State<ThreadSubPage>
     );
   }
 
-  void _loadData({bool isReloaded = false}) {
+  void _loadData(
+      {bool isReloaded = false,
+      String searchedKeyword = '',
+      bool searchResultIsCleared = false}) {
+    if (_gCurrSearchedKeyword != searchedKeyword) {
+      _currentPageIndex = 1;
+    }
+
     // fetch data
     widget.presenter.eventViewReady(
         input: ThreadListPresenterInput(
             itemIndex: widget.tabIndex,
+            searchedKeyword: searchedKeyword,
+            searchResultIsCleared: searchResultIsCleared,
             pageIndex: _currentPageIndex,
-            isReloaded: isReloaded));
-
+            isReloaded: searchedKeyword.isEmpty ? true : isReloaded));
     Future.delayed(Duration.zero, () {
       setState(() {});
     });

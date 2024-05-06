@@ -119,10 +119,12 @@ class ThreadNovaListUseCaseImpl extends ThreadNovaListUseCase {
     _inputUrlData[input.itemIndex].pageIndex = input.targetPageIndex;
     final result = await repository.fetchThreadNovaList(input: () {
       FetchThreadNovaListRepoInput input_ = _inputUrlData[input.itemIndex];
-      input_.searchedKeyword = input.searchedKeyword;
-      input_.docType = input.searchedKeyword.isNotEmpty
-          ? NovaDocType.threadList
-          : NovaDocType.list;
+      if (input.itemIndex > 0) {
+        input_.searchedKeyword = input.searchedKeyword;
+        input_.docType = input.searchedKeyword.isNotEmpty
+            ? NovaDocType.threadList
+            : NovaDocType.list;
+      }
       return input_;
     }());
 
