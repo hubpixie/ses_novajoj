@@ -60,6 +60,9 @@ class NovaItemInfo {
   String thunnailUrlString;
   String title;
   String urlString;
+  List<String>? innerLinks;
+  String? previousUrlString;
+  Future<String> Function(String innerLinkUrl)? innerLinkDetail;
   String source;
   String author;
   DateTime createAt;
@@ -72,6 +75,7 @@ class NovaItemInfo {
   bool isRead;
   bool isNew;
   bool isFavorite;
+  bool isInnerLink;
   List<NovaItemInfo>? children;
   WeatherInfo? weatherInfo;
   int? pageNumber;
@@ -83,6 +87,9 @@ class NovaItemInfo {
       this.thunnailUrlString = '',
       required this.title,
       required this.urlString,
+      this.innerLinks,
+      this.previousUrlString,
+      this.innerLinkDetail,
       this.source = '',
       this.author = '',
       required this.createAt,
@@ -95,6 +102,7 @@ class NovaItemInfo {
       this.isRead = false,
       this.isNew = false,
       this.isFavorite = false,
+      this.isInnerLink = false,
       this.children,
       this.weatherInfo,
       this.pageNumber = 1,

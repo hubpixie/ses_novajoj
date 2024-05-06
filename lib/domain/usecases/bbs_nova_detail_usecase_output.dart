@@ -2,10 +2,10 @@ import 'package:ses_novajoj/foundation/data/user_types.dart';
 
 abstract class BbsNovaDetailUseCaseOutput {}
 
-class PresentModel extends BbsNovaDetailUseCaseOutput {
+class BbsNovaDetaiPresentModel extends BbsNovaDetailUseCaseOutput {
   final BbsNovaDetailUseCaseModel? model;
   final AppError? error;
-  PresentModel({this.model, this.error});
+  BbsNovaDetaiPresentModel({this.model, this.error});
 }
 
 class BbsNovaDetailUseCaseModel {

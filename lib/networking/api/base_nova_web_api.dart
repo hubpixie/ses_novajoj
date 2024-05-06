@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:async';
 import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:html/parser.dart' as html_parser;
 import 'package:html/dom.dart';
 import 'package:ses_novajoj/foundation//log_util.dart';
@@ -23,12 +24,10 @@ class BaseNovaWebApi {
   //'aHR0cHM6Ly93ZWIuNnBhcmtiYnMuY29tL3B1Yl9wYWdlL2hvbWVfbG9naW4ucGhw';
   static const String kSampleUrlParams = 'cGljaG82cGFya0A6d2FoYWhhQF8=';
   static const String kSampleReplacedPkCode =
-      'Pihjb29sMTh8NnBhcmspXC5jb208Ly8+IDw=@@';
+      'Pihccyl7MCx9KHd3d1wuKXswLH0oY29vbDE4fDZwYXJrKVwuY29tKFxzKXswLH08Ly8+IDw=@@';
   static bool _logined = false;
-  static const String kBbsMenuSettingUrl =
-      'https://qczkbaujyxmh9zzbl82kzq.on.drv.tw/www2.pixie.net/www/apps/ses_novajoj/assets/json/bbs_menu.json.txt';
-  static const String kMiscInfoSelectSettingUrl =
-      'https://qczkbaujyxmh9zzbl82kzq.on.drv.tw/www2.pixie.net/www/apps/ses_novajoj/assets/json/misc_info_select.json.txt';
+
+  final FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.instance;
 
   ///
   ////api name: fetchNovaItemThumbUrl
@@ -57,17 +56,24 @@ class BaseNovaWebApi {
   ////      </div>
   ///
   Future<Result<String>> fetchNovaItemThumbUrl(
-      {required NovaItemParameter parameter}) async {
+      {required NovaItemParameter parameter, dynamic httpBody}) async {
     try {
       ///send request for fetching nova item's thumb url.
-      final response =
-          await BaseApiClient.client.get(Uri.parse(parameter.targetUrl));
-      if (response.statusCode >= HttpStatus.badRequest) {
+      dynamic response;
+      if (httpBody != null) {
+        response = httpBody;
+      } else {
+        response =
+            await BaseApiClient.client.get(Uri.parse(parameter.targetUrl));
+      }
+      if (response == null) {
+        return Result.failure(error: AppError.fromStatusCode(404));
+      } else if (response.statusCode >= HttpStatus.badRequest) {
         return Result.failure(
             error: AppError.fromStatusCode(response.statusCode));
       }
 
-      ///prepares to parse nova list from response.body.
+      ///prepares to parse nova detail `created time` from response.body.
       final document = html_parser.parse(response.body);
       final imgElements = document.getElementsByTagName('img');
       if (imgElements.isEmpty) {
@@ -138,6 +144,52 @@ class BaseNovaWebApi {
     }
   }
 
+  ////api name: fetchNovaItemCreatedAt
+  ///
+  ///<div class="td3" id="newscontent_2">
+  ///		<p style="padding:5px;">
+  ///		新闻来源: XXXXX 于2024-04-19 22:03:06
+  ///		<span style="FONT-SIZE: 11px"><button onclick="changefont(this)">大字阅读</button>&nbsp;<b>提示:</b>新闻观点不代表本网立场
+  ///		</span>
+  ///		</p>...</div>
+  ///
+  Future<Result<String>> fetchNovaItemCreatedAt(
+      {required NovaItemParameter parameter, dynamic httpBody}) async {
+    try {
+      dynamic response;
+      if (httpBody != null) {
+        response = httpBody;
+      } else {
+        response =
+            await BaseApiClient.client.get(Uri.parse(parameter.targetUrl));
+      }
+      if (response == null) {
+        return Result.failure(error: AppError.fromStatusCode(404));
+      } else if (response.statusCode >= HttpStatus.badRequest) {
+        return Result.failure(
+            error: AppError.fromStatusCode(response.statusCode));
+      }
+
+      ///prepares to parse nova list from response.body.
+      String retStr = '';
+      final document = html_parser.parse(response.body);
+      final titleElement = document
+          .getElementById("newscontent_2")
+          ?.children
+          ?.firstWhere((element) => element.localName == 'p',
+              orElse: () => Element.tag('p'));
+      if (titleElement != null) {
+        retStr = titleElement.text;
+      }
+      retStr = StringUtil().substring(retStr, start: " \u4e8e", end: "").trim();
+      return Result.success(data: retStr);
+    } on AppError catch (error) {
+      return Result.failure(error: error);
+    } on Exception catch (error) {
+      return Result.failure(error: AppError.fromException(error));
+    }
+  }
+
   ///
   ////reshapeDetailBodyTags
   ///
@@ -162,11 +214,12 @@ class BaseNovaWebApi {
 
     ///reshape other tags
     Codec<String, String> codec = utf8.fuse(base64);
-    final codes = codec
+    String retStr = inElement?.innerHtml ?? '';
+    // code ssample
+    var codes = codec
         .decode(kSampleReplacedPkCode.substring(
             0, kSampleReplacedPkCode.length - 2))
         .split('//');
-    String retStr = inElement?.innerHtml ?? '';
     retStr = retStr.replaceAll(RegExp(r'' + codes.first), codes.last);
     return retStr;
   }
@@ -755,17 +808,21 @@ extension BaseNovaWebApiForAuth on BaseNovaWebApi {
 extension BaseNovaWebSettings on BaseNovaWebApi {
   Future<Result<String>> fetchBbsMenuSettings() async {
     try {
+      await remoteConfig.setConfigSettings(RemoteConfigSettings(
+        fetchTimeout: const Duration(seconds: 60),
+        minimumFetchInterval: Duration.zero,
+      ));
+      await remoteConfig.fetchAndActivate();
+
       ///fetch bbs munu settings
-      final response = await BaseApiClient.client
-          .get(Uri.parse(BaseNovaWebApi.kBbsMenuSettingUrl));
-      if (response.statusCode >= HttpStatus.badRequest) {
+      final configValue = remoteConfig.getString("bbs_menu");
+      if (configValue.isEmpty) {
         return Result.failure(
-            error: AppError.fromStatusCode(response.statusCode));
+            error: AppError.fromException(Exception("bbs_menu is not set")));
       }
 
-      ///set result from response.body.
-
-      return Result.success(data: utf8.decode(response.bodyBytes));
+      ///set result from remoteConfig.
+      return Result.success(data: configValue);
     } on AppError catch (error) {
       return Result.failure(error: error);
     } on Exception catch (error) {
@@ -776,24 +833,30 @@ extension BaseNovaWebSettings on BaseNovaWebApi {
   Future<Result<List<MiscInfoSelectItemItemRes>>>
       fetchMiscInfoSelectSettings() async {
     try {
-      ///fetch bbs munu settings
-      final response = await BaseApiClient.client
-          .get(Uri.parse(BaseNovaWebApi.kMiscInfoSelectSettingUrl));
-      if (response.statusCode >= HttpStatus.badRequest) {
+      await remoteConfig.setConfigSettings(RemoteConfigSettings(
+        fetchTimeout: const Duration(seconds: 60),
+        minimumFetchInterval: Duration.zero,
+      ));
+      await remoteConfig.fetchAndActivate();
+
+      ///fetch misc info select settings
+      final configValue = remoteConfig.getString("misc_info_select");
+      if (configValue.isEmpty) {
         return Result.failure(
-            error: AppError.fromStatusCode(response.statusCode));
+            error: AppError.fromException(
+                Exception("misc_info_select is not set")));
       }
 
-      ///set result from response.body.
+      ///set result from remoteConfig.
       final ret = (dynamic res) {
-        final parsed = jsonDecode(utf8.decode(res));
+        final parsed = jsonDecode(res);
         final list = parsed?['misc_select_menu'] as List?;
         return list != null
             ? list
                 .map((elem) => MiscInfoSelectItemItemRes.fromJson(elem))
                 .toList()
             : <MiscInfoSelectItemItemRes>[];
-      }(response.bodyBytes);
+      }(configValue);
 
       return Result.success(data: ret);
     } on AppError catch (error) {

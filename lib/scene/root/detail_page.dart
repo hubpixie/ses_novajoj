@@ -11,12 +11,14 @@ class DetailPage {
       {dynamic detailItem,
       bool isWebDetail = false,
       bool imageZommingEnabled = true,
-      ImageLoadingDelegate? onImageLoad}) {
+      ImageLoadingDelegate? onImageLoad,
+      InnerLinkDelegate? onInnerLink}) {
     return ExtWebView(
       detailItem: detailItem,
       isWebDetail: isWebDetail,
       imageZoomingEnabled: imageZommingEnabled,
       onImageLoad: onImageLoad,
+      onInnerLink: onInnerLink,
       scrollController: scrollController,
     );
   }
@@ -52,7 +54,9 @@ class DetailPage {
                             ''),
                   ),
                 );
-              } else if (element == DetailMenuItem.favorite && action != null) {
+              } else if (element == DetailMenuItem.favorite &&
+                  action != null &&
+                  itemInfo.isInnerLink != true) {
                 retMenus.add(
                   PopupMenuItem<DetailMenuItem>(
                     value: DetailMenuItem.favorite,

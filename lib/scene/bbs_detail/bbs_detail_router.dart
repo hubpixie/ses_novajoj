@@ -11,6 +11,8 @@ abstract class BbsDetailRouter {
       List<dynamic>? imageSrcList,
       dynamic parentViewImage,
       Object? completeHandler});
+  void gotoInnerDetail(Object context,
+      {required String appBarTitle, Object? itemInfo, Object? completeHandler});
 }
 
 class BbsDetailRouterImpl extends BbsDetailRouter {
@@ -46,6 +48,22 @@ class BbsDetailRouterImpl extends BbsDetailRouter {
         if (value is int) {
           completeHandler?.call(value);
         }
+      }
+    });
+  }
+
+  @override
+  void gotoInnerDetail(Object context,
+      {required String appBarTitle,
+      Object? itemInfo,
+      Object? completeHandler}) {
+    Navigator.pushNamed(context as BuildContext, ScreenRouteName.bbsDetail.name,
+        arguments: {
+          BbsDetailParamKeys.appBarTitle: appBarTitle,
+          BbsDetailParamKeys.itemInfo: itemInfo
+        }).then((value) {
+      if (completeHandler != null && completeHandler is Function) {
+        completeHandler.call();
       }
     });
   }

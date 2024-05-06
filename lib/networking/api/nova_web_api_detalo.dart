@@ -147,15 +147,8 @@ extension NovaWebApiDetail on NovaWebApi {
       }(commentLinkTag?.first);
 
       // commentCount
-      retVal.itemInfo.commentCount = (Element? aLink) {
-        if (aLink != null) {
-          final countStr = StringUtil()
-              .substring(aLink.innerHtml, start: '<span>', end: ' ');
-          return NumberUtil().parseInt(string: countStr) ?? 0;
-        }
-        return 0;
-      }(commentLinkTag?.first);
-
+      retVal.itemInfo.commentCount =
+          rootElement?.getElementsByClassName('reply_auther_info').length ?? 0;
       return Result.success(data: retVal);
     } on AppError catch (error) {
       return Result.failure(error: error);

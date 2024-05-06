@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/scene/foundation/page/page_parameter.dart';
 import 'package:ses_novajoj/scene/favorites/favorites_presenter.dart';
 import 'package:ses_novajoj/scene/favorites/favorites_presenter_output.dart';
@@ -18,6 +19,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
 
   late String _appBarTitle;
   Map? _parameters;
+  Future<String>? Function(NovaItemInfo?, String?, String?)? _innerDetailAction;
 
   @override
   void initState() {
@@ -53,6 +55,14 @@ class _FavoritesPageState extends State<FavoritesPage> {
                   itemBuilder: (context, index) => HistorioCell(
                       viewModel: viewModels![index],
                       onCellSelecting: (selIndex) {
+                        viewModels[selIndex].bookmark.itemInfo.innerLinkDetail =
+                            (innerLink) async {
+                          return await _innerDetailAction?.call(
+                                  viewModels[selIndex].bookmark.itemInfo,
+                                  innerLink,
+                                  viewModels[selIndex].bookmark.category) ??
+                              '';
+                        };
                         widget.presenter.eventViewWebPage(context,
                             input: FavoritesPresenterInput(
                                 appBarTitle: _appBarTitle,
@@ -94,6 +104,10 @@ class _FavoritesPageState extends State<FavoritesPage> {
     _parameters = ModalRoute.of(context)?.settings.arguments as Map?;
     _appBarTitle =
         _parameters?[FavoritesParamKeys.appBarTitle] as String? ?? '';
+    if (_parameters?[FavoritesParamKeys.innerDetailAction] is Future<String>?
+        Function(NovaItemInfo?, String?, String?)?) {
+      _innerDetailAction = _parameters?[FavoritesParamKeys.innerDetailAction];
+    }
     // _itemInfo = _parameters?[FavoritesParamKeys.itemInfos] as NovaItemInfo?;
 
     //

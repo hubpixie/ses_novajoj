@@ -17,6 +17,11 @@ abstract class WebPresenter with SimpleBloc<dynamic> {
       List<dynamic>? imageSrcList,
       dynamic parentViewImage,
       Object? completeHandler});
+  void eventSelectInnerDetail(Object context,
+      {required String appBarTitle,
+      Object? itemInfo,
+      String? htmlText,
+      Object? completeHandler});
 }
 
 class WebPresenterImpl extends WebPresenter {
@@ -36,6 +41,19 @@ class WebPresenterImpl extends WebPresenter {
         imageSrcIndex: imageSrcIndex,
         imageSrcList: imageSrcList,
         parentViewImage: parentViewImage,
+        completeHandler: completeHandler);
+  }
+
+  @override
+  void eventSelectInnerDetail(Object context,
+      {required String appBarTitle,
+      Object? itemInfo,
+      String? htmlText,
+      Object? completeHandler}) {
+    router.gotoInnerDetail(context,
+        appBarTitle: appBarTitle,
+        itemInfo: itemInfo,
+        htmlText: htmlText,
         completeHandler: completeHandler);
   }
 }

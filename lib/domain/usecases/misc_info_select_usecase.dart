@@ -1,3 +1,4 @@
+import 'package:ses_novajoj/domain/entities/misc_info_select_item.dart';
 import 'package:ses_novajoj/domain/foundation/bloc/simple_bloc.dart';
 import 'package:ses_novajoj/domain/repositories/misc_info_select_repository.dart';
 import 'package:ses_novajoj/data/repositories/misc_info_select_repository.dart';
@@ -14,6 +15,7 @@ abstract class MiscInfoSelectUseCase
 class MiscInfoSelectUseCaseImpl extends MiscInfoSelectUseCase {
   final MiscInfoSelectRepositoryImpl repository;
   MiscInfoSelectUseCaseImpl() : repository = MiscInfoSelectRepositoryImpl();
+  static List<MiscInfoSelectItem> _g_select_item_list = [];
 
   @override
   void fetchMiscInfoSelectData(
@@ -21,13 +23,21 @@ class MiscInfoSelectUseCaseImpl extends MiscInfoSelectUseCase {
     final result = await repository.fetchMiscInfoSelectData(
         input: FetchMiscInfoSelectRepoInput());
 
-    result.when(success: (value) {
+    if (_g_select_item_list.isEmpty) {
+      result.when(success: (value) {
+        _g_select_item_list.addAll(value);
+        streamAdd(PresentModel(
+            models: value
+                .map((entity) => MiscInfoSelectUseCaseRowModel(entity))
+                .toList()));
+      }, failure: (error) {
+        streamAdd(PresentModel(error: error));
+      });
+    } else {
       streamAdd(PresentModel(
-          models: value
+          models: _g_select_item_list
               .map((entity) => MiscInfoSelectUseCaseRowModel(entity))
               .toList()));
-    }, failure: (error) {
-      streamAdd(PresentModel(error: error));
-    });
+    }
   }
 }

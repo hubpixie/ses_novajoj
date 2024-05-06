@@ -6,6 +6,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:ses_novajoj/foundation/log_util.dart';
 
 typedef ImageLoadingDelegate = void Function(int, List<dynamic>, dynamic);
+typedef InnerLinkDelegate = void Function(int, dynamic, dynamic);
 
 class PageScrollController {
   StreamController<int>? _pageScrollStreamController;
@@ -20,6 +21,7 @@ class ExtWebView extends StatefulWidget {
   final bool isWebDetail;
   final bool imageZoomingEnabled;
   final ImageLoadingDelegate? onImageLoad;
+  final InnerLinkDelegate? onInnerLink;
   final PageScrollController? scrollController;
 
   const ExtWebView(
@@ -28,6 +30,7 @@ class ExtWebView extends StatefulWidget {
       this.isWebDetail = false,
       this.imageZoomingEnabled = true,
       this.onImageLoad,
+      this.onInnerLink,
       this.scrollController})
       : super(key: key);
 
@@ -162,13 +165,22 @@ class _ExtWebViewState extends State<ExtWebView> {
                           json.decode(message?.trim() ?? '');
                       String node = jsonData['node'] as String? ?? '';
                       String ingSrc = jsonData['src'] as String? ?? '';
+                      String href = jsonData['href'] as String? ?? '';
+                      String innerTitle = jsonData['title'] as String? ?? '';
                       int index = jsonData['index'] as int? ?? 0;
                       final imageUrls =
                           jsonData['imageUrls'] as List? ?? [ingSrc];
 
+                      // onImageLoad
                       if (node == "IMG" && imageUrls.isNotEmpty) {
                         log.info('double tap in dart!');
                         widget.onImageLoad?.call(index, imageUrls, null);
+                      }
+
+                      // onInnerLink
+                      if (node == "A" && href.isNotEmpty) {
+                        log.info("It's a inner link!");
+                        widget.onInnerLink?.call(index, href, innerTitle);
                       }
                     });
 

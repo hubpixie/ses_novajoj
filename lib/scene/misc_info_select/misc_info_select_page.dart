@@ -88,10 +88,7 @@ class _MiscInfoSelectPageState extends State<MiscInfoSelectPage> {
               if (data is ShowMiscInfoSelectPageModel) {
                 if (data.error == null) {
                   final models = data.viewModelList?.where((elem) =>
-                      elem.urlSelectInfo.serviceType ==
-                          _itemInfo?.serviceType &&
-                      (_itemInfo?.orderIndex == -1 ||
-                          elem.urlSelectInfo.order == _itemInfo?.orderIndex));
+                      elem.urlSelectInfo.serviceType == _itemInfo?.serviceType);
 
                   // TODO: no data displaying
                   if (models == null || models.isEmpty) {

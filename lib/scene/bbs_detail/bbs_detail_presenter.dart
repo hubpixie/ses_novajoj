@@ -23,6 +23,8 @@ abstract class BbsDetailPresenter with SimpleBloc<BbsDetailPresenterOutput> {
       dynamic parentViewImage,
       Object? completeHandler});
   bool eventSaveBookmark({required BbsDetailPresenterInput input});
+  void eventSelectInnerDetail(Object context,
+      {required String appBarTitle, Object? itemInfo, Object? completeHandler});
 }
 
 class BbsDetailPresenterImpl extends BbsDetailPresenter {
@@ -32,7 +34,7 @@ class BbsDetailPresenterImpl extends BbsDetailPresenter {
   BbsDetailPresenterImpl({required this.router})
       : useCase = BbsNovaDetailUseCaseImpl() {
     useCase.stream.listen((event) {
-      if (event is PresentModel) {
+      if (event is BbsNovaDetaiPresentModel) {
         if (event.error == null) {
           streamAdd(ShowBbsDetailPageModel(
               viewModel: BbsDetailViewModel(event.model!)));
@@ -76,5 +78,16 @@ class BbsDetailPresenterImpl extends BbsDetailPresenter {
     return useCase.saveBookmark(
         input: BbsNovaDetailUseCaseInput(
             itemInfo: input.itemInfo, htmlText: input.htmlText));
+  }
+
+  @override
+  void eventSelectInnerDetail(Object context,
+      {required String appBarTitle,
+      Object? itemInfo,
+      Object? completeHandler}) {
+    router.gotoInnerDetail(context,
+        appBarTitle: appBarTitle,
+        itemInfo: itemInfo,
+        completeHandler: completeHandler);
   }
 }

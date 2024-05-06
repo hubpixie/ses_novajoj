@@ -1,3 +1,4 @@
+import 'package:ses_novajoj/foundation/data/string_util.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/foundation/data/date_util.dart';
 
@@ -67,6 +68,10 @@ class DetailItem {
           function double_tap_func(elm, index, imageUrls) {
              port.postMessage(JSON.stringify({node: 'IMG', src: elm.src, index: index, imageUrls: imageUrls}));
           }          
+          function jump_inner_link_func(href, index, title) {
+             port.postMessage(JSON.stringify({node: 'A', href: href, index: index, title: title}));
+          }          
+
 
           function startLoadImages() {
             // Run your code here
@@ -91,9 +96,33 @@ class DetailItem {
               });
           }
 
+          // setupInnerLinks
+          function setupInnerLinks() {
+              var keyword;
+              var links = [...document.getElementsByTagName('a')];
+
+              if (links.length > 0) {
+                  keyword = links[0].href.match(/https:\\/\\/.*index\\.php\\?/g);
+                  if (keyword == null) {
+                    return;
+                  }
+                  var href = '';
+                  links.forEach((elm, index) => {
+                      href = elm.getAttribute('href');
+                      if (href.includes(keyword)) {
+                        innerTitle = elm.innerHTML;
+
+                        elm.setAttribute('href', "");
+                        elm.setAttribute('onclick', "jump_inner_link_func('" + href + "'," + index + ",'" + innerTitle + "');return false;");
+                      }
+                  });
+              }
+          }
+
           // DOMContentLoaded, load
           window.addEventListener('DOMContentLoaded', function () {
-              startLoadImages()
+              startLoadImages();
+              setupInnerLinks();
           });
         </script>        
       </head>
@@ -167,7 +196,8 @@ class DetailItem {
     String html = _kHtmlTemplateString.replaceAll(r'{{title}}', itemInfo.title);
     html = html.replaceAll(r'{{itemSource}}', itemInfo.source);
     if (itemInfo.reads > 0) {
-      html = html.replaceAll('{{reads}}', "(${itemInfo.reads}&nbsp;reads)");
+      html = html.replaceAll('{{reads}}',
+          "(${StringUtil().thousandFormat(itemInfo.reads)}&nbsp;reads)");
     } else {
       html = html.replaceAll('{{reads}}', "");
     }

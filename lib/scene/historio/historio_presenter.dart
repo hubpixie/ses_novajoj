@@ -63,10 +63,7 @@ class HistorioPresenterImpl extends HistorioPresenter {
     }
 
     void removeAction() {
-      UserData().saveFavorites(
-          bookmark: '',
-          bookmarkIsOn: itemInfo?.isFavorite ?? false,
-          url: itemInfo?.urlString ?? '');
+      UserData().removeHistorio(url: itemInfo?.urlString ?? '');
     }
 
     router.gotoWebPage(context,

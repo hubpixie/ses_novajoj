@@ -185,7 +185,7 @@ class BbsNovaWebApi extends BaseNovaWebApi {
 
     // title, urlString
     if (aLink.innerHtml.isNotEmpty) {
-      title = aLink.innerHtml;
+      title = aLink.text;
 
       urlString = () {
         String str = aLink.attributes['href'] ?? '';

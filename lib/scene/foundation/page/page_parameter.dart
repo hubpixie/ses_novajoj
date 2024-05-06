@@ -12,9 +12,19 @@ enum CommentListParamKeys { appBarTitle, itemInfo }
 
 enum MiscInfoSelectParamKeys { appBarTitle, itemInfo }
 
-enum HistorioParamKeys { appBarTitle, itemInfos, sourceRoute }
+enum HistorioParamKeys {
+  appBarTitle,
+  itemInfos,
+  sourceRoute,
+  innerDetailAction
+}
 
-enum FavoritesParamKeys { appBarTitle, itemInfos, sourceRoute }
+enum FavoritesParamKeys {
+  appBarTitle,
+  itemInfos,
+  sourceRoute,
+  innerDetailAction
+}
 
 enum WeeklyReportParamKeys { appBarTitle, itemInfo, menuItems, menuActions }
 
