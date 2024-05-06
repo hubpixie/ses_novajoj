@@ -8,6 +8,7 @@ import 'package:ses_novajoj/scene/top_list/top_list_page_builder.dart';
 import 'package:ses_novajoj/scene/bbs_main/bbs_main_page_builder.dart';
 import 'package:ses_novajoj/scene/local_list/local_list_page_builder.dart';
 import 'package:ses_novajoj/scene/thread_list/thread_list_page_builder.dart';
+import 'package:ses_novajoj/scene/thread_list/thread_list_page.dart';
 import 'package:ses_novajoj/scene/misc_info_list/misc_info_list_page_builder.dart';
 
 class TabsPage extends StatefulWidget {
@@ -23,6 +24,8 @@ class _TabsPageState extends State<TabsPage> with WidgetsBindingObserver {
       MethodChannel('com.pixie.sesNovajoj/app_helper');
 
   int _selectedIndex = 0;
+  final DateTime _startedTime = DateTime.now();
+  final List<bool> _firstTapDeleyInfo = [];
   late final List<String> _tabTitles = [
     L10n.of(context)?.tabBarNameHome ?? '',
     L10n.of(context)?.tabBarNameBBS ?? '',
@@ -51,8 +54,19 @@ class _TabsPageState extends State<TabsPage> with WidgetsBindingObserver {
   }
 
   void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
+    int delaySec = 0;
+    DateTime now = DateTime.now();
+    int elapsed =
+        now.millisecondsSinceEpoch - _startedTime.millisecondsSinceEpoch;
+    if (elapsed < 6000) {
+      delaySec = _firstTapDeleyInfo[index] ? 6000 : 2500;
+      delaySec = delaySec < 0 ? 2500 : delaySec;
+      _firstTapDeleyInfo[index] = false;
+    }
+    Future.delayed(Duration(milliseconds: delaySec), () {
+      setState(() {
+        _selectedIndex = index;
+      });
     });
   }
 
@@ -79,7 +93,11 @@ class _TabsPageState extends State<TabsPage> with WidgetsBindingObserver {
               BbsMainPageBuilder().page,
               LocalListPageBuilder().page,
               MiscInfoListPageBuilder().page,
-              ThreadListPageBuilder().page,
+              () {
+                ThreadListPage page = ThreadListPageBuilder().page;
+                page.pageLoadingState.isActive = (_selectedIndex == 4);
+                return page;
+              }(),
             ],
           ),
           bottomNavigationBar: BottomNavigationBar(

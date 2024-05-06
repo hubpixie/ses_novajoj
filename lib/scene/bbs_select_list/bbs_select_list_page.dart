@@ -45,7 +45,7 @@ class _BbsSelectListPageState extends State<BbsSelectListPage> {
 
     return Scaffold(
       appBar: _searchPage.buildAppBar(context,
-          appBarTitle: _appBarTitle,
+          appBarTitle: Text(_appBarTitle),
           automaticallyImplyLeading: true,
           searchAction: (keyword) {
             _currentSearchedKeyword = keyword;

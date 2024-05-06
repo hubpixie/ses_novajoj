@@ -1,70 +1,281 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/scene/foundation/color_def.dart';
+import 'package:ses_novajoj/scene/root/search_page.dart';
 import 'package:ses_novajoj/scene/thread_list/thread_sub_page.dart';
 import 'package:ses_novajoj/scene/foundation/use_l10n.dart';
+import 'package:ses_novajoj/foundation/log_util.dart';
 import 'package:ses_novajoj/scene/thread_list/thread_list_presenter.dart';
 
 class ThreadListPage extends StatefulWidget {
   final List<ThreadListPresenter> presenters;
-  const ThreadListPage({Key? key, required this.presenters}) : super(key: key);
+  final PageLoadingState pageLoadingState;
+  const ThreadListPage(
+      {Key? key, required this.presenters, required this.pageLoadingState})
+      : super(key: key);
 
   @override
   State<ThreadListPage> createState() => _ThreadListPageState();
 }
 
-class _ThreadListPageState extends State<ThreadListPage> {
+class _ThreadListPageState extends State<ThreadListPage>
+    with TickerProviderStateMixin {
   List<String> _tabNames = [];
+  final Map<int, List<String>> _pickedTabsInfoList = {};
+
+  double _scrollOffset = 0;
+  bool _scrollTextStateChanged = false;
+  TabController? _tabController;
+  late ScrollController _scrollController;
+  AnimationController? _animationController;
+  StreamController<ThreadSubInfo>? _pickedInfoList;
+  late StreamController<ThreadSearchKeyItem> _reloadedController;
+
+  // searchbar
+  final SearchPage _searchPage = SearchPage();
+  String _currentSearchedKeyword = '';
 
   @override
   void initState() {
     super.initState();
+
+    // init some variables
+    _pickedInfoList = StreamController<ThreadSubInfo>.broadcast();
+    _reloadedController = StreamController<ThreadSearchKeyItem>.broadcast();
+
+    _scrollController = ScrollController();
+    Future.delayed(const Duration(milliseconds: 1500), () {
+      int tabIndex = _tabController?.index ?? 0;
+      if (tabIndex == 0) {
+        _pickedTabsInfoList[tabIndex] = ["🟠${_tabNames[tabIndex]}"];
+        setState(() {});
+      }
+
+      _tabController?.addListener(() {
+        int tabIndex = _tabController?.index ?? 0;
+        String firstText = "🟠${_tabNames[tabIndex]}";
+        List<String> infos = _pickedTabsInfoList[tabIndex] ?? [];
+        //  add scroll to readint text
+        if (infos.isEmpty) {
+          infos.add(firstText);
+        }
+        if (!infos.contains(firstText)) {
+          _addListenerOntoAnimationController();
+          infos.insert(0, firstText);
+        }
+        _pickedTabsInfoList[tabIndex] = infos;
+        _scrollOffset = 0;
+        if (_animationController == null && _animationController!.isAnimating) {
+          _addListenerOntoAnimationController();
+        }
+        //_tabIndexController.add(tabIndex);
+        if (tabIndex > 0) {
+          _reloadedController.add(ThreadSearchKeyItem(
+              tabIndex: tabIndex, searchedKey: _currentSearchedKeyword));
+        }
+
+        //setState(() {});
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _pickedInfoList?.close();
+    _reloadedController.close();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     _initTabNames(context);
+    _tabController ??= TabController(length: _tabNames.length, vsync: this);
 
-    return DefaultTabController(
-      length: _tabNames.length,
-      child: Scaffold(
-          appBar: AppBar(
-            backgroundColor: ColorDef.appBarBackColor2,
-            foregroundColor: ColorDef.appBarTitleColor,
+    return Scaffold(
+        appBar: _searchPage.buildAppBar(context,
+            appBarTitle: _buildAppBarTitleArea(context),
             automaticallyImplyLeading: false,
-            leading: const SizedBox(width: 0),
-            centerTitle: false,
-            bottom: PreferredSize(
-                preferredSize: const Size.fromHeight(0.0),
+            bottomBar: PreferredSize(
+                preferredSize: const Size.fromHeight(40.0),
                 child: _buildAppBarTabArea(context)),
-            titleSpacing: 0,
-            leadingWidth: 10,
-          ),
-          body: _buildTabPage(context)),
-    );
+            searchAction: (keyword) {
+              // _prevPickedTitleList = _pickedTitleList;
+
+              _currentSearchedKeyword = keyword;
+              if (keyword.isNotEmpty) {
+                _reloadedController.add(ThreadSearchKeyItem(
+                    tabIndex: _tabController!.index, searchedKey: keyword));
+              }
+            },
+            cancelAction: (isSearched) {
+              int deleyedInterval = 0;
+              if (isSearched || _currentSearchedKeyword.isNotEmpty) {
+                _currentSearchedKeyword = '';
+                _reloadedController.add(ThreadSearchKeyItem(
+                    isReload: true,
+                    searchResultIsCleared: true,
+                    tabIndex: _tabController!.index,
+                    searchedKey: _currentSearchedKeyword));
+
+                // set deleyedInterval
+                deleyedInterval = 2000;
+              }
+              Future.delayed(Duration(milliseconds: deleyedInterval), () {
+                _reloadedController.add(ThreadSearchKeyItem(
+                    isReload: true,
+                    tabIndex: _tabController!.index,
+                    searchedKey: _currentSearchedKeyword));
+                setState(
+                  () {
+                    Future.delayed(const Duration(milliseconds: 2000), () {
+                      // add subInfo
+                      ThreadSubInfo subInfo = ThreadSubInfo(
+                          index: _tabController!.index,
+                          infos:
+                              _pickedTabsInfoList[_tabController?.index ?? 0] ??
+                                  []);
+                      _pickedInfoList?.add(subInfo);
+
+                      // add animationController listner
+                      _addListenerOntoAnimationController();
+                    });
+                  },
+                );
+              });
+            },
+            openSearchAction: _tabController!.index != 0
+                ? () => setState(
+                      () {
+                        // remove animationController listner
+                        _removeListenerFromAnimationController();
+                      },
+                    )
+                : null,
+            refreshAction: () {
+              _reloadedController.add(ThreadSearchKeyItem(
+                  tabIndex: _tabController!.index,
+                  searchedKey: _currentSearchedKeyword));
+            }),
+        body: _buildTabPage(context));
+  }
+
+  void _addListenerOntoAnimationController() {
+    if (_animationController != null) {
+      return;
+    }
+    _scrollOffset = 0;
+    _animationController = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 1500))
+      ..addListener(() {
+        _scrollOffset += 6.0;
+        if (_animationController!.isCompleted) {
+          _animationController!.repeat();
+        }
+        if (!_scrollTextStateChanged) {
+          _scrollTextStateChanged = true;
+          setState(() {
+            Future.delayed(const Duration(milliseconds: 2500), () {
+              int tabIndex = _tabController?.index ?? 0;
+              if ((_pickedTabsInfoList[tabIndex] ?? []).length <= 1) {
+                _scrollOffset = 0.0;
+              }
+              try {
+                if (_scrollController.position.outOfRange) {
+                  log.severe(
+                      "_scrollController.jumpTo error:position.outOfRange");
+                  _removeListenerFromAnimationController();
+                  return;
+                } else {
+                  _scrollController.jumpTo(_scrollOffset);
+                }
+              } catch (error) {
+                log.severe("_scrollController.jumpTo error=$error");
+              }
+            });
+          });
+        }
+      });
+    _animationController?.forward();
+  }
+
+  void _removeListenerFromAnimationController() {
+    if (_animationController == null) {
+      return;
+    }
+    if (_animationController!.isAnimating) {
+      _animationController!.stop();
+      _animationController!.dispose();
+    }
+    _animationController = null;
   }
 
   // ignore: unused_element
   Widget _buildAppBarTitleArea(BuildContext context) {
-    return SizedBox(
-        width: 265,
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(
-              width: 125,
-              height: 35,
-            ),
-            SizedBox(
-                width: 140,
-                height: 35,
-                child: IconButton(
-                    padding: const EdgeInsets.only(left: 5),
-                    onPressed: null,
-                    icon: Text(
-                        UseL10n.of(context)?.hotThreadListAppBarTitle ?? "",
-                        style: const TextStyle(fontWeight: FontWeight.bold)))),
-          ],
-        ));
+    return Container(
+      margin: const EdgeInsets.only(top: 15),
+      padding: const EdgeInsets.only(left: 0, right: 20, bottom: 10),
+      //alignment: Alignment.centerLeft,
+      height: 40.0,
+      child: DecoratedBox(
+        decoration: const BoxDecoration(
+            boxShadow: [BoxShadow(blurRadius: 1, color: Colors.grey)],
+            color: Colors.white,
+            shape: BoxShape.rectangle),
+        child: StreamBuilder<ThreadSubInfo>(
+            stream: _pickedInfoList?.stream,
+            builder: (context, snapshot) {
+              int tabIndex = _tabController?.index ?? 0;
+              String nameStr = "🟠${_tabNames[_tabController?.index ?? 0]}";
+
+              if (!widget.pageLoadingState.isActive ||
+                  snapshot.connectionState == ConnectionState.waiting ||
+                  (_pickedTabsInfoList[_tabController?.index ?? 0] ?? [])
+                      .isEmpty) {
+                if (!widget.pageLoadingState.isActive) {
+                  // remove animationController listner
+                  _removeListenerFromAnimationController();
+                }
+                // return empty container
+                _pickedTabsInfoList[tabIndex] = [nameStr];
+                return Container();
+              }
+              if (_scrollTextStateChanged) {
+                Future.delayed(const Duration(milliseconds: 2000), () {
+                  _scrollTextStateChanged = false;
+                });
+              }
+
+              // add animationController listner
+              if (widget.pageLoadingState.isActive &&
+                  _animationController == null) {
+                _addListenerOntoAnimationController();
+              }
+              final data = snapshot.data;
+              if (data is ThreadSubInfo) {
+                ThreadSubInfo subInfo = data;
+                List<String> infoList = _pickedTabsInfoList[tabIndex] ?? [];
+                _pickedTabsInfoList[subInfo.index] = subInfo.infos;
+                log.info(
+                    "[${DateTime.now()}][2] infos.first = ${infoList.first},tabIndex = $tabIndex, length = ${infoList.length}");
+                // return a listView
+                return ListView.builder(
+                    controller: _scrollController,
+                    scrollDirection: Axis.horizontal,
+                    itemCount: infoList.length,
+                    itemBuilder: (context, index) {
+                      return Text(infoList[index],
+                          textAlign: TextAlign.justify,
+                          style: const TextStyle(
+                              color: Colors.black87, fontSize: 16.0));
+                    });
+              } else {
+                // return an error container
+                return Container();
+              }
+            }),
+      ),
+    );
   }
 
   Widget _buildAppBarTabArea(BuildContext context) {
@@ -74,8 +285,10 @@ class _ThreadListPageState extends State<ThreadListPage> {
         child: Text(name),
       ));
     }
+    _tabController ??= TabController(length: tabs.length, vsync: this);
 
     return TabBar(
+        controller: _tabController,
         isScrollable: true,
         unselectedLabelColor: ColorDef.tabLabelColor.withOpacity(0.6),
         indicatorColor: ColorDef.tabLabelColor.withOpacity(0.4),
@@ -87,13 +300,15 @@ class _ThreadListPageState extends State<ThreadListPage> {
     List<Widget> pages = [];
     _tabNames.asMap().forEach((int index, String value) {
       pages.add(ThreadSubPage(
-        presenter: widget.presenters[index],
-        tabIndex: index,
-        appBarTitle: value,
-      ));
+          presenter: widget.presenters[index],
+          tabIndex: index,
+          appBarTitle: value,
+          pickedInfoList: _pickedInfoList,
+          reloadedController: _reloadedController));
     });
 
     return TabBarView(
+      controller: _tabController,
       children: pages,
     );
   }
@@ -109,7 +324,7 @@ class _ThreadListPageState extends State<ThreadListPage> {
               color: Colors.white,
               onPressed: () {
                 // reload data
-                //_loadData(isReloaded: true);
+                // _loadData(isReloaded: true);
               },
               icon: const Icon(Icons.refresh_rounded))),
       SizedBox(

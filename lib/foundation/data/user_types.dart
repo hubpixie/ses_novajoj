@@ -21,6 +21,12 @@ enum ServiceType {
   // history,
 }
 
+class PageLoadingState {
+  bool isActive = false;
+  bool? isLoading;
+  int pageIndex = -1;
+}
+
 class NovaComment {
   late int id;
   late String author;
