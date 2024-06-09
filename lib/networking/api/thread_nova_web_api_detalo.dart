@@ -119,7 +119,7 @@ extension ThreadNovaWebApiDetail on ThreadNovaWebApi {
         // XXXX-XX-XX XX:XX *** XXXX
         String dateStr = '';
         final dateLoc = infoStr.indexOf(
-            RegExp(r' [0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}.*[0-9]+ '),
+            RegExp(r' [0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{1,}:[0-9]{1,}.*[0-9]+ '),
             0);
         if (dateLoc >= 0) {
           dateStr = infoStr.substring(dateLoc + 1, dateLoc + 17);

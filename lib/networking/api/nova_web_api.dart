@@ -31,7 +31,7 @@ class NovaWebApi extends BaseNovaWebApi {
       String bodyString = await loadResponseDataFromCache(
           urlString: parameter.targetUrl,
           cacheFolder: "top",
-          pageBlockIndex: 1 /* TODO: parameter.pageBlockIndex*/);
+          pageBlockIndex: parameter.pageBlockIndex);
 
       // prepares to parse nova list from response.body.
       final document =
@@ -111,9 +111,18 @@ class NovaWebApi extends BaseNovaWebApi {
             reason: FailureReason.missingListNode);
       }
       int index = 0;
-      for (Element li in ulElement?.children ?? []) {
-        NovaListItemRes? novaListItemRes =
-            await _createNovaLiItem(parameter.targetUrl, index: index, li: li);
+      int totolItemCount = ulElement?.children.length ?? 0;
+      int pageBlockIndex =
+          parameter.pageBlockIndex < 1 ? 1 : parameter.pageBlockIndex;
+      int takenStart = (pageBlockIndex - 1) * parameter.limitPerBlock;
+      int takenEnd = pageBlockIndex * parameter.limitPerBlock;
+      for (Element li
+          in ulElement?.children.sublist(takenStart, takenEnd) ?? []) {
+        NovaListItemRes? novaListItemRes = await _createNovaLiItem(
+            parameter.targetUrl,
+            index: index,
+            li: li,
+            totolItemCount: totolItemCount);
         if (novaListItemRes != null) {
           retArr.add(novaListItemRes);
           index++;
@@ -129,7 +138,9 @@ class NovaWebApi extends BaseNovaWebApi {
   }
 
   Future<NovaListItemRes?> _createNovaLiItem(String url,
-      {required int index, required Element li}) async {
+      {required int index,
+      required Element li,
+      required int totolItemCount}) async {
     NovaListItemRes? retNovaItem;
     int id = index;
     String thunnailUrlString = "";
@@ -146,6 +157,7 @@ class NovaWebApi extends BaseNovaWebApi {
     List<Element> liSubElements = li.children;
     int liCount = liSubElements.length;
     String parentUrl = _parentUrl(url: url);
+    bool networkIsOK = await ConnectUtil.isAvailable();
 
     // title, urlString
     dynamic detailResponsedBody;
@@ -156,9 +168,12 @@ class NovaWebApi extends BaseNovaWebApi {
         return retNovaItem;
       }
       // thumbUrlString
-      detailResponsedBody ??=
-          await BaseApiClient.client.get(Uri.parse(urlString));
-      if (urlString.isNotEmpty && index < _kThumbLimit) {
+      detailResponsedBody ??= networkIsOK
+          ? await BaseApiClient.client.get(Uri.parse(urlString))
+          : "";
+      if (urlString.isNotEmpty &&
+          index < _kThumbLimit &&
+          detailResponsedBody != "") {
         Result<String> thumbUrlResult = await fetchNovaItemThumbUrl(
             parameter: NovaItemParameter(
                 targetUrl: urlString, docType: NovaDocType.thumb),
@@ -176,12 +191,15 @@ class NovaWebApi extends BaseNovaWebApi {
       createAt = DateUtil().fromString(liSubElements[1].innerHtml);
     }
     if (createAt == null) {
-      detailResponsedBody ??=
-          await BaseApiClient.client.get(Uri.parse(urlString));
-      Result<String> createdAtStrRes = await fetchNovaItemCreatedAt(
-          parameter: NovaItemParameter(
-              targetUrl: urlString, docType: NovaDocType.thumb),
-          httpBody: detailResponsedBody);
+      detailResponsedBody ??= networkIsOK
+          ? await BaseApiClient.client.get(Uri.parse(urlString))
+          : "";
+      Result<String> createdAtStrRes = detailResponsedBody != ""
+          ? await fetchNovaItemCreatedAt(
+              parameter: NovaItemParameter(
+                  targetUrl: urlString, docType: NovaDocType.thumb),
+              httpBody: detailResponsedBody)
+          : const Result.success(data: "");
       createdAtStrRes.when(
           success: (value) {
             createAt =
@@ -224,7 +242,8 @@ class NovaWebApi extends BaseNovaWebApi {
         commentCount: commentCount,
         reads: reads,
         isNew: isNew,
-        isRead: isRead);
+        isRead: isRead,
+        totolItemClount: totolItemCount);
     return NovaListItemRes(itemInfo: itemInfo);
   }
 

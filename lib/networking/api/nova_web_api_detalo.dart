@@ -25,10 +25,15 @@ extension NovaWebApiDetail on NovaWebApi {
       NovaDetaloItemRes? retVal;
 
       if (parameter.docType == NovaDocType.detail) {
+        var rootElement = document.getElementById("newscontent_2");
+        rootElement ??=
+            document.getElementsByClassName("art-main-body-auth").first;
+        var detailElement = document.getElementById("shownewsc");
+        detailElement ??= document.getElementById("news_content");
         return _parseDetailItems(
             parameter: parameter,
-            rootElement: document.getElementById("newscontent_2"),
-            detailElement: document.getElementById("shownewsc"));
+            rootElement: rootElement,
+            detailElement: detailElement);
       }
 
       return Result.success(data: retVal!);
@@ -84,7 +89,7 @@ extension NovaWebApiDetail on NovaWebApi {
       NovaDetaloItemRes retVal = NovaDetaloItemRes(
           itemInfo: parameter.itemInfo,
           bodyString: reshapeDetailBodyTags(detailElement));
-      String source = parameter.itemInfo.source;
+      //String source = parameter.itemInfo.source;
       if (rootElement?.children == null) {
         log.severe('rootElement?.children == null');
         throw AppError(
@@ -96,41 +101,50 @@ extension NovaWebApiDetail on NovaWebApi {
 
       // createAt (detail)
       retVal.itemInfo.createAt = (DateTime value) {
-        final plElement = rootElement?.children
-            .firstWhere((element) => element.localName == 'p');
-        if (plElement != null && plElement.innerHtml.isNotEmpty) {
-          String createAtStr = StringUtil()
-              .substring(plElement.innerHtml, start: source, end: ' \n');
-          createAtStr = StringUtil().subfix(createAtStr, width: 18);
-          return DateUtil()
-                  .fromString(createAtStr, format: 'yyyy-MM-dd H:mm') ??
-              value;
+        final plElements =
+            rootElement?.children.where((element) => element.localName == 'p');
+        String infoStr = plElements != null && plElements.isNotEmpty
+            ? plElements.first.innerHtml
+            : rootElement!.innerHtml;
+
+        String dateStr = '';
+        final dateLoc = infoStr.indexOf(
+            RegExp(r' [0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{1,}:[0-9]{1,}.*[0-9]+ '),
+            0);
+        if (dateLoc >= 0) {
+          dateStr = infoStr.substring(dateLoc + 1, dateLoc + 17);
         }
-        return value;
+
+        return dateStr.isEmpty
+            ? value
+            : DateUtil().fromString(dateStr, format: 'yyyy-MM-dd H:mm') ??
+                value;
       }(retVal.itemInfo.createAt);
 
       // author
       retVal.itemInfo.author = () {
         String retStr = '';
-        var tablelElement = rootElement?.children
-            .firstWhere((element) => element.localName == 'table');
-        if (tablelElement?.children != null) {
-          if (tablelElement?.children.first.localName == 'tbody') {
-            tablelElement = tablelElement?.children.first;
-          }
-        }
-
-        for (Element tr in tablelElement?.children ?? []) {
-          for (Element td in tr.children) {
-            final alink = td.children.firstWhere(
-                (element) => element.localName == 'a',
-                orElse: () => Element.tag('a'));
-            if (alink.attributes['name'] == 'postfp') {
-              retStr = StringUtil()
-                  .substring(td.innerHtml, start: '：', end: alink.outerHtml);
-              return retStr;
+        final tablelElements = rootElement?.children
+            .where((element) => element.localName == 'table');
+        final tablelElement = (tablelElements == null || tablelElements.isEmpty)
+            ? rootElement
+            : tablelElements.first;
+        if (tablelElement?.children.isNotEmpty ?? false) {
+          for (Element tr in tablelElement?.children ?? []) {
+            for (Element td in tr.children) {
+              final alink = td.children.firstWhere(
+                  (element) => element.localName == 'a',
+                  orElse: () => Element.tag('a'));
+              if (alink.attributes['name'] == 'postfp') {
+                retStr = StringUtil()
+                    .substring(td.innerHtml, start: '：', end: alink.outerHtml);
+                return retStr;
+              }
             }
           }
+        } else {
+          retStr = StringUtil()
+              .substring(rootElement!.innerHtml, start: '：', end: " \u4e8e ");
         }
         return retStr;
       }();
@@ -138,12 +152,14 @@ extension NovaWebApiDetail on NovaWebApi {
       // commentUrlString
       final commentLinkTag =
           rootElement?.getElementsByClassName('reply_link_img');
-      retVal.itemInfo.commentUrlString = (Element? aLink) {
-        // reply_link_img
-        String str = aLink?.attributes['href'] ?? '';
-        str = "$parentUrl/${str.replaceAll('\\"', '')}";
-        return str;
-      }(commentLinkTag?.first);
+      if (commentLinkTag != null && commentLinkTag.isNotEmpty) {
+        retVal.itemInfo.commentUrlString = (Element? aLink) {
+          // reply_link_img
+          String str = aLink?.attributes['href'] ?? '';
+          str = "$parentUrl/${str.replaceAll('\\"', '')}";
+          return str;
+        }(commentLinkTag.first);
+      }
 
       // commentCount
       retVal.itemInfo.commentCount =
