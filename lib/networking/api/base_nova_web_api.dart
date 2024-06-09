@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:html/parser.dart' as html_parser;
 import 'package:html/dom.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:ses_novajoj/foundation//log_util.dart';
 import 'package:ses_novajoj/foundation/connect_util.dart';
 import 'package:ses_novajoj/foundation/data/date_util.dart';
@@ -176,7 +177,7 @@ class BaseNovaWebApi {
       final titleElement = document
           .getElementById("newscontent_2")
           ?.children
-          ?.firstWhere((element) => element.localName == 'p',
+          .firstWhere((element) => element.localName == 'p',
               orElse: () => Element.tag('p'));
       if (titleElement != null) {
         retStr = titleElement.text;
@@ -188,6 +189,51 @@ class BaseNovaWebApi {
     } on Exception catch (error) {
       return Result.failure(error: AppError.fromException(error));
     }
+  }
+
+  ///
+  ////api name: loadResponseDataFromCache
+  ///
+  /// Load the response data corresponding to the parameter
+  /// 'urlString' from the cache, and if it's not available,
+  ///  return an empty string.
+  ///
+  Future<String> loadResponseDataFromCache(
+      {required String urlString,
+      required String cacheFolder,
+      int pageBlockIndex = 1}) async {
+    String retStr = '';
+    Directory tempRootDir = await getTemporaryDirectory();
+    Directory tempDir = Directory('${tempRootDir.path}/top');
+    if (!(await tempDir.exists())) {
+      await tempDir.create();
+    }
+    // check network state
+    final networkStateIsOK = await ConnectUtil.isAvailable(checksAgain: true);
+    File tempFile = File('${tempDir.path}/${urlString.hashCode}');
+    if (await tempFile.exists()) {
+      retStr = tempFile.readAsStringSync();
+      if (pageBlockIndex <= 1 && networkStateIsOK) {
+        retStr = "";
+        await tempFile.delete();
+      }
+    }
+    if (retStr.isEmpty) {
+      // check network state
+      // final networkState = await BaseApiClient.connectivityState();
+      if (!networkStateIsOK) {
+        throw const SocketException('Network is unavailable!');
+      }
+
+      // send request for fetching nova list.
+      final response = await BaseApiClient.client.get(Uri.parse(urlString));
+      if (response.statusCode >= HttpStatus.badRequest) {
+        throw AppError.fromStatusCode(response.statusCode);
+      }
+      retStr = response.body;
+      tempFile.writeAsString(retStr);
+    }
+    return retStr;
   }
 
   ///

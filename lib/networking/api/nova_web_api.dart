@@ -27,20 +27,15 @@ class NovaWebApi extends BaseNovaWebApi {
   Future<Result<List<NovaListItemRes>>> fetchNovaList(
       {required NovaItemParameter parameter}) async {
     try {
-      // check network state
-      if (await ConnectUtil.isUnavailable(checksAgain: true)) {
-        throw const SocketException('Network is unavailable!');
-      }
+      // load response data from its cache if needs.
+      String bodyString = await loadResponseDataFromCache(
+          urlString: parameter.targetUrl,
+          cacheFolder: "top",
+          pageBlockIndex: 1 /* TODO: parameter.pageBlockIndex*/);
 
-      // send request for fetching nova list.
-      final response =
-          await BaseApiClient.client.get(Uri.parse(parameter.targetUrl));
-      if (response.statusCode >= HttpStatus.badRequest) {
-        return Result.failure(
-            error: AppError.fromStatusCode(response.statusCode));
-      }
       // prepares to parse nova list from response.body.
-      final document = html_parser.parse(response.body);
+      final document =
+          Document.html(bodyString); //html_parser.parse(response.body);
       List<NovaListItemRes> retArr = [];
 
       if (parameter.docType == NovaDocType.list) {
