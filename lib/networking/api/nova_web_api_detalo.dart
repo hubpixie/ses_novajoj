@@ -8,8 +8,7 @@ extension NovaWebApiDetail on NovaWebApi {
       {required NovaDetaloParameter parameter}) async {
     try {
       // check network state
-      final networkState = await BaseApiClient.connectivityState();
-      if (networkState == ConnectivityResult.none) {
+      if (await ConnectUtil.isUnavailable(checksAgain: true)) {
         throw const SocketException('Network is unavailable!');
       }
 

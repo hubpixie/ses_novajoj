@@ -1,10 +1,8 @@
 import "dart:io";
-import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import 'package:http/io_client.dart';
 import 'package:http/http.dart' as http;
-import 'package:connectivity_plus/connectivity_plus.dart';
 
 /// The service responsible for networking requests
 class BaseApiClient {
@@ -14,9 +12,6 @@ class BaseApiClient {
   };
   static dynamic _httpClient;
   static dynamic _client;
-  static Future<ConnectivityResult> connectivityState() {
-    return (Connectivity().checkConnectivity());
-  }
 
   static get commonHeaders => _commonHeaders;
   static get client {

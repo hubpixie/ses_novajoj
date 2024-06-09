@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'dart:convert';
 
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:ses_novajoj/foundation//log_util.dart';
+import 'package:ses_novajoj/foundation/connect_util.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/foundation/data/result.dart';
 import 'package:ses_novajoj/networking/api_client/base_api_client.dart';
@@ -24,8 +24,7 @@ class WeatherWebApi {
     log.info('getWeatherWithLocation $url');
     try {
       // check network state
-      final networkState = await BaseApiClient.connectivityState();
-      if (networkState == ConnectivityResult.none) {
+      if (await ConnectUtil.isUnavailable(checksAgain: true)) {
         throw const SocketException('Network is unavailable!');
       }
 
@@ -182,8 +181,7 @@ class WeatherWebApi {
 
     try {
       // check network state
-      final networkState = await BaseApiClient.connectivityState();
-      if (networkState == ConnectivityResult.none) {
+      if (await ConnectUtil.isUnavailable(checksAgain: true)) {
         throw const SocketException('Network is unavailable!');
       }
 

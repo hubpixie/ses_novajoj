@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'dart:async';
 import 'dart:io';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:html/parser.dart' as html_parser;
 import 'package:html/dom.dart';
 import 'package:ses_novajoj/foundation//log_util.dart';
+import 'package:ses_novajoj/foundation/connect_util.dart';
 import 'package:ses_novajoj/foundation/data/date_util.dart';
 import 'package:ses_novajoj/foundation/data/string_util.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
@@ -231,8 +231,7 @@ class BaseNovaWebApi {
       {required CommentItemParameter parameter}) async {
     try {
       ///check network state
-      final networkState = await BaseApiClient.connectivityState();
-      if (networkState == ConnectivityResult.none) {
+      if (await ConnectUtil.isUnavailable(checksAgain: true)) {
         throw const SocketException('Network is unavailable!');
       }
 
@@ -503,8 +502,7 @@ class BaseNovaWebApi {
     ///send request for fetching searched result.
     try {
       // check network state
-      final networkState = await BaseApiClient.connectivityState();
-      if (networkState == ConnectivityResult.none) {
+      if (await ConnectUtil.isUnavailable(checksAgain: true)) {
         throw const SocketException('Network is unavailable!');
       }
 

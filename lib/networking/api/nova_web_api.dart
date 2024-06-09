@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:html/parser.dart' as html_parser;
 import 'package:html/dom.dart';
 import 'package:ses_novajoj/foundation//log_util.dart';
+import 'package:ses_novajoj/foundation/connect_util.dart';
 import 'package:ses_novajoj/foundation/data/date_util.dart';
 import 'package:ses_novajoj/foundation/data/number_util.dart';
 import 'package:ses_novajoj/foundation/data/string_util.dart';
@@ -28,8 +28,7 @@ class NovaWebApi extends BaseNovaWebApi {
       {required NovaItemParameter parameter}) async {
     try {
       // check network state
-      final networkState = await BaseApiClient.connectivityState();
-      if (networkState == ConnectivityResult.none) {
+      if (await ConnectUtil.isUnavailable(checksAgain: true)) {
         throw const SocketException('Network is unavailable!');
       }
 
@@ -56,6 +55,7 @@ class NovaWebApi extends BaseNovaWebApi {
 
       return Result.success(data: retArr);
     } on AppError catch (error) {
+      log.severe('$error');
       return Result.failure(error: error);
     } on Exception catch (error) {
       log.severe('$error');
