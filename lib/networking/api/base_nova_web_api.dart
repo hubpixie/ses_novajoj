@@ -86,7 +86,7 @@ class BaseNovaWebApi {
         bool ret = false;
         if (element.attributes.keys.contains("src")) {
           String imgSrc = element.attributes["src"] ?? "";
-          ret = imgSrc.contains("https://www.popo8.com/") ||
+          ret = imgSrc.contains("popo8.com/") ||
               element.attributes['mydatasrc'] != null;
           if (ret) {
             return ret;
@@ -201,37 +201,56 @@ class BaseNovaWebApi {
   Future<String> loadResponseDataFromCache(
       {required String urlString,
       required String cacheFolder,
-      int pageBlockIndex = 1}) async {
+      bool cacheIsCleared = false}) async {
     String retStr = '';
+    int httpStatus = 200;
     Directory tempRootDir = await getTemporaryDirectory();
     Directory tempDir = Directory('${tempRootDir.path}/top');
     if (!(await tempDir.exists())) {
       await tempDir.create();
     }
+
     // check network state
     final networkStateIsOK = await ConnectUtil.isAvailable(checksAgain: true);
     File tempFile = File('${tempDir.path}/${urlString.hashCode}');
     if (await tempFile.exists()) {
       retStr = tempFile.readAsStringSync();
-      if (pageBlockIndex <= 1 && networkStateIsOK) {
-        retStr = "";
+      if (cacheIsCleared && networkStateIsOK) {
         await tempFile.delete();
       }
     }
+
+    if (networkStateIsOK && (retStr.isEmpty || cacheIsCleared)) {
+      // send request for fetching nova list.
+      final response = BaseApiClient.client.get(Uri.parse(urlString));
+      if (retStr.isEmpty) {
+        print("response-AAA");
+        final result = await response;
+        httpStatus = result.statusCode;
+        retStr = result.body;
+        tempFile.writeAsString(retStr);
+        print("response-BBBB");
+      } else {
+        print("response-CCCC");
+        response.then((result) {
+          httpStatus = result.statusCode;
+          retStr = result.body;
+          tempFile.writeAsString(retStr);
+          print("response-DDDD");
+        });
+      }
+    }
+
+    // response data is empty
     if (retStr.isEmpty) {
-      // check network state
-      // final networkState = await BaseApiClient.connectivityState();
+      // check network connection
       if (!networkStateIsOK) {
         throw const SocketException('Network is unavailable!');
       }
-
-      // send request for fetching nova list.
-      final response = await BaseApiClient.client.get(Uri.parse(urlString));
-      if (response.statusCode >= HttpStatus.badRequest) {
-        throw AppError.fromStatusCode(response.statusCode);
+      // check response status
+      if (httpStatus >= HttpStatus.badRequest) {
+        throw AppError.fromStatusCode(httpStatus);
       }
-      retStr = response.body;
-      tempFile.writeAsString(retStr);
     }
     return retStr;
   }

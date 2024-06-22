@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 import 'package:html/parser.dart' as html_parser;
 import 'package:html/dom.dart';
 import 'package:ses_novajoj/foundation//log_util.dart';
@@ -20,18 +21,23 @@ part 'nova_web_api_detalo.dart';
 
 class NovaWebApi extends BaseNovaWebApi {
   static const int _kThumbLimit = 5;
+  NovaItemParameter? _itemParameter;
+  Map<int, dynamic>? _responsedInfo;
 
   ///
   /// api entry: fetchNovaList
   ///
   Future<Result<List<NovaListItemRes>>> fetchNovaList(
       {required NovaItemParameter parameter}) async {
+    _itemParameter = parameter;
+    _responsedInfo ??= {};
+
     try {
       // load response data from its cache if needs.
       String bodyString = await loadResponseDataFromCache(
           urlString: parameter.targetUrl,
           cacheFolder: "top",
-          pageBlockIndex: parameter.pageBlockIndex);
+          cacheIsCleared: parameter.fetchedBlockItemIndex >= 1);
 
       // prepares to parse nova list from response.body.
       final document =
@@ -39,9 +45,7 @@ class NovaWebApi extends BaseNovaWebApi {
       List<NovaListItemRes> retArr = [];
 
       if (parameter.docType == NovaDocType.list) {
-        return _parseLiItems(
-            parameter: parameter,
-            rootElement: document.getElementById("d_list"));
+        return _parseLiItems(rootElement: document.getElementById("d_list"));
       } else if (parameter.docType == NovaDocType.table) {
         return _parseTrItems(
             parameter: parameter,
@@ -72,9 +76,12 @@ class NovaWebApi extends BaseNovaWebApi {
   ///     <!-- </div></div> -->
   /// </div>
   Future<Result<List<NovaListItemRes>>> _parseLiItems(
-      {required NovaItemParameter parameter, Element? rootElement}) async {
+      {Element? rootElement}) async {
+    NovaItemParameter parameter = _itemParameter!;
     try {
       List<NovaListItemRes> retArr = [];
+      Map<int, NovaListItemRes> keepedResponseInfo =
+          _responsedInfo?[parameter.targetUrl.hashCode] ?? {};
 
       if (rootElement?.children == null) {
         log.severe('rootElement?.children');
@@ -110,24 +117,37 @@ class NovaWebApi extends BaseNovaWebApi {
             type: AppErrorType.dataError,
             reason: FailureReason.missingListNode);
       }
+
       int index = 0;
       int totolItemCount = ulElement?.children.length ?? 0;
       int pageBlockIndex =
           parameter.pageBlockIndex < 1 ? 1 : parameter.pageBlockIndex;
       int takenStart = (pageBlockIndex - 1) * parameter.limitPerBlock;
-      int takenEnd = pageBlockIndex * parameter.limitPerBlock;
+      int takenEnd =
+          min(pageBlockIndex * parameter.limitPerBlock, totolItemCount);
       for (Element li
           in ulElement?.children.sublist(takenStart, takenEnd) ?? []) {
-        NovaListItemRes? novaListItemRes = await _createNovaLiItem(
-            parameter.targetUrl,
-            index: index,
-            li: li,
-            totolItemCount: totolItemCount);
-        if (novaListItemRes != null) {
-          retArr.add(novaListItemRes);
+        if (parameter.fetchedBlockItemIndex < 1 && index >= 10) {
+          break;
+        }
+        if (keepedResponseInfo[li.innerHtml.hashCode] != null) {
+          retArr.add(
+              keepedResponseInfo[li.innerHtml.hashCode] as NovaListItemRes);
           index++;
+        } else {
+          NovaListItemRes? novaListItemRes = await _createNovaLiItem(
+              parameter.targetUrl,
+              index: index,
+              li: li,
+              totolItemCount: totolItemCount);
+          if (novaListItemRes != null) {
+            retArr.add(novaListItemRes);
+            keepedResponseInfo[li.innerHtml.hashCode] = novaListItemRes;
+            index++;
+          }
         }
       }
+      _responsedInfo?[parameter.targetUrl.hashCode] = keepedResponseInfo;
 
       return Result.success(data: retArr);
     } on AppError catch (error) {
@@ -243,6 +263,9 @@ class NovaWebApi extends BaseNovaWebApi {
         reads: reads,
         isNew: isNew,
         isRead: isRead,
+        blockIndex: _itemParameter!.pageBlockIndex,
+        fetchedBlockItemIndex: index,
+        limitPerBlock: _itemParameter!.limitPerBlock,
         totolItemClount: totolItemCount);
     return NovaListItemRes(itemInfo: itemInfo);
   }

@@ -82,7 +82,7 @@ class NovaItemInfo {
   int? pageCount;
   int limitPerBlock;
   int? blockIndex;
-  int itemCountPerPage;
+  int? fetchedBlockItemIndex;
   int? totolItemClount;
 
   NovaItemInfo(
@@ -111,9 +111,9 @@ class NovaItemInfo {
       this.weatherInfo,
       this.pageNumber = 1,
       this.pageCount = 20,
-      this.limitPerBlock = 10,
+      this.limitPerBlock = 50,
       this.blockIndex = 0,
-      this.itemCountPerPage = 50,
+      this.fetchedBlockItemIndex = 0,
       this.totolItemClount});
 }
 
