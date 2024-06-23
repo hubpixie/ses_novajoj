@@ -16,11 +16,20 @@ class NovaListRowViewModel {
   String createAtText;
   String readsText;
   String isNewText;
+  bool showsIndicatorOnNextBlock;
 
-  NovaListRowViewModel(NovaListUseCaseRowModel model)
+  NovaListRowViewModel(
+      {required this.itemInfo,
+      this.createAtText = "",
+      this.readsText = "",
+      this.isNewText = "",
+      this.showsIndicatorOnNextBlock = false});
+
+  NovaListRowViewModel.fromUseCase(NovaListUseCaseRowModel model)
       : itemInfo = model.itemInfo,
         createAtText = DateUtil()
             .getDateString(date: model.itemInfo.createAt, format: 'M/d (E)'),
         readsText = StringUtil().thousandFormat(model.itemInfo.reads),
-        isNewText = model.itemInfo.isNew ? 'NEW' : '';
+        isNewText = model.itemInfo.isNew ? 'NEW' : '',
+        showsIndicatorOnNextBlock = false;
 }

@@ -7,6 +7,9 @@ class FetchNewsListRepoInput {
   String searchedUrl;
   String searchedKeyword;
   int pageIndex;
+  int pageBlockIndex;
+  int limitPerBlock;
+  int fetchedBlockItemIndex;
   NovaDocType docType;
 
   FetchNewsListRepoInput(
@@ -14,6 +17,9 @@ class FetchNewsListRepoInput {
       this.searchedUrl = '',
       this.searchedKeyword = '',
       this.pageIndex = 1,
+      this.pageBlockIndex = 1,
+      this.limitPerBlock = 10,
+      this.fetchedBlockItemIndex = 0,
       required this.docType});
 }
 

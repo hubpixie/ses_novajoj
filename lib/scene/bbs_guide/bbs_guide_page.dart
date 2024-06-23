@@ -39,7 +39,11 @@ class _BbsGuidePageState extends State<BbsGuidePage>
   @override
   void initState() {
     super.initState();
-    _loadData(isReloaded: false);
+
+    int delay = widget.pageState.subPageIndex == 0 ? 5 : 0;
+    Future.delayed(Duration(seconds: delay), () {
+      _loadData(isReloaded: false);
+    });
   }
 
   @override

@@ -16,11 +16,13 @@ class LocalNovaListRowViewModel {
   String createAtText;
   String readsText;
   String isNewText;
+  bool showsIndicatorOnNextBlock;
 
   LocalNovaListRowViewModel(LocalNovaListUseCaseRowModel model)
       : itemInfo = model.itemInfo,
         createAtText = DateUtil()
             .getDateString(date: model.itemInfo.createAt, format: 'M/d (E)'),
         readsText = StringUtil().thousandFormat(model.itemInfo.reads),
-        isNewText = model.itemInfo.isNew ? 'NEW' : '';
+        isNewText = model.itemInfo.isNew ? 'NEW' : '',
+        showsIndicatorOnNextBlock = false;
 }

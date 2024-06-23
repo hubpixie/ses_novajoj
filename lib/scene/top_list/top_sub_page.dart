@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/domain/foundation/bloc/bloc_provider.dart';
 import 'package:ses_novajoj/scene/foundation/use_l10n.dart';
@@ -41,25 +42,67 @@ class TopSubPage extends StatefulWidget {
 class _TopSubPageState extends State<TopSubPage>
     with AutomaticKeepAliveClientMixin<TopSubPage> {
   final ScrollController _scrollController = ScrollController();
-  int _currentPageIndex = 1;
+  final int _limitPerBlock = 25;
   String _prevSearchedKeyword = '';
+  late BuildContext _keyContext;
+  late Map<int, List<int>> _usedPageBlock;
+  int _totalItemCount = 1;
+  int _maxBlockCount = 0;
+  int _currentBlockIndex = 0;
+  int _currentPageIndex = 1;
 
   @override
   bool get wantKeepAlive => true;
 
   @override
   void initState() {
+    _usedPageBlock = {};
+    _usedPageBlock[_currentPageIndex] ??= [0];
+
     widget.reloadedController.stream.listen((event) {
       if (event.isReload) {
-        _loadData(searchedKeyword: event.searchedKey);
+        _usedPageBlock[_currentPageIndex] = [0];
+        _loadData(isReloaded: true, searchedKeyword: event.searchedKey);
       }
     });
+
+    // calculate item height of Listview
+    double calcItemHeight() {
+      double itemHeight = 0;
+      RenderObject? render = _keyContext.findRenderObject();
+      if (render is RenderSliverList?) {
+        itemHeight = render?.firstChild?.size.height ?? 0;
+      } else if (render is RenderBox?) {
+        itemHeight = (render as RenderBox?)?.size.height ?? 0;
+      }
+      return itemHeight;
+    }
+
+    // listen _scrollController
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels + 100 >=
+          _scrollController.position.maxScrollExtent) {
+        double itemHeight = calcItemHeight();
+        int itemIndex =
+            (_scrollController.position.pixels / itemHeight).floor();
+        _currentBlockIndex = (itemIndex / _limitPerBlock).floor() + 1;
+        int blockCount = (_totalItemCount / _limitPerBlock).floor() + 1;
+        if (!(_usedPageBlock[_currentPageIndex] ?? [])
+                .contains(_currentBlockIndex) &&
+            _currentBlockIndex < blockCount) {
+          _loadData();
+          _usedPageBlock[_currentPageIndex]?.add(_currentBlockIndex);
+        }
+      }
+    });
+
     _loadData();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    _keyContext = context;
     super.build(context);
     return BlocProvider<TopListPresenter>(
       bloc: widget.presenter,
@@ -76,20 +119,28 @@ class _TopSubPageState extends State<TopSubPage>
               int itemCnt = data.viewModelList?.length ?? 0;
               if (data.error == null && itemCnt > 0) {
                 final lastViewModel = data.viewModelList![itemCnt - 1];
+                _totalItemCount =
+                    data.viewModelList!.first.itemInfo.totolItemClount ?? 1;
+                _maxBlockCount = (_totalItemCount / _limitPerBlock).floor() + 1;
                 return ListView.builder(
                     controller: _scrollController,
-                    itemCount: lastViewModel.itemInfo.pageCount! > 1
+                    itemCount: lastViewModel.itemInfo.pageCount! > 1 &&
+                            _currentBlockIndex + 1 >= _maxBlockCount
                         ? itemCnt + 1
                         : itemCnt,
                     itemBuilder: (context, index) {
+                      _keyContext = context;
                       if (lastViewModel.itemInfo.pageCount! > 1 &&
                           index == itemCnt) {
                         return NovaListCell(
                           viewModel: lastViewModel,
                           index: index,
                           onPageChanged: (pageIndex) {
+                            _usedPageBlock[pageIndex] ??= [0];
                             _currentPageIndex = pageIndex;
-                            _loadData(searchedKeyword: _prevSearchedKeyword);
+                            _loadData(
+                                isReloaded: true,
+                                searchedKeyword: _prevSearchedKeyword);
                           },
                           pageEnd: true,
                           onScrollToTop: () {
@@ -101,6 +152,8 @@ class _TopSubPageState extends State<TopSubPage>
                           },
                         );
                       }
+                      // _currentBlockIndex =
+                      //     data.viewModelList![index].itemInfo.blockIndex ?? 1;
                       return NovaListCell(
                         viewModel: data.viewModelList![index],
                         onCellSelecting: (selIndex) {
@@ -108,6 +161,7 @@ class _TopSubPageState extends State<TopSubPage>
                               appBarTitle: widget.appBarTitle,
                               itemInfo: data.viewModelList![selIndex].itemInfo,
                               completeHandler: () {
+                            _usedPageBlock[_currentPageIndex] = [0];
                             _loadData(
                                 isReloaded: true,
                                 searchedKeyword: _prevSearchedKeyword);
@@ -131,15 +185,22 @@ class _TopSubPageState extends State<TopSubPage>
                       );
                     });
               } else {
-                return ErrorView(
-                  message: UseL10n.localizedTextWithError(context,
-                      error: data.error),
-                  onFirstButtonTap: data.error?.type == AppErrorType.network
-                      ? () {
-                          _loadData();
-                        }
-                      : null,
-                );
+                if (widget.presenter.isProcessing) {
+                  return Center(
+                      child: CircularProgressIndicator(
+                          color: Colors.amber,
+                          backgroundColor: Colors.grey[850]));
+                } else {
+                  return ErrorView(
+                    message: UseL10n.localizedTextWithError(context,
+                        error: data.error),
+                    onFirstButtonTap: data.error?.type == AppErrorType.network
+                        ? () {
+                            _loadData();
+                          }
+                        : null,
+                  );
+                }
               }
             } else {
               assert(false, "unknown event $data");
@@ -157,17 +218,24 @@ class _TopSubPageState extends State<TopSubPage>
       _prevSearchedKeyword = searchedKeyword;
       _currentPageIndex = 1;
     }
+    _currentBlockIndex = isReloaded ? 0 : _currentBlockIndex;
     // fetch data
     widget.presenter.eventViewReady(
         targetUrlIndex: widget.tabIndex,
         searchedKeyword: searchedKeyword,
         searchResultIsCleared: searchResultIsCleared,
         pageIndex: _currentPageIndex,
+        blockIndex: _currentBlockIndex + 1,
+        limitPerBlock: _limitPerBlock,
         prefixTitle: widget.prefixTitle,
         isReloaded: isReloaded);
 
-    Future.delayed(Duration.zero, () {
-      setState(() {});
+    Future.delayed(const Duration(seconds: 5), () {
+      setState(() {
+        if (isReloaded) {
+          _scrollController.jumpTo(0);
+        }
+      });
     });
   }
 }
