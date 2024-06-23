@@ -24,8 +24,6 @@ class _TabsPageState extends State<TabsPage> with WidgetsBindingObserver {
       MethodChannel('com.pixie.sesNovajoj/app_helper');
 
   int _selectedIndex = 0;
-  final DateTime _startedTime = DateTime.now();
-  final List<bool> _firstTapDeleyInfo = [];
   late final List<String> _tabTitles = [
     L10n.of(context)?.tabBarNameHome ?? '',
     L10n.of(context)?.tabBarNameBBS ?? '',
@@ -54,19 +52,8 @@ class _TabsPageState extends State<TabsPage> with WidgetsBindingObserver {
   }
 
   void _onItemTapped(int index) {
-    int delaySec = 0;
-    DateTime now = DateTime.now();
-    int elapsed =
-        now.millisecondsSinceEpoch - _startedTime.millisecondsSinceEpoch;
-    if (elapsed < 6000) {
-      delaySec = _firstTapDeleyInfo[index] ? 6000 : 2500;
-      delaySec = delaySec < 0 ? 2500 : delaySec;
-      _firstTapDeleyInfo[index] = false;
-    }
-    Future.delayed(Duration(milliseconds: delaySec), () {
-      setState(() {
-        _selectedIndex = index;
-      });
+    setState(() {
+      _selectedIndex = index;
     });
   }
 

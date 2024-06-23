@@ -80,6 +80,10 @@ class NovaItemInfo {
   WeatherInfo? weatherInfo;
   int? pageNumber;
   int? pageCount;
+  int limitPerBlock;
+  int? blockIndex;
+  int? fetchedBlockItemIndex;
+  int? totolItemClount;
 
   NovaItemInfo(
       {required this.id,
@@ -106,7 +110,11 @@ class NovaItemInfo {
       this.children,
       this.weatherInfo,
       this.pageNumber = 1,
-      this.pageCount = 20});
+      this.pageCount = 20,
+      this.limitPerBlock = 50,
+      this.blockIndex = 0,
+      this.fetchedBlockItemIndex = 0,
+      this.totolItemClount});
 }
 
 class NovaImageInfo {

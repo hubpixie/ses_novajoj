@@ -1,9 +1,10 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:connectivity_plus/connectivity_plus.dart';
+import 'dart:math';
 import 'package:html/parser.dart' as html_parser;
 import 'package:html/dom.dart';
 import 'package:ses_novajoj/foundation//log_util.dart';
+import 'package:ses_novajoj/foundation/connect_util.dart';
 import 'package:ses_novajoj/foundation/data/date_util.dart';
 import 'package:ses_novajoj/foundation/data/number_util.dart';
 import 'package:ses_novajoj/foundation/data/string_util.dart';
@@ -20,34 +21,31 @@ part 'nova_web_api_detalo.dart';
 
 class NovaWebApi extends BaseNovaWebApi {
   static const int _kThumbLimit = 5;
+  NovaItemParameter? _itemParameter;
+  Map<int, dynamic>? _responsedInfo;
 
   ///
   /// api entry: fetchNovaList
   ///
   Future<Result<List<NovaListItemRes>>> fetchNovaList(
       {required NovaItemParameter parameter}) async {
-    try {
-      // check network state
-      final networkState = await BaseApiClient.connectivityState();
-      if (networkState == ConnectivityResult.none) {
-        throw const SocketException('Network is unavailable!');
-      }
+    _itemParameter = parameter;
+    _responsedInfo ??= {};
 
-      // send request for fetching nova list.
-      final response =
-          await BaseApiClient.client.get(Uri.parse(parameter.targetUrl));
-      if (response.statusCode >= HttpStatus.badRequest) {
-        return Result.failure(
-            error: AppError.fromStatusCode(response.statusCode));
-      }
+    try {
+      // load response data from its cache if needs.
+      String bodyString = await loadResponseDataFromCache(
+          urlString: parameter.targetUrl,
+          cacheFolder: "top",
+          cacheIsCleared: parameter.fetchedBlockItemIndex >= 1);
+
       // prepares to parse nova list from response.body.
-      final document = html_parser.parse(response.body);
+      final document =
+          Document.html(bodyString); //html_parser.parse(response.body);
       List<NovaListItemRes> retArr = [];
 
       if (parameter.docType == NovaDocType.list) {
-        return _parseLiItems(
-            parameter: parameter,
-            rootElement: document.getElementById("d_list"));
+        return _parseLiItems(rootElement: document.getElementById("d_list"));
       } else if (parameter.docType == NovaDocType.table) {
         return _parseTrItems(
             parameter: parameter,
@@ -56,6 +54,7 @@ class NovaWebApi extends BaseNovaWebApi {
 
       return Result.success(data: retArr);
     } on AppError catch (error) {
+      log.severe('$error');
       return Result.failure(error: error);
     } on Exception catch (error) {
       log.severe('$error');
@@ -77,9 +76,12 @@ class NovaWebApi extends BaseNovaWebApi {
   ///     <!-- </div></div> -->
   /// </div>
   Future<Result<List<NovaListItemRes>>> _parseLiItems(
-      {required NovaItemParameter parameter, Element? rootElement}) async {
+      {Element? rootElement}) async {
+    NovaItemParameter parameter = _itemParameter!;
     try {
       List<NovaListItemRes> retArr = [];
+      Map<int, NovaListItemRes> keepedResponseInfo =
+          _responsedInfo?[parameter.targetUrl.hashCode] ?? {};
 
       if (rootElement?.children == null) {
         log.severe('rootElement?.children');
@@ -115,15 +117,37 @@ class NovaWebApi extends BaseNovaWebApi {
             type: AppErrorType.dataError,
             reason: FailureReason.missingListNode);
       }
+
       int index = 0;
-      for (Element li in ulElement?.children ?? []) {
-        NovaListItemRes? novaListItemRes =
-            await _createNovaLiItem(parameter.targetUrl, index: index, li: li);
-        if (novaListItemRes != null) {
-          retArr.add(novaListItemRes);
+      int totolItemCount = ulElement?.children.length ?? 0;
+      int pageBlockIndex =
+          parameter.pageBlockIndex < 1 ? 1 : parameter.pageBlockIndex;
+      int takenStart = (pageBlockIndex - 1) * parameter.limitPerBlock;
+      int takenEnd =
+          min(pageBlockIndex * parameter.limitPerBlock, totolItemCount);
+      for (Element li
+          in ulElement?.children.sublist(takenStart, takenEnd) ?? []) {
+        if (parameter.fetchedBlockItemIndex < 1 && index >= 10) {
+          break;
+        }
+        if (keepedResponseInfo[li.innerHtml.hashCode] != null) {
+          retArr.add(
+              keepedResponseInfo[li.innerHtml.hashCode] as NovaListItemRes);
           index++;
+        } else {
+          NovaListItemRes? novaListItemRes = await _createNovaLiItem(
+              parameter.targetUrl,
+              index: index,
+              li: li,
+              totolItemCount: totolItemCount);
+          if (novaListItemRes != null) {
+            retArr.add(novaListItemRes);
+            keepedResponseInfo[li.innerHtml.hashCode] = novaListItemRes;
+            index++;
+          }
         }
       }
+      _responsedInfo?[parameter.targetUrl.hashCode] = keepedResponseInfo;
 
       return Result.success(data: retArr);
     } on AppError catch (error) {
@@ -134,7 +158,9 @@ class NovaWebApi extends BaseNovaWebApi {
   }
 
   Future<NovaListItemRes?> _createNovaLiItem(String url,
-      {required int index, required Element li}) async {
+      {required int index,
+      required Element li,
+      required int totolItemCount}) async {
     NovaListItemRes? retNovaItem;
     int id = index;
     String thunnailUrlString = "";
@@ -151,6 +177,7 @@ class NovaWebApi extends BaseNovaWebApi {
     List<Element> liSubElements = li.children;
     int liCount = liSubElements.length;
     String parentUrl = _parentUrl(url: url);
+    bool networkIsOK = await ConnectUtil.isAvailable();
 
     // title, urlString
     dynamic detailResponsedBody;
@@ -161,9 +188,12 @@ class NovaWebApi extends BaseNovaWebApi {
         return retNovaItem;
       }
       // thumbUrlString
-      detailResponsedBody ??=
-          await BaseApiClient.client.get(Uri.parse(urlString));
-      if (urlString.isNotEmpty && index < _kThumbLimit) {
+      detailResponsedBody ??= networkIsOK
+          ? await BaseApiClient.client.get(Uri.parse(urlString))
+          : "";
+      if (urlString.isNotEmpty &&
+          index < _kThumbLimit &&
+          detailResponsedBody != "") {
         Result<String> thumbUrlResult = await fetchNovaItemThumbUrl(
             parameter: NovaItemParameter(
                 targetUrl: urlString, docType: NovaDocType.thumb),
@@ -181,12 +211,15 @@ class NovaWebApi extends BaseNovaWebApi {
       createAt = DateUtil().fromString(liSubElements[1].innerHtml);
     }
     if (createAt == null) {
-      detailResponsedBody ??=
-          await BaseApiClient.client.get(Uri.parse(urlString));
-      Result<String> createdAtStrRes = await fetchNovaItemCreatedAt(
-          parameter: NovaItemParameter(
-              targetUrl: urlString, docType: NovaDocType.thumb),
-          httpBody: detailResponsedBody);
+      detailResponsedBody ??= networkIsOK
+          ? await BaseApiClient.client.get(Uri.parse(urlString))
+          : "";
+      Result<String> createdAtStrRes = detailResponsedBody != ""
+          ? await fetchNovaItemCreatedAt(
+              parameter: NovaItemParameter(
+                  targetUrl: urlString, docType: NovaDocType.thumb),
+              httpBody: detailResponsedBody)
+          : const Result.success(data: "");
       createdAtStrRes.when(
           success: (value) {
             createAt =
@@ -229,7 +262,11 @@ class NovaWebApi extends BaseNovaWebApi {
         commentCount: commentCount,
         reads: reads,
         isNew: isNew,
-        isRead: isRead);
+        isRead: isRead,
+        blockIndex: _itemParameter!.pageBlockIndex,
+        fetchedBlockItemIndex: index,
+        limitPerBlock: _itemParameter!.limitPerBlock,
+        totolItemClount: totolItemCount);
     return NovaListItemRes(itemInfo: itemInfo);
   }
 

@@ -8,8 +8,7 @@ extension BbsNovaWebApiDetail on BbsNovaWebApi {
       {required NovaDetaloParameter parameter}) async {
     try {
       // check network state
-      final networkState = await BaseApiClient.connectivityState();
-      if (networkState == ConnectivityResult.none) {
+      if (await ConnectUtil.isUnavailable(checksAgain: true)) {
         throw const SocketException('Network is unavailable!');
       }
 
@@ -136,7 +135,7 @@ extension BbsNovaWebApiDetail on BbsNovaWebApi {
         // XXXX-XX-XX XX:XX *** XXXX
         String dateStr = '';
         final dateLoc = infoStr.indexOf(
-            RegExp(r' [0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}.*[0-9]+ '),
+            RegExp(r' [0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{1,}:[0-9]{1,}.*[0-9]+ '),
             0);
         if (dateLoc >= 0) {
           dateStr = infoStr.substring(dateLoc + 1, dateLoc + 17);

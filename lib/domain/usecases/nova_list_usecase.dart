@@ -36,27 +36,42 @@ class NewsListUseCase with SimpleBloc<NovaListUseCaseOutput> {
       {required int targetUrlIndex,
       String? searchedKeyword,
       int? targetPageIndex,
+      int? pageBlockIndex,
+      int? limitPerBlock,
       String? prefixTitle}) async {
-    _inputUrlData[targetUrlIndex].pageIndex = targetPageIndex ?? 0;
-    _inputUrlData[targetUrlIndex].searchedKeyword = searchedKeyword ?? '';
-    final result =
-        await repository.fetchNewsList(input: _inputUrlData[targetUrlIndex]);
+    int fetchedBlockItemIndex = 0;
+    int blockIndex = pageBlockIndex ?? 1;
+    for (int seq = 0; seq < (blockIndex <= 1 ? 2 : 1); seq++) {
+      _inputUrlData[targetUrlIndex].pageIndex = targetPageIndex ?? 0;
+      _inputUrlData[targetUrlIndex].pageBlockIndex = pageBlockIndex ?? 0;
+      _inputUrlData[targetUrlIndex].limitPerBlock = limitPerBlock ?? 10;
+      _inputUrlData[targetUrlIndex].fetchedBlockItemIndex = limitPerBlock ?? 10;
+      _inputUrlData[targetUrlIndex].searchedKeyword = searchedKeyword ?? '';
+      final result =
+          await repository.fetchNewsList(input: _inputUrlData[targetUrlIndex]);
 
-    result.when(success: (value) {
-      List<NovaListItem> list = value;
-      String prefixTitle_ = prefixTitle ?? '';
-      for (var index = 0; index < list.length; index++) {
-        if (index < 4) {
-          list[index].itemInfo.title =
-              prefixTitle_ + list[index].itemInfo.title;
+      result.when(success: (value) {
+        List<NovaListItem> list = value;
+        String prefixTitle_ = prefixTitle ?? '';
+        for (var index = 0; index < list.length; index++) {
+          if (index < 4) {
+            list[index].itemInfo.title =
+                prefixTitle_ + list[index].itemInfo.title;
+          }
+          fetchedBlockItemIndex =
+              list[index].itemInfo.fetchedBlockItemIndex ?? 0;
         }
+        streamAdd(PresentModel(
+            model: list
+                .map((entity) => NovaListUseCaseRowModel(entity))
+                .toList()));
+      }, failure: (error) {
+        streamAdd(PresentModel(error: error));
+      });
+      if (fetchedBlockItemIndex < 1) {
+        break;
       }
-      streamAdd(PresentModel(
-          model:
-              list.map((entity) => NovaListUseCaseRowModel(entity)).toList()));
-    }, failure: (error) {
-      streamAdd(PresentModel(error: error));
-    });
+    }
   }
 
   Future<String> fetchThumbUrl({required String itemUrl}) async {

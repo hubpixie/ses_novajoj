@@ -1,11 +1,12 @@
 import 'dart:convert';
 import 'dart:async';
 import 'dart:io';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:html/parser.dart' as html_parser;
 import 'package:html/dom.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:ses_novajoj/foundation//log_util.dart';
+import 'package:ses_novajoj/foundation/connect_util.dart';
 import 'package:ses_novajoj/foundation/data/date_util.dart';
 import 'package:ses_novajoj/foundation/data/string_util.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
@@ -85,7 +86,7 @@ class BaseNovaWebApi {
         bool ret = false;
         if (element.attributes.keys.contains("src")) {
           String imgSrc = element.attributes["src"] ?? "";
-          ret = imgSrc.contains("https://www.popo8.com/") ||
+          ret = imgSrc.contains("popo8.com/") ||
               element.attributes['mydatasrc'] != null;
           if (ret) {
             return ret;
@@ -176,7 +177,7 @@ class BaseNovaWebApi {
       final titleElement = document
           .getElementById("newscontent_2")
           ?.children
-          ?.firstWhere((element) => element.localName == 'p',
+          .firstWhere((element) => element.localName == 'p',
               orElse: () => Element.tag('p'));
       if (titleElement != null) {
         retStr = titleElement.text;
@@ -188,6 +189,70 @@ class BaseNovaWebApi {
     } on Exception catch (error) {
       return Result.failure(error: AppError.fromException(error));
     }
+  }
+
+  ///
+  ////api name: loadResponseDataFromCache
+  ///
+  /// Load the response data corresponding to the parameter
+  /// 'urlString' from the cache, and if it's not available,
+  ///  return an empty string.
+  ///
+  Future<String> loadResponseDataFromCache(
+      {required String urlString,
+      required String cacheFolder,
+      bool cacheIsCleared = false}) async {
+    String retStr = '';
+    int httpStatus = 200;
+    Directory tempRootDir = await getTemporaryDirectory();
+    Directory tempDir = Directory('${tempRootDir.path}/top');
+    if (!(await tempDir.exists())) {
+      await tempDir.create();
+    }
+
+    // check network state
+    final networkStateIsOK = await ConnectUtil.isAvailable(checksAgain: true);
+    File tempFile = File('${tempDir.path}/${urlString.hashCode}');
+    if (await tempFile.exists()) {
+      retStr = tempFile.readAsStringSync();
+      if (cacheIsCleared && networkStateIsOK) {
+        await tempFile.delete();
+      }
+    }
+
+    if (networkStateIsOK && (retStr.isEmpty || cacheIsCleared)) {
+      // send request for fetching nova list.
+      final response = BaseApiClient.client.get(Uri.parse(urlString));
+      if (retStr.isEmpty) {
+        print("response-AAA");
+        final result = await response;
+        httpStatus = result.statusCode;
+        retStr = result.body;
+        tempFile.writeAsString(retStr);
+        print("response-BBBB");
+      } else {
+        print("response-CCCC");
+        response.then((result) {
+          httpStatus = result.statusCode;
+          retStr = result.body;
+          tempFile.writeAsString(retStr);
+          print("response-DDDD");
+        });
+      }
+    }
+
+    // response data is empty
+    if (retStr.isEmpty) {
+      // check network connection
+      if (!networkStateIsOK) {
+        throw const SocketException('Network is unavailable!');
+      }
+      // check response status
+      if (httpStatus >= HttpStatus.badRequest) {
+        throw AppError.fromStatusCode(httpStatus);
+      }
+    }
+    return retStr;
   }
 
   ///
@@ -231,8 +296,7 @@ class BaseNovaWebApi {
       {required CommentItemParameter parameter}) async {
     try {
       ///check network state
-      final networkState = await BaseApiClient.connectivityState();
-      if (networkState == ConnectivityResult.none) {
+      if (await ConnectUtil.isUnavailable(checksAgain: true)) {
         throw const SocketException('Network is unavailable!');
       }
 
@@ -503,8 +567,7 @@ class BaseNovaWebApi {
     ///send request for fetching searched result.
     try {
       // check network state
-      final networkState = await BaseApiClient.connectivityState();
-      if (networkState == ConnectivityResult.none) {
+      if (await ConnectUtil.isUnavailable(checksAgain: true)) {
         throw const SocketException('Network is unavailable!');
       }
 

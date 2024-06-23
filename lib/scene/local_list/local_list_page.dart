@@ -34,7 +34,9 @@ class _LocalListPageState extends State<LocalListPage> {
       _selectedMenuItemText = UseL10n.of(context)?.localListMenuAll;
     });
     FirebaseUtil().sendViewEvent(route: AnalyticsRoute.localList);
-    _loadData();
+    Future.delayed(const Duration(seconds: 6), () {
+      _loadData();
+    });
   }
 
   @override

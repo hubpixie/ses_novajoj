@@ -69,8 +69,6 @@ class _ThreadSubPageState extends State<ThreadSubPage>
         return;
       }
       _searchedTime = DateTime.now();
-      print(
-          '[${DateTime.now().toIso8601String()}]thread_sub_page: widget.reloadedController.stream.listen: ${event.tabIndex},searchResultIsCleared = ${event.searchResultIsCleared},searchedKey=${event.searchedKey}, isReload=${event.isReload}{${DateTime.now().difference(_searchedTime!).inMilliseconds}}');
       if (event.searchedKey.isNotEmpty) {
         _gCurrSearchedKeyword = event.searchedKey;
       }
@@ -83,7 +81,9 @@ class _ThreadSubPageState extends State<ThreadSubPage>
           searchResultIsCleared: event.searchResultIsCleared);
     });
 
-    _loadData(searchedKeyword: _gCurrSearchedKeyword);
+    Future.delayed(const Duration(seconds: 8), () {
+      _loadData(searchedKeyword: _gCurrSearchedKeyword);
+    });
   }
 
   @override

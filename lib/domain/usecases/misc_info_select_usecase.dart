@@ -15,7 +15,7 @@ abstract class MiscInfoSelectUseCase
 class MiscInfoSelectUseCaseImpl extends MiscInfoSelectUseCase {
   final MiscInfoSelectRepositoryImpl repository;
   MiscInfoSelectUseCaseImpl() : repository = MiscInfoSelectRepositoryImpl();
-  static List<MiscInfoSelectItem> _g_select_item_list = [];
+  static final List<MiscInfoSelectItem> _gSelectItemList = [];
 
   @override
   void fetchMiscInfoSelectData(
@@ -23,9 +23,9 @@ class MiscInfoSelectUseCaseImpl extends MiscInfoSelectUseCase {
     final result = await repository.fetchMiscInfoSelectData(
         input: FetchMiscInfoSelectRepoInput());
 
-    if (_g_select_item_list.isEmpty) {
+    if (_gSelectItemList.isEmpty) {
       result.when(success: (value) {
-        _g_select_item_list.addAll(value);
+        _gSelectItemList.addAll(value);
         streamAdd(PresentModel(
             models: value
                 .map((entity) => MiscInfoSelectUseCaseRowModel(entity))
@@ -35,7 +35,7 @@ class MiscInfoSelectUseCaseImpl extends MiscInfoSelectUseCase {
       });
     } else {
       streamAdd(PresentModel(
-          models: _g_select_item_list
+          models: _gSelectItemList
               .map((entity) => MiscInfoSelectUseCaseRowModel(entity))
               .toList()));
     }

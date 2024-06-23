@@ -24,7 +24,9 @@ class _MiscInfoListPageState extends State<MiscInfoListPage> {
   @override
   void initState() {
     super.initState();
-    widget.presenter.eventViewReady(input: MiscInfoListPresenterInput());
+    Future.delayed(const Duration(seconds: 6), () {
+      widget.presenter.eventViewReady(input: MiscInfoListPresenterInput());
+    });
   }
 
   @override

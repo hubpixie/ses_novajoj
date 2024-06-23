@@ -91,8 +91,8 @@ class UserData {
   ///
   Future<String> _getUuidFileName({required String key}) async {
     String fileName = await _preferences.getString(key);
-    if (fileName.isEmpty) {
-      fileName = _uuid.v4();
+    if (fileName.isEmpty || fileName.length > 30) {
+      fileName = "${_uuid.v4().hashCode}";
       _preferences.setString(key, fileName);
     }
     return fileName;
@@ -281,7 +281,9 @@ class UserData {
     // save file
     _getDataPath(
             key: _UserDataKey.miscHistory.name,
-            subKey: innerUrl == null ? '' : '${url.hashCode}')
+            subKey: innerUrl == null || innerUrl.isEmpty
+                ? '${url.hashCode}'
+                : '${innerUrl.hashCode}')
         .then((path) {
       // encode
       Codec<String, String> codec = utf8.fuse(base64);
@@ -343,7 +345,7 @@ class UserData {
     log.info('UserData: [url = $url]');
     String path = await _getDataPath(
         key: _UserDataKey.miscHistory.name,
-        subKey: innerUrl.isEmpty ? '' : '${url.hashCode}');
+        subKey: innerUrl.isEmpty ? '${url.hashCode}' : '${innerUrl.hashCode}');
     String filename = innerUrl.isEmpty
         ? '$path/${url.hashCode}'
         : '$path/${innerUrl.hashCode}';
@@ -366,7 +368,7 @@ class UserData {
     log.info('UserData: [url = $url]');
     String path = await _getDataPath(
         key: _UserDataKey.miscFavorites.name,
-        subKey: innerUrl.isEmpty ? '' : '${url.hashCode}');
+        subKey: innerUrl.isEmpty ? '${url.hashCode}' : '${innerUrl.hashCode}');
     String filename = innerUrl.isEmpty
         ? '$path/${url.hashCode}'
         : '$path/${innerUrl.hashCode}';
@@ -451,7 +453,8 @@ class UserData {
     if ((htmlText ?? '').isNotEmpty) {
       _getDataPath(
               key: _UserDataKey.miscFavorites.name,
-              subKey: innerUrl == null ? '' : '${url.hashCode}')
+              subKey:
+                  innerUrl == null ? '${url.hashCode}' : '${innerUrl.hashCode}')
           .then((path) {
         // encode
         Codec<String, String> codec = utf8.fuse(base64);

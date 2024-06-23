@@ -78,8 +78,12 @@ class NovaListRepositoryImpl extends NovaListRepository {
       _estimatedPageCnt = 50; // default value
       // fetch next page data
       Result<List<NovaListItemRes>> result = await _api.fetchNovaList(
-          parameter:
-              NovaItemParameter(targetUrl: targetUrl, docType: input.docType));
+          parameter: NovaItemParameter(
+              targetUrl: targetUrl,
+              docType: input.docType,
+              pageBlockIndex: input.pageBlockIndex,
+              limitPerBlock: input.limitPerBlock,
+              fetchedBlockItemIndex: input.fetchedBlockItemIndex));
       result.when(success: (response) {
         ret = setReturnVal(response, false);
       }, failure: (error) {
