@@ -6,6 +6,8 @@ import 'package:ses_novajoj/domain/usecases/nova_list_usecase_output.dart';
 import 'top_list_router.dart';
 import 'top_list_presenter_output.dart';
 
+typedef LoadingCompleteHandler = void Function();
+
 abstract class TopListPresenter with SimpleBloc<TopListPresenterOutput> {
   bool get isProcessing;
 
@@ -17,7 +19,8 @@ abstract class TopListPresenter with SimpleBloc<TopListPresenterOutput> {
       int? blockIndex,
       int? pageIndex,
       int? limitPerBlock,
-      bool isReloaded = false});
+      bool isReloaded = false,
+      LoadingCompleteHandler? completeHandler});
   void eventSelectDetail(Object context,
       {required String appBarTitle, Object? itemInfo, Object? completeHandler});
   Future<String> eventFetchThumbnail({required String targetUrl});
@@ -29,6 +32,7 @@ class TopListPresenterImpl extends TopListPresenter {
   late StreamSubscription<NovaListUseCaseOutput> _streamSubscription;
   List<NovaListRowViewModel>? _viewModelList;
   bool _isProcessing = false;
+  LoadingCompleteHandler? _loadingCompleteHandler;
 
   TopListPresenterImpl({required this.router}) : useCase = NewsListUseCase() {
     _streamSubscription = _addStreamListener();
@@ -46,7 +50,8 @@ class TopListPresenterImpl extends TopListPresenter {
       int? blockIndex,
       int? pageIndex,
       int? limitPerBlock,
-      bool isReloaded = false}) async {
+      bool isReloaded = false,
+      LoadingCompleteHandler? completeHandler}) async {
     if (searchResultIsCleared) {
       streamAdd(ShowListPageModel(
         viewModelList: _viewModelList,
@@ -54,6 +59,8 @@ class TopListPresenterImpl extends TopListPresenter {
       return;
     }
     _isProcessing = true;
+    _loadingCompleteHandler = completeHandler;
+
     if (isReloaded) {
       await _streamSubscription.cancel();
       _streamSubscription = _addStreamListener();
@@ -122,6 +129,7 @@ class TopListPresenterImpl extends TopListPresenter {
         streamAdd(ShowListPageModel(
             viewModelList: _viewModelList, error: event.error));
         _isProcessing = false;
+        _loadingCompleteHandler?.call();
       }
     });
   }

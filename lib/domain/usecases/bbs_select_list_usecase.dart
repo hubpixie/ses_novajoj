@@ -10,10 +10,15 @@ class BbsSelectListUseCaseInput {
   String targetUrl;
   String searchedKeyword;
   int targetPageIndex;
+  int? pageBlockIndex;
+  int? limitPerBlock;
+
   BbsSelectListUseCaseInput(
       {required this.targetUrl,
       this.searchedKeyword = '',
-      this.targetPageIndex = 1});
+      this.targetPageIndex = 1,
+      this.pageBlockIndex,
+      this.limitPerBlock});
 }
 
 abstract class BbsSelectListUseCase
@@ -27,21 +32,31 @@ class BbsSelectListUseCaseImpl extends BbsSelectListUseCase {
 
   @override
   void fetchBbsSelectList({required BbsSelectListUseCaseInput input}) async {
-    final result = await repository.fetchBbsNovaSelectList(
-        input: FetchBbsNovaSelectListRepoInput(
-            targetUrl: input.targetUrl,
-            searchedKeyword: input.searchedKeyword,
-            pageIndex: input.targetPageIndex,
-            docType: NovaDocType.bbsSelect));
+    int fetchedBlockItemIndex = 0;
+    for (int seq = 0;
+        seq < 1; /* ((input.pageBlockIndex ?? 10) <= 1 ? 2 : 1);*/
+        seq++) {
+      final result = await repository.fetchBbsNovaSelectList(
+          input: FetchBbsNovaSelectListRepoInput(
+              targetUrl: input.targetUrl,
+              searchedKeyword: input.searchedKeyword,
+              pageIndex: input.targetPageIndex,
+              pageBlockIndex: input.pageBlockIndex ?? 1,
+              limitPerBlock: input.limitPerBlock ?? 10,
+              fetchedBlockItemIndex: input.limitPerBlock ?? 10,
+              docType: NovaDocType.bbsSelect));
 
-    result.when(success: (value) {
-      List<BbsNovaSelectListItem> list = value;
-      streamAdd(PresentModel(
-          model: list
-              .map((entity) => BbsSelectListUseCaseRowModel(entity))
-              .toList()));
-    }, failure: (error) {
-      streamAdd(PresentModel(error: error));
-    });
+      result.when(success: (value) {
+        List<BbsNovaSelectListItem> list = value;
+        fetchedBlockItemIndex = list.last.itemInfo.fetchedBlockItemIndex ?? 0;
+        print("[2]:totolItemCount=${list.last.itemInfo.totolItemClount}");
+        streamAdd(PresentModel(
+            model: list
+                .map((entity) => BbsSelectListUseCaseRowModel(entity))
+                .toList()));
+      }, failure: (error) {
+        streamAdd(PresentModel(error: error));
+      });
+    }
   }
 }

@@ -1,12 +1,13 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'package:html/parser.dart' as html_parser;
 import 'package:html/dom.dart';
 import 'package:ses_novajoj/foundation//log_util.dart';
 import 'package:ses_novajoj/foundation/connect_util.dart';
-import 'package:ses_novajoj/foundation/data/date_util.dart';
 import 'package:ses_novajoj/foundation/data/number_util.dart';
+import 'package:ses_novajoj/foundation/data/date_util.dart';
 import 'package:ses_novajoj/foundation/data/string_util.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/foundation/data/result.dart';
@@ -45,7 +46,9 @@ class NovaWebApi extends BaseNovaWebApi {
       List<NovaListItemRes> retArr = [];
 
       if (parameter.docType == NovaDocType.list) {
-        return _parseLiItems(rootElement: document.getElementById("d_list"));
+        return _parseLiItems(
+            rootElement: document.getElementById("d_list"),
+            bodyElement: document.body);
       } else if (parameter.docType == NovaDocType.table) {
         return _parseTrItems(
             parameter: parameter,
@@ -76,7 +79,7 @@ class NovaWebApi extends BaseNovaWebApi {
   ///     <!-- </div></div> -->
   /// </div>
   Future<Result<List<NovaListItemRes>>> _parseLiItems(
-      {Element? rootElement}) async {
+      {Element? rootElement, Element? bodyElement}) async {
     NovaItemParameter parameter = _itemParameter!;
     try {
       List<NovaListItemRes> retArr = [];
@@ -97,25 +100,35 @@ class NovaWebApi extends BaseNovaWebApi {
         // <div class="news_list">
         Element? nlistDiv = inElement?.children.firstWhere(
             (element) => (element.attributes['class'] ?? "") == "news_list",
-            orElse: () => inElement);
-        // <div id="nlist">
-        Element? nlistSubDiv = nlistDiv != null && nlistDiv.children.isNotEmpty
-            ? nlistDiv.children.firstWhere(
-                (element) => (element.attributes['id'] ?? "") == "nlist",
-                orElse: () => nlistDiv)
-            : nlistDiv;
-        // ul
-        Element? retElem = nlistSubDiv?.children.firstWhere(
-            (element) => element.localName == 'ul',
-            orElse: () => Element.tag('ul'));
-        return retElem;
+            orElse: () => Element.tag(""));
+        if (nlistDiv != null && nlistDiv.children.isNotEmpty) {
+          // <div id="nlist">
+          Element? nlistSubDiv = nlistDiv.children.isNotEmpty
+              ? nlistDiv.children.firstWhere(
+                  (element) => (element.attributes['id'] ?? "") == "nlist",
+                  orElse: () => nlistDiv)
+              : nlistDiv;
+          // ul
+          Element? retElem = nlistSubDiv?.children.firstWhere(
+              (element) => element.localName == 'ul',
+              orElse: () => Element.tag('ul'));
+          return retElem;
+        } else {
+          return inElement?.children.firstWhere(
+              (elem) => elem.localName == "ul",
+              orElse: () => Element.tag('ul'));
+        }
       }(rootElement);
 
-      if (ulElement?.children == null) {
-        log.severe('ulElement?.children');
-        throw AppError(
-            type: AppErrorType.dataError,
-            reason: FailureReason.missingListNode);
+      if ((ulElement?.children ?? []).isEmpty) {
+        if (bodyElement == null) {
+          log.severe('ulElement?.children');
+          throw AppError(
+              type: AppErrorType.dataError,
+              reason: FailureReason.missingListNode);
+        } else {
+          return _parseJsonItems(bodyElement: bodyElement);
+        }
       }
 
       int index = 0;
@@ -125,8 +138,9 @@ class NovaWebApi extends BaseNovaWebApi {
       int takenStart = (pageBlockIndex - 1) * parameter.limitPerBlock;
       int takenEnd =
           min(pageBlockIndex * parameter.limitPerBlock, totolItemCount);
-      for (Element li
-          in ulElement?.children.sublist(takenStart, takenEnd) ?? []) {
+      List<Element> subList =
+          ulElement?.children.sublist(takenStart, takenEnd) ?? [];
+      for (Element li in subList) {
         if (parameter.fetchedBlockItemIndex < 1 && index >= 10) {
           break;
         }
@@ -248,6 +262,171 @@ class NovaWebApi extends BaseNovaWebApi {
           : StringUtil().substring(liInnerHtml, start: " (", end: " reads)");
       reads = NumberUtil().parseInt(string: readsStr.trim()) ?? 0;
     }
+
+    NovaItemInfo itemInfo = NovaItemInfo(
+        id: id,
+        thunnailUrlString: thunnailUrlString,
+        title: title,
+        urlString: urlString,
+        source: source,
+        author: '',
+        createAt: createAt ?? DateTime.now(),
+        loadCommentAt: '',
+        commentUrlString: commentUrlString,
+        commentCount: commentCount,
+        reads: reads,
+        isNew: isNew,
+        isRead: isRead,
+        blockIndex: _itemParameter!.pageBlockIndex,
+        fetchedBlockItemIndex: index,
+        limitPerBlock: _itemParameter!.limitPerBlock,
+        totolItemClount: totolItemCount);
+    return NovaListItemRes(itemInfo: itemInfo);
+  }
+
+  Future<Result<List<NovaListItemRes>>> _parseJsonItems(
+      {Element? bodyElement}) async {
+    NovaItemParameter parameter = _itemParameter!;
+    Element? jsonElement = bodyElement?.children.firstWhere((element) =>
+        element.localName == "script" &&
+        element.innerHtml.contains("_PageData ="));
+
+    List<NovaListItemRes> retArr = [];
+    Map<int, NovaListItemRes> keepedResponseInfo =
+        _responsedInfo?[parameter.targetUrl.hashCode] ?? {};
+
+    try {
+      if (jsonElement == null) {
+        log.severe('jsonElement is null');
+        throw AppError(
+            type: AppErrorType.dataError,
+            reason: FailureReason.missingRootNode);
+      }
+      final jsonText = StringUtil()
+          .substring(jsonElement.innerHtml, start: "_PageData =", end: ";");
+      final jsonData = await json.decode(jsonText);
+      if (jsonData is List) {
+        List<dynamic> itemListData = jsonData;
+
+        int index = 0;
+        int totolItemCount = itemListData.length;
+        int pageBlockIndex =
+            parameter.pageBlockIndex < 1 ? 1 : parameter.pageBlockIndex;
+        int takenStart = (pageBlockIndex - 1) * parameter.limitPerBlock;
+        int takenEnd =
+            min(pageBlockIndex * parameter.limitPerBlock, totolItemCount);
+        List<dynamic> subList = itemListData.sublist(takenStart, takenEnd);
+        for (dynamic item in subList) {
+          if (parameter.fetchedBlockItemIndex < 1 && index >= 10) {
+            break;
+          }
+          if (keepedResponseInfo[item.hashCode] != null) {
+            retArr.add(keepedResponseInfo[item.hashCode] as NovaListItemRes);
+            index++;
+          } else {
+            NovaListItemRes? novaListItemRes = await _createNovajsonItem(
+                parameter.targetUrl,
+                index: index,
+                jsonItem: item,
+                totolItemCount: totolItemCount);
+            if (novaListItemRes != null) {
+              retArr.add(novaListItemRes);
+              keepedResponseInfo[item.hashCode] = novaListItemRes;
+              index++;
+            }
+          }
+        }
+        _responsedInfo?[parameter.targetUrl.hashCode] = keepedResponseInfo;
+      } else {
+        log.severe('jsonData isn ot List');
+        throw AppError(
+            type: AppErrorType.dataError,
+            reason: FailureReason.missingRootNode);
+      }
+      return Result.success(data: retArr);
+    } on AppError catch (error) {
+      return Result.failure(error: error);
+    } on Exception catch (error) {
+      return Result.failure(error: AppError.fromException(error));
+    }
+  }
+
+  Future<NovaListItemRes?> _createNovajsonItem(String url,
+      {required int index,
+      required dynamic jsonItem,
+      required int totolItemCount}) async {
+    int id = index;
+    String thunnailUrlString = "";
+    String title = "";
+    String urlString = "";
+    String source = "";
+    String commentUrlString = "";
+    int commentCount = 0;
+    DateTime? createAt;
+    int reads = 0;
+    bool isRead = false;
+    bool isNew = false;
+
+    String parentUrl = _parentUrl(url: url);
+    bool networkIsOK = await ConnectUtil.isAvailable();
+
+    // title, urlString
+    dynamic detailResponsedBody;
+    title = jsonItem["title"];
+    urlString = (String urlStr) {
+      if (RegExp(r'^https?://').hasMatch(urlStr)) {
+        return urlStr;
+      }
+      return "$parentUrl/$urlStr";
+    }("${jsonItem['url']}");
+
+    // thumbUrlString
+    detailResponsedBody ??=
+        networkIsOK ? await BaseApiClient.client.get(Uri.parse(urlString)) : "";
+    if (urlString.isNotEmpty &&
+        index < _kThumbLimit &&
+        detailResponsedBody != "") {
+      Result<String> thumbUrlResult = await fetchNovaItemThumbUrl(
+          parameter: NovaItemParameter(
+              targetUrl: urlString, docType: NovaDocType.thumb),
+          httpBody: detailResponsedBody);
+      thumbUrlResult.when(
+          success: (value) {
+            thunnailUrlString = value;
+          },
+          failure: (value) {});
+    }
+
+    // createAt
+    createAt = DateUtil().fromString(jsonItem["date"]);
+    if (createAt == null) {
+      detailResponsedBody ??= networkIsOK
+          ? await BaseApiClient.client.get(Uri.parse(urlString))
+          : "";
+      Result<String> createdAtStrRes = detailResponsedBody != ""
+          ? await fetchNovaItemCreatedAt(
+              parameter: NovaItemParameter(
+                  targetUrl: urlString, docType: NovaDocType.thumb),
+              httpBody: detailResponsedBody)
+          : const Result.success(data: "");
+      createdAtStrRes.when(
+          success: (value) {
+            createAt =
+                DateUtil().fromString(value, format: "yyyy-MM-dd HH:mm:ss");
+          },
+          failure: (value) {});
+    }
+
+    // commentUrlString, commentCount
+    String tmpUrl = "";
+    commentUrlString = parentUrl + tmpUrl;
+
+    commentCount = NumberUtil().parseInt(string: jsonItem["replies"]) ?? 0;
+
+    // source, reads
+    source = jsonItem["src"];
+
+    reads = NumberUtil().parseInt(string: jsonItem["views"]) ?? 0;
 
     NovaItemInfo itemInfo = NovaItemInfo(
         id: id,

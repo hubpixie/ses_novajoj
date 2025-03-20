@@ -43,6 +43,7 @@ class _TopSubPageState extends State<TopSubPage>
     with AutomaticKeepAliveClientMixin<TopSubPage> {
   final ScrollController _scrollController = ScrollController();
   final int _limitPerBlock = 25;
+  late StreamController<bool> _blockLoadCompleteController;
   String _prevSearchedKeyword = '';
   late BuildContext _keyContext;
   late Map<int, List<int>> _usedPageBlock;
@@ -56,10 +57,28 @@ class _TopSubPageState extends State<TopSubPage>
 
   @override
   void initState() {
+    bool? prevLoadingFlag;
+    bool reloadingFlag = false;
+    _blockLoadCompleteController = StreamController<bool>.broadcast()
+      ..stream.listen((event) {
+        if (reloadingFlag) {
+          prevLoadingFlag = null;
+        }
+        if (prevLoadingFlag != null &&
+            event != prevLoadingFlag &&
+            _scrollController.position.pixels + 65 <
+                _scrollController.position.maxScrollExtent) {
+          // double offset = _scrollController.offset + 65;
+          // _scrollController.jumpTo(offset);
+        }
+        prevLoadingFlag = event;
+      });
+
     _usedPageBlock = {};
     _usedPageBlock[_currentPageIndex] ??= [0];
 
     widget.reloadedController.stream.listen((event) {
+      reloadingFlag = event.isReload;
       if (event.isReload) {
         _usedPageBlock[_currentPageIndex] = [0];
         _loadData(isReloaded: true, searchedKeyword: event.searchedKey);
@@ -98,6 +117,12 @@ class _TopSubPageState extends State<TopSubPage>
 
     _loadData();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _blockLoadCompleteController.close();
+    super.dispose();
   }
 
   @override
@@ -152,8 +177,10 @@ class _TopSubPageState extends State<TopSubPage>
                           },
                         );
                       }
-                      // _currentBlockIndex =
-                      //     data.viewModelList![index].itemInfo.blockIndex ?? 1;
+                      bool loadingFlag =
+                          data.viewModelList![index].showsIndicatorOnNextBlock;
+                      _blockLoadCompleteController.sink.add(!loadingFlag);
+                      // show list item
                       return NovaListCell(
                         viewModel: data.viewModelList![index],
                         onCellSelecting: (selIndex) {
@@ -228,14 +255,15 @@ class _TopSubPageState extends State<TopSubPage>
         blockIndex: _currentBlockIndex + 1,
         limitPerBlock: _limitPerBlock,
         prefixTitle: widget.prefixTitle,
-        isReloaded: isReloaded);
-
-    Future.delayed(const Duration(seconds: 5), () {
-      setState(() {
-        if (isReloaded) {
-          _scrollController.jumpTo(0);
-        }
-      });
-    });
+        isReloaded: isReloaded,
+        completeHandler: () {
+          Future.delayed(const Duration(seconds: 1), () {
+            setState(() {
+              if (isReloaded) {
+                _scrollController.jumpTo(0);
+              }
+            });
+          });
+        });
   }
 }

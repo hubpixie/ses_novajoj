@@ -1,5 +1,5 @@
 class AppState {
-  static bool isLogined = false;
+  static bool isLogined = true;
   static bool isDebugEnabled = false;
   static bool isHistorioEnabled = true;
 }

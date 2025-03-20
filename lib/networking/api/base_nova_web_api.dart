@@ -205,11 +205,12 @@ class BaseNovaWebApi {
     String retStr = '';
     int httpStatus = 200;
     Directory tempRootDir = await getTemporaryDirectory();
-    Directory tempDir = Directory('${tempRootDir.path}/top');
+    Directory tempDir = Directory('${tempRootDir.path}/$cacheFolder');
     if (!(await tempDir.exists())) {
       await tempDir.create();
     }
 
+    print("aaaa-3.1=$urlString");
     // check network state
     final networkStateIsOK = await ConnectUtil.isAvailable(checksAgain: true);
     File tempFile = File('${tempDir.path}/${urlString.hashCode}');
@@ -219,12 +220,13 @@ class BaseNovaWebApi {
         await tempFile.delete();
       }
     }
+    print("aaaa-3.2=$urlString,$cacheIsCleared,$networkStateIsOK");
 
     if (networkStateIsOK && (retStr.isEmpty || cacheIsCleared)) {
       // send request for fetching nova list.
       final response = BaseApiClient.client.get(Uri.parse(urlString));
-      if (retStr.isEmpty) {
-        print("response-AAA");
+      if (retStr.isEmpty || cacheIsCleared) {
+        print("response-AAA：$urlString");
         final result = await response;
         httpStatus = result.statusCode;
         retStr = result.body;
@@ -286,6 +288,13 @@ class BaseNovaWebApi {
             0, kSampleReplacedPkCode.length - 2))
         .split('//');
     retStr = retStr.replaceAll(RegExp(r'' + codes.first), codes.last);
+    //Advertisements
+    retStr = retStr.replaceAll("Advertisements", "");
+    // class="ad_div" style="height:600px;"
+    retStr = retStr.replaceAll("class=\"ad_div\" style=\"height:600px;\"",
+        "class=\"ad_div\" style=\"height5px;\"");
+    retStr = retStr.replaceAll(RegExp(r'<br />(\n<br />){0,}'), "<br/>");
+
     return retStr;
   }
 

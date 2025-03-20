@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 import 'package:async/async.dart' as future_ext;
 import 'package:html/parser.dart' as html_parser;
 import 'package:html/dom.dart';
@@ -23,6 +24,8 @@ part 'bbs_nova_web_api_select.dart';
 
 class BbsNovaWebApi extends BaseNovaWebApi {
   static const int _kThumbLimit = 5;
+  NovaItemParameter? _itemParameter;
+  Map<int, dynamic>? _responsedInfo;
 
   ///
   /// api entry: fetchNovaList

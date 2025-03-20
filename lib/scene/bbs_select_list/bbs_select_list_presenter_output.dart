@@ -12,9 +12,13 @@ class ShowBbsSelectListPageModel extends BbsSelectListPresenterOutput {
 
 class BbsSelectListRowViewModel {
   NovaItemInfo itemInfo;
+  bool showsIndicatorOnNextBlock;
+  BbsSelectListRowViewModel(
+      {required this.itemInfo, this.showsIndicatorOnNextBlock = false});
 
-  BbsSelectListRowViewModel(BbsSelectListUseCaseRowModel model)
-      : itemInfo = model.itemInfo;
+  BbsSelectListRowViewModel.fromUseCase(BbsSelectListUseCaseRowModel model)
+      : itemInfo = model.itemInfo,
+        showsIndicatorOnNextBlock = false;
 
   static String asCreateAtText(DateTime createAt) {
     return DateUtil().getDateString(date: createAt, format: 'yyyy/MM/dd');

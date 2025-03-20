@@ -20,6 +20,7 @@ class BbsNovaSelectListRepositoryImpl extends BbsNovaSelectListRepository {
       {required FetchBbsNovaSelectListRepoInput input}) async {
     String targetUrl =
         input.targetUrl.replaceAll('{{page}}', '${input.pageIndex}');
+    targetUrl = targetUrl.replaceAll('{{keywords}}', input.searchedKeyword);
 
     List<BbsNovaSelectListItem> list = [];
     late Result<List<BbsNovaSelectListItem>> ret;
@@ -35,7 +36,7 @@ class BbsNovaSelectListRepositoryImpl extends BbsNovaSelectListRepository {
             int retCnt =
                 targetUrl == input.targetUrl ? 1 : _estimatedPageCnt; //default
             if (searched) {
-              if (response.length > 90) {
+              if (response.length > 40) {
                 retCnt = input.pageIndex + 1;
               } else {
                 retCnt = 1;
@@ -54,7 +55,8 @@ class BbsNovaSelectListRepositoryImpl extends BbsNovaSelectListRepository {
       }
     }
 
-    if (targetUrl.contains('{{keywords}}')) {
+    if (input.searchedKeyword.isNotEmpty) {
+      print("aaaa-1=$targetUrl");
       if (_prevSearchedKeyword.isEmpty) {
         _prevSearchedKeyword = input.searchedKeyword;
       }
@@ -64,7 +66,6 @@ class BbsNovaSelectListRepositoryImpl extends BbsNovaSelectListRepository {
         _estimatedPageCnt = 10; // defalut value
       }
       // fetch next page data
-      targetUrl = targetUrl.replaceAll('{{keywords}}', input.searchedKeyword);
       final result = await _api.fetchSearchedResult(
           parameter:
               NovaItemParameter(targetUrl: targetUrl, docType: input.docType));
@@ -74,11 +75,17 @@ class BbsNovaSelectListRepositoryImpl extends BbsNovaSelectListRepository {
         ret = Result.failure(error: error);
       });
     } else {
+      print("aaaa-2=$targetUrl");
       _estimatedPageCnt = 10; // default value
       // fetch next page data
       final result = await _api.fetchSelectList(
-          parameter:
-              NovaItemParameter(targetUrl: targetUrl, docType: input.docType));
+          parameter: NovaItemParameter(
+              targetUrl: targetUrl,
+              docType: input.docType,
+              pageBlockIndex: input.pageBlockIndex,
+              limitPerBlock: input.limitPerBlock,
+              fetchedBlockItemIndex: input.fetchedBlockItemIndex));
+
       result.when(success: (response) {
         ret = setReturnVal(response, false);
       }, failure: (error) {

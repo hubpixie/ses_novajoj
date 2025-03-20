@@ -21,15 +21,30 @@ extension NovaWebApiDetail on NovaWebApi {
             error: AppError.fromStatusCode(response.statusCode));
       }
       // prepares to parse nova list from response.body.
-      final document = html_parser.parse(response.body);
+      String htmlString = utf8.decode(response.bodyBytes, allowMalformed: true);
+      final document = html_parser.parse(htmlString);
       NovaDetaloItemRes? retVal;
 
       if (parameter.docType == NovaDocType.detail) {
-        var rootElement = document.getElementById("newscontent_2");
-        rootElement ??=
-            document.getElementsByClassName("art-main-body-auth").first;
-        var detailElement = document.getElementById("shownewsc");
-        detailElement ??= document.getElementById("news_content");
+        final rootElement = () {
+          var rootElement = document.getElementById("newscontent_2");
+          if (rootElement == null) {
+            var list = document.getElementsByClassName("art-main-body-auth");
+            if (list.isEmpty) {
+              list = document.getElementsByClassName("main-content");
+            }
+            if (list.isNotEmpty) {
+              rootElement = list.first;
+            }
+          }
+          return rootElement;
+        }();
+        final detailElement = () {
+          var detailElement = document.getElementById("shownewsc");
+          detailElement ??= document.getElementById("news_content");
+          detailElement ??= document.getElementById("article-content");
+          return detailElement;
+        }();
         return _parseDetailItems(
             parameter: parameter,
             rootElement: rootElement,
@@ -135,9 +150,10 @@ extension NovaWebApiDetail on NovaWebApi {
               final alink = td.children.firstWhere(
                   (element) => element.localName == 'a',
                   orElse: () => Element.tag('a'));
-              if (alink.attributes['name'] == 'postfp') {
+              if (alink.attributes['name'] == 'postfp' ||
+                  td.innerHtml.contains('postfp')) {
                 retStr = StringUtil()
-                    .substring(td.innerHtml, start: '：', end: alink.outerHtml);
+                    .substring(td.innerHtml, start: '：', end: "<a ");
                 return retStr;
               }
             }
@@ -145,13 +161,18 @@ extension NovaWebApiDetail on NovaWebApi {
         } else {
           retStr = StringUtil()
               .substring(rootElement!.innerHtml, start: '：', end: " \u4e8e ");
+          print("reshapeDetailBodyTags:b postfp=$retStr");
         }
+        print(
+            "reshapeDetailBodyTags:c postfp=$retStr,  tables.length=${tablelElements?.length}");
         return retStr;
       }();
 
       // commentUrlString
       final commentLinkTag =
           rootElement?.getElementsByClassName('reply_link_img');
+      final commentCountTag =
+          rootElement?.getElementsByClassName('comment-count');
       if (commentLinkTag != null && commentLinkTag.isNotEmpty) {
         retVal.itemInfo.commentUrlString = (Element? aLink) {
           // reply_link_img
@@ -159,11 +180,37 @@ extension NovaWebApiDetail on NovaWebApi {
           str = "$parentUrl/${str.replaceAll('\\"', '')}";
           return str;
         }(commentLinkTag.first);
+      } else if (commentCountTag != null && commentCountTag.isNotEmpty) {
+        retVal.itemInfo.commentUrlString = (String initailUrl, Element? aLink) {
+          // comment-count
+          String str = aLink?.attributes['href'] ?? '';
+          str = str.replaceAll('\\"', '');
+          // if (initailUrl.isEmpty) {
+          //   str = "$parentUrl/$str";
+          // } else {
+          //   str = "$initailUrl/$str";
+          // }
+          str = "$parentUrl/$str";
+          return str;
+        }(retVal.itemInfo.commentUrlString,
+            commentCountTag.first.children.first);
       }
 
       // commentCount
-      retVal.itemInfo.commentCount =
-          rootElement?.getElementsByClassName('reply_auther_info').length ?? 0;
+      retVal.itemInfo.commentCount = () {
+        final elems = rootElement?.getElementsByClassName('reply_auther_info');
+        if (elems?.isNotEmpty ?? false) {
+          return elems?.length ?? 0;
+        }
+        final alink = commentCountTag?.first.children.first;
+        final span =
+            alink?.children.firstWhere((elem) => elem.localName == "span");
+        if (span != null) {
+          String numStr = RegExp(r'\d+').firstMatch(span.text)?.group(0) ?? "";
+          return NumberUtil().parseInt(string: numStr) ?? 0;
+        }
+        return 0;
+      }();
       return Result.success(data: retVal);
     } on AppError catch (error) {
       return Result.failure(error: error);

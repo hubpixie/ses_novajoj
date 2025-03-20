@@ -11,21 +11,21 @@ extension BbsNovaWebApiSelect on BbsNovaWebApi {
   ///
   Future<Result<List<BbsNovaSelectListItemRes>>> fetchSelectList(
       {required NovaItemParameter parameter}) async {
-    try {
-      // check network state
-      if (await ConnectUtil.isUnavailable(checksAgain: true)) {
-        throw const SocketException('Network is unavailable!');
-      }
+    _itemParameter = parameter;
+    _responsedInfo ??= {};
 
-      // send request for fetching nova list.
-      final response =
-          await BaseApiClient.client.get(Uri.parse(parameter.targetUrl));
-      if (response.statusCode >= HttpStatus.badRequest) {
-        return Result.failure(
-            error: AppError.fromStatusCode(response.statusCode));
-      }
+    try {
       // prepares to parse nova list from response.body.
-      final document = html_parser.parse(response.body);
+      // load response data from its cache if needs.
+      print("aaaa-2.1=${parameter.targetUrl}");
+      String bodyString = await loadResponseDataFromCache(
+          urlString: parameter.targetUrl,
+          cacheFolder: "bbs_select",
+          cacheIsCleared: parameter.fetchedBlockItemIndex >= 1);
+
+      print("aaaa-2.2=${parameter.targetUrl}");
+      // prepares to parse nova list from response.body.
+      final document = Document.html(bodyString);
       List<BbsNovaSelectListItemRes> retArr = [];
       AppError? retErr;
       if (parameter.docType == NovaDocType.bbsSelect) {
@@ -78,6 +78,8 @@ extension BbsNovaWebApiSelect on BbsNovaWebApi {
       int startId = 0}) async {
     try {
       List<BbsNovaSelectListItemRes> retArr = [];
+      Map<int, BbsNovaSelectListItemRes> keepedResponseInfo =
+          _responsedInfo?[parameter.targetUrl.hashCode] ?? {};
 
       if (rootElement?.children == null) {
         log.severe('rootElement?.children');
@@ -91,35 +93,64 @@ extension BbsNovaWebApiSelect on BbsNovaWebApi {
 
       // ul --> div list
       if (ulElement?.children.isEmpty ?? true) {
+        print("totolItemCount= _parseDivItems ...  START");
         return _parseDivItems(
             parameter: parameter, rootElement: rootElement, startId: 100);
       }
 
       int index = 0;
-      for (Element li in ulElement?.children ?? []) {
-        BbsNovaSelectListItemRes? novaListItemRes =
-            await _createNovaLiItem(parameter.targetUrl, index: index, li: li);
-        if (novaListItemRes != null) {
-          retArr.add(novaListItemRes);
-          retArr[index].itemInfo.id = retArr[index].itemInfo.id + startId;
-          retArr[index].itemInfo.children = await () async {
-            Element subLi = li.children.firstWhere(
-                (element) => element.localName == 'ul',
-                orElse: () => Element.tag('ul'));
-            if (subLi.children.isNotEmpty) {
-              BbsNovaSelectListItemRes? subListItemRes =
-                  await _createNovaLiItem(parameter.targetUrl,
-                      index: 0, li: subLi.children.first);
-              if (subListItemRes != null) {
-                return [subListItemRes.itemInfo];
-              }
-            }
-            return null;
-          }();
-
+      int totolItemCount = ulElement?.children.length ?? 0;
+      int limitPerBlock = parameter.limitPerBlock > totolItemCount
+          ? totolItemCount
+          : parameter.limitPerBlock;
+      int pageBlockIndex =
+          parameter.pageBlockIndex < 1 ? 1 : parameter.pageBlockIndex;
+      int takenStart = (pageBlockIndex - 1) * limitPerBlock;
+      // int takenEnd = totolItemCount;
+      int takenEnd = min(pageBlockIndex * limitPerBlock, totolItemCount);
+      print(
+          "[0]totolItemCount=$totolItemCount, limitPerBlock=$limitPerBlock, blockIndex = ${parameter.pageBlockIndex}, takenStart=$takenStart, takenEnd=$takenEnd");
+      List<Element> subList =
+          ulElement?.children.sublist(takenStart, takenEnd) ?? [];
+      for (Element li in subList) {
+        // if (parameter.fetchedBlockItemIndex < 1 && index >= 20) {
+        //   break;
+        // }
+        if (keepedResponseInfo[li.innerHtml.hashCode] != null) {
+          retArr.add(keepedResponseInfo[li.innerHtml.hashCode]
+              as BbsNovaSelectListItemRes);
           index++;
+        } else {
+          BbsNovaSelectListItemRes? novaListItemRes = await _createNovaLiItem(
+              parameter.targetUrl,
+              index: index,
+              li: li,
+              totolItemCount: totolItemCount);
+          if (novaListItemRes != null) {
+            retArr.add(novaListItemRes);
+            retArr[index].itemInfo.id = retArr[index].itemInfo.id + startId;
+            retArr[index].itemInfo.children = await () async {
+              Element subLi = li.children.firstWhere(
+                  (element) => element.localName == 'ul',
+                  orElse: () => Element.tag('ul'));
+              if (subLi.children.isNotEmpty) {
+                BbsNovaSelectListItemRes? subListItemRes =
+                    await _createNovaLiItem(parameter.targetUrl,
+                        index: 0,
+                        li: subLi.children.first,
+                        totolItemCount: totolItemCount);
+                if (subListItemRes != null) {
+                  return [subListItemRes.itemInfo];
+                }
+              }
+              return null;
+            }();
+            keepedResponseInfo[li.innerHtml.hashCode] = novaListItemRes;
+            index++;
+          }
         }
       }
+      _responsedInfo?[parameter.targetUrl.hashCode] = keepedResponseInfo;
 
       return Result.success(data: retArr);
     } on AppError catch (error) {
@@ -167,7 +198,8 @@ extension BbsNovaWebApiSelect on BbsNovaWebApi {
         BbsNovaSelectListItemRes? novaListItemRes = await _createNovaLiItem(
             parameter.targetUrl,
             index: index,
-            li: divLi);
+            li: divLi,
+            totolItemCount: 0);
         if (novaListItemRes != null) {
           retArr.add(novaListItemRes);
           retArr[index].itemInfo.id = retArr[index].itemInfo.id + startId;
@@ -180,7 +212,7 @@ extension BbsNovaWebApiSelect on BbsNovaWebApi {
             if (subDivLi.attributes.isNotEmpty) {
               BbsNovaSelectListItemRes? subListItemRes =
                   await _createNovaLiItem(parameter.targetUrl,
-                      index: 0, li: subDivLi);
+                      index: 0, li: subDivLi, totolItemCount: 0);
               if (subListItemRes != null) {
                 return [subListItemRes.itemInfo];
               }
@@ -201,7 +233,9 @@ extension BbsNovaWebApiSelect on BbsNovaWebApi {
   }
 
   Future<BbsNovaSelectListItemRes?> _createNovaLiItem(String url,
-      {required int index, required Element li}) async {
+      {required int index,
+      required Element li,
+      required int totolItemCount}) async {
     int id = index;
     String thunnailUrlString = "";
     String title = "";
@@ -274,7 +308,11 @@ extension BbsNovaWebApiSelect on BbsNovaWebApi {
         commentCount: commentCount,
         reads: reads,
         isNew: isNew,
-        isRead: isRead);
+        isRead: isRead,
+        blockIndex: _itemParameter!.pageBlockIndex,
+        fetchedBlockItemIndex: index,
+        limitPerBlock: _itemParameter!.limitPerBlock,
+        totolItemClount: totolItemCount);
     return BbsNovaSelectListItemRes(itemInfo: itemInfo);
   }
 

@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/foundation/log_util.dart';
 import 'package:ses_novajoj/foundation/firebase_util.dart';
@@ -26,8 +28,20 @@ class _BbsSelectListPageState extends State<BbsSelectListPage> {
   late String _appBarTitle;
   late String? _targetUrl;
   final ScrollController _scrollController = ScrollController();
+
+  int _limitPerBlock = 25;
+  //late BuildContext _keyContext;
+  late GlobalKey _latestListKey;
+  late Map<int, List<int>> _usedPageBlock;
+  int _currentItemIndex = 0;
+  int _totalItemCount = 1;
+  int _dispTotalItemCount = 1;
+  int _foryouItemCount = 0;
+  // int _maxBlockCount = 0;
+  int _currentBlockIndex = 0;
   int _currentPageIndex = 1;
   int _waitingCount = 0;
+  bool _hasNextBlock = true;
 
   late String? _searchedUrl;
   final SearchPage _searchPage = SearchPage();
@@ -37,6 +51,63 @@ class _BbsSelectListPageState extends State<BbsSelectListPage> {
   @override
   void initState() {
     super.initState();
+    print("[- initState]:totolItemCount=$_totalItemCount");
+    _initProc();
+    _latestListKey = GlobalKey();
+    // calculate item height of Listview
+    double calcItemHeight() {
+      double itemHeight = 90;
+      RenderObject? render = _latestListKey.currentContext?.findRenderObject();
+
+      if (render is RenderSliverList?) {
+        itemHeight = render?.firstChild?.size.height ?? 0;
+        print("[- render:1]:totolItemCount=$render, itemHeight=$itemHeight");
+      } else if (render is RenderBox?) {
+        print(
+            "[- render:2]:totolItemCount=$render,render.child=$render, itemHeight=$itemHeight");
+        itemHeight = (render as RenderBox?)?.size.height ?? 0;
+      }
+      return itemHeight;
+    }
+
+    int calcItemIndex(double itemHeight) {
+      int itemIndex = (_scrollController.position.pixels / itemHeight).floor() +
+          _foryouItemCount;
+      if (_scrollController.position.userScrollDirection ==
+          ScrollDirection.forward) {
+        if (itemIndex >= _totalItemCount && _currentItemIndex > 0) {
+          itemIndex = _currentItemIndex + 1;
+        }
+      }
+      return itemIndex;
+    }
+
+    // listen _scrollController
+    _scrollController.addListener(() {
+      if (!_hasNextBlock) {
+        return;
+      }
+      if (_scrollController.position.pixels + 160 >=
+          _scrollController.position.maxScrollExtent) {
+        double itemHeight = calcItemHeight();
+        int itemIndex = calcItemIndex(itemHeight);
+        _currentBlockIndex = (itemIndex / _limitPerBlock).floor();
+        print(
+            "[5-0] currentBlockIndex]:totolItemCount= _currentBlockIndex:$_currentBlockIndex, itemIndex:$itemIndex, itemHeight:$itemHeight");
+        int blockCount = ((_totalItemCount) / _limitPerBlock).floor() + 1;
+        print(
+            "[5-1]:totolItemCount=$_totalItemCount,blockCount = $blockCount, _usedPageBlock[_currentBlockIndex]=${_usedPageBlock[_currentBlockIndex]}");
+        if (!(_usedPageBlock[_currentPageIndex] ?? []).contains(
+                _currentBlockIndex) /*&&
+            _currentBlockIndex < blockCount*/
+            ) {
+          print(
+              "[5-2]:totolItemCount=$_totalItemCount,blockCount = $blockCount");
+          _usedPageBlock[_currentPageIndex]?.add(_currentBlockIndex);
+          _loadData();
+        }
+      }
+    });
   }
 
   @override
@@ -67,13 +138,16 @@ class _BbsSelectListPageState extends State<BbsSelectListPage> {
                 () {},
               ),
           refreshAction: () {
-            _loadData(searchedKeyword: _currentSearchedKeyword);
+            _initProc();
+            _loadData(
+                isReloaded: true, searchedKeyword: _currentSearchedKeyword);
           }),
       body: BlocProvider<BbsSelectListPresenter>(
         bloc: widget.presenter,
         child: StreamBuilder<BbsSelectListPresenterOutput>(
             stream: widget.presenter.stream,
             builder: (context, snapshot) {
+              // _keyContext = context;
               if (snapshot.connectionState == ConnectionState.waiting ||
                   widget.presenter.isProcessing) {
                 if (_waitingCount == 0 && _currentSearchedKeyword.isNotEmpty) {
@@ -88,6 +162,7 @@ class _BbsSelectListPageState extends State<BbsSelectListPage> {
               }
               final data = snapshot.data;
               if (data is ShowBbsSelectListPageModel) {
+                // display listView
                 if (data.error == null) {
                   return CustomScrollView(
                     controller: _scrollController,
@@ -108,6 +183,23 @@ class _BbsSelectListPageState extends State<BbsSelectListPage> {
     );
   }
 
+  void _initProc() {
+    print("[- _initProc]:totolItemCount=$_totalItemCount");
+    _currentItemIndex = 0;
+    _totalItemCount = 1;
+    _dispTotalItemCount = 0;
+    _foryouItemCount = 0;
+    // _maxBlockCount = 0;
+    _currentBlockIndex = 0;
+    _currentPageIndex = 1;
+    _waitingCount = 0;
+    _hasNextBlock = true;
+
+    _searchedUrl = "";
+    _usedPageBlock = {};
+    _usedPageBlock[_currentPageIndex] ??= [0];
+  }
+
   List<Widget> _buildForYouList(BuildContext context,
       {required List<BbsSelectListRowViewModel> dataList}) {
     if (_currentSearchedKeyword.isNotEmpty) {
@@ -115,6 +207,7 @@ class _BbsSelectListPageState extends State<BbsSelectListPage> {
     }
     List<BbsSelectListRowViewModel> foryouList =
         dataList.where((element) => element.itemInfo.id < 100).toList();
+    _foryouItemCount = foryouList.length;
     if (foryouList.isEmpty) {
       return [];
     }
@@ -156,35 +249,74 @@ class _BbsSelectListPageState extends State<BbsSelectListPage> {
     final itemCnt = latestList.length;
     final lastViewModel = latestList[itemCnt - 1];
 
+    // set member properties
+    int _totalItemCount = dataList.last.itemInfo.totolItemClount ?? 1;
+    _limitPerBlock =
+        _limitPerBlock > _totalItemCount ? _totalItemCount : _limitPerBlock;
+    // _maxBlockCount = (_totalItemCount / _limitPerBlock).floor() + 1;
+    print("[4]:totolItemCount=$_totalItemCount");
     return [
       SliverList(
+          key: _latestListKey,
           delegate: SliverChildBuilderDelegate((context, index) {
-        if (index == 0) {
-          return Column(children: [
-            Container(
-              height: 40,
-              color: Colors.grey[300],
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left: 20, top: 10),
-                    child: Text(_currentSearchedKeyword.isEmpty
-                        ? UseL10n.of(context)?.bbsSelectListLatest ?? ''
-                        : UseL10n.of(context)?.searchedResultTitle ?? ''),
-                  )
-                ],
-              ),
-            ),
-            _buildLatestCard(context, dataList: latestList, row: index),
-          ]);
-        } else {
-          if (lastViewModel.itemInfo.pageCount! > 1 && index == itemCnt) {
-            return _buildPagingArea(context, itemInfo: lastViewModel.itemInfo);
-          }
-          return _buildLatestCard(context, dataList: latestList, row: index);
-        }
-      },
+            print("[5]:totolItemCount=$_totalItemCount");
+            _currentItemIndex = index;
+            if (index == 0) {
+              return Column(children: [
+                Container(
+                  height: 40,
+                  color: Colors.grey[300],
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 20, top: 10),
+                        child: Text(_currentSearchedKeyword.isEmpty
+                            ? UseL10n.of(context)?.bbsSelectListLatest ?? ''
+                            : UseL10n.of(context)?.searchedResultTitle ?? ''),
+                      )
+                    ],
+                  ),
+                ),
+                _buildLatestCard(context, dataList: latestList, row: index),
+              ]);
+            } else {
+              int fetchedIndex = lastViewModel.itemInfo.fetchedBlockItemIndex!;
+              print(
+                  "[=.1.0]:totolItemCount=$itemCnt, ${lastViewModel.itemInfo.pageCount}, $_totalItemCount, _limitPerBlock =$_limitPerBlock, fetchedIndex = $fetchedIndex, fetchedCount=${_currentBlockIndex * _limitPerBlock + fetchedIndex}. index=$index");
+              if (!_hasNextBlock) {
+                return Container();
+              } else if (((_totalItemCount <= _limitPerBlock &&
+                          index >= itemCnt) ||
+                      ((lastViewModel.itemInfo.pageCount! > 1) &&
+                          (index + 1 >= _totalItemCount))) &&
+                  _hasNextBlock) {
+                print(
+                    "[=.1.1]:totolItemCount=$itemCnt, ${lastViewModel.itemInfo.pageCount}, $_totalItemCount, _limitPerBlock =$_limitPerBlock");
+                if (_hasNextBlock) {
+                  _hasNextBlock = false;
+                  return _buildPagingArea(context,
+                      itemInfo: lastViewModel.itemInfo);
+                }
+              } else if (lastViewModel.itemInfo.pageCount! > 1 &&
+                  index >= itemCnt) {
+                _dispTotalItemCount += itemCnt;
+                print(
+                    "[=.2]:totolItemCount=$itemCnt, ${lastViewModel.itemInfo.pageCount}, $_totalItemCount, _limitPerBlock =$_limitPerBlock, index=$index");
+                return Center(
+                    child: SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                            color: Colors.grey,
+                            backgroundColor: Colors.grey[350])));
+              } else {
+                print("[=.3]:totolItemCount=$_totalItemCount, index = $index");
+                return _buildLatestCard(context,
+                    dataList: latestList, row: index);
+              }
+            }
+          },
               childCount: lastViewModel.itemInfo.pageCount! > 1
                   ? itemCnt + 1
                   : itemCnt))
@@ -216,7 +348,8 @@ class _BbsSelectListPageState extends State<BbsSelectListPage> {
     return Card(
       color: Colors.grey[100],
       child: (dataList[row].itemInfo.children?.isEmpty ?? true)
-          ? _buildLatestRowTile(context, itemInfo: dataList[row].itemInfo)
+          ? _buildLatestRowTile(context,
+              itemInfo: dataList[row].itemInfo, row: row)
           : ExpansionTile(
               title: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -259,14 +392,15 @@ class _BbsSelectListPageState extends State<BbsSelectListPage> {
               children: <Widget>[
                 _buildLatestRowTile(context,
                     itemInfo: dataList[row].itemInfo.children!.first,
-                    isSub: true),
+                    isSub: true,
+                    row: row),
               ],
             ),
     );
   }
 
   Widget _buildLatestRowTile(BuildContext context,
-      {required NovaItemInfo itemInfo, bool isSub = false}) {
+      {required NovaItemInfo itemInfo, bool isSub = false, int? row}) {
     return ListTile(
         title: Padding(
           padding: isSub
@@ -313,7 +447,14 @@ class _BbsSelectListPageState extends State<BbsSelectListPage> {
               onPressed: (targetPageIndex < 1 || targetPageIndex > pageCnt)
                   ? null
                   : () {
+                      _currentItemIndex = -1;
+                      _totalItemCount = 1;
+                      _dispTotalItemCount = 0;
                       _currentPageIndex = targetPageIndex;
+                      _hasNextBlock = true;
+                      _usedPageBlock = {};
+                      _usedPageBlock[_currentPageIndex] ??= [0];
+
                       _loadData(
                           isReloaded: true,
                           searchedKeyword: _currentSearchedKeyword);
@@ -399,19 +540,27 @@ class _BbsSelectListPageState extends State<BbsSelectListPage> {
       _currentPageIndex = 1;
     }
     _waitingCount = 0;
+    _currentBlockIndex = isReloaded ? 0 : _currentBlockIndex;
 
     if (_targetUrl != null) {
       widget.presenter.eventViewReady(
           input: BbsSelectListPresenterInput(
-        targetUrl: searchedKeyword.isEmpty ? _targetUrl! : _searchedUrl!,
-        targetPageIndex: _currentPageIndex,
-        searchedKeyword: searchedKeyword,
-        searchResultIsCleared: searchResultIsCleared,
-      ));
-
-      Future.delayed(Duration.zero, () {
-        setState(() {});
-      });
+              targetUrl: searchedKeyword.isEmpty ? _targetUrl! : _searchedUrl!,
+              targetPageIndex: _currentPageIndex,
+              blockIndex: _currentBlockIndex + 1,
+              limitPerBlock: _limitPerBlock,
+              searchedKeyword: searchedKeyword,
+              searchResultIsCleared: searchResultIsCleared,
+              isReloaded: isReloaded,
+              completeHandler: () {
+                Future.delayed(const Duration(seconds: 1), () {
+                  setState(() {
+                    if (isReloaded) {
+                      _scrollController.jumpTo(0);
+                    }
+                  });
+                });
+              }));
     } else {
       log.warning('bbs_select_list_page: parameter is error!');
     }
