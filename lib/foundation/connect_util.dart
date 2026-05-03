@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:http/http.dart' as http;
 
 class ConnectUtil {
@@ -12,6 +15,15 @@ class ConnectUtil {
       }
     }
     return _isConncted!;
+  }
+
+  static Future<bool> isUrlAvailable({required String url}) async {
+    bool ret = false;
+    try {
+      var response = await http.head(Uri.parse(url));
+      return response.statusCode == 200;
+    } on Exception catch (_) {}
+    return ret;
   }
 
   static Future<bool> isUnavailable({bool checksAgain = false}) async {

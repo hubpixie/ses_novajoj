@@ -181,19 +181,21 @@ extension NovaWebApiDetail on NovaWebApi {
           return str;
         }(commentLinkTag.first);
       } else if (commentCountTag != null && commentCountTag.isNotEmpty) {
-        retVal.itemInfo.commentUrlString = (String initailUrl, Element? aLink) {
+        retVal.itemInfo.commentUrlString =
+            await (String initailUrl, Element? aLink) async {
           // comment-count
           String str = aLink?.attributes['href'] ?? '';
           str = str.replaceAll('\\"', '');
-          // if (initailUrl.isEmpty) {
-          //   str = "$parentUrl/$str";
-          // } else {
-          //   str = "$initailUrl/$str";
-          // }
-          str = "$parentUrl/$str";
+          if (initailUrl.isEmpty) {
+            str = "$parentUrl/$str";
+            if (await ConnectUtil.isUrlAvailable(url: str)) {
+              return str;
+            }
+          }
+          str = "$initailUrl/$str";
           return str;
         }(retVal.itemInfo.commentUrlString,
-            commentCountTag.first.children.first);
+                commentCountTag.first.children.first);
       }
 
       // commentCount

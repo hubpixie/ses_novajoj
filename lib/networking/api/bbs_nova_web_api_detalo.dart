@@ -13,8 +13,12 @@ extension BbsNovaWebApiDetail on BbsNovaWebApi {
       }
 
       // send request for fetching nova list.
+      /*
       final response = await BaseApiClient.client
           .get(Uri.parse(parameter.itemInfo.urlString));
+          */
+      final response = await validateLogin(
+          parameter.itemInfo.urlString, "username", "password");
 
       if (response.statusCode >= HttpStatus.badRequest) {
         return Result.failure(
@@ -26,15 +30,21 @@ extension BbsNovaWebApiDetail on BbsNovaWebApi {
       BbsDetaloItemRes? retVal;
 
       final rootElement = () {
-        final elements = document.getElementsByClassName('show_content');
+        var elements = document.getElementsByClassName('show_content');
         if (elements.isEmpty) {
-          return document.getElementsByClassName('c-box').first;
+          elements = document.getElementsByClassName('c-box');
+        }
+        if (elements.isEmpty) {
+          elements = document.getElementsByClassName('main-content');
         }
         return elements.first;
       }();
 
       if (parameter.docType == NovaDocType.detail) {
-        final infoElements = rootElement.getElementsByClassName('c-box-a');
+        var infoElements = rootElement.getElementsByClassName('c-box-a');
+        if (infoElements.isEmpty) {
+          infoElements = rootElement.getElementsByClassName('post-content');
+        }
         if (infoElements.isEmpty) {
           return _parseDetailItems(
               parameter: parameter,
@@ -50,7 +60,14 @@ extension BbsNovaWebApiDetail on BbsNovaWebApi {
 
       return Result.success(data: retVal!);
     } on AppError catch (error) {
-      return Result.failure(error: error);
+      if (error.type == AppErrorType.unauthorized &&
+          error.reason == FailureReason.exception) {
+        return Result.success(
+            data: BbsDetaloItemRes(
+                itemInfo: parameter.itemInfo, bodyString: error.innerMessage));
+      } else {
+        return Result.failure(error: error);
+      }
     } on Exception catch (error) {
       return Result.failure(error: AppError.fromException(error));
     } catch (error) {
@@ -99,10 +116,14 @@ extension BbsNovaWebApiDetail on BbsNovaWebApi {
       Element? rootElement,
       Element? infoElement}) async {
     try {
+      final preTags = rootElement?.getElementsByTagName('pre');
+      if (preTags?.isEmpty ?? true) {
+        preTags?.add(Element.html(
+            '<pre>no data</pre><a href="${parameter.itemInfo.urlString}">リロード</a>'));
+      }
       BbsDetaloItemRes retVal = BbsDetaloItemRes(
           itemInfo: parameter.itemInfo,
-          bodyString: reshapeDetailBodyTags(
-              rootElement?.getElementsByTagName('pre').first));
+          bodyString: reshapeDetailBodyTags(preTags!.first));
       if (rootElement?.children == null) {
         log.severe('rootElement?.children == null');
         throw AppError(
@@ -164,8 +185,12 @@ extension BbsNovaWebApiDetail on BbsNovaWebApi {
       Element? rootElement,
       Element? infoElement}) async {
     try {
-      String bodyString =
-          reshapeDetailBodyTags(rootElement?.getElementsByTagName('pre').first);
+      final preTags = rootElement?.getElementsByTagName('pre');
+      if (preTags?.isEmpty ?? true) {
+        preTags?.add(Element.html(
+            '<div><pre>no data</pre><a href="javascript:alert(${parameter.itemInfo.urlString});">リロード</a></div>'));
+      }
+      String bodyString = reshapeDetailBodyTags(preTags!.first);
 
       BbsDetaloItemRes retVal = BbsDetaloItemRes(
           itemInfo: parameter.itemInfo, bodyString: bodyString);
@@ -211,8 +236,9 @@ extension BbsNovaWebApiDetail on BbsNovaWebApi {
         if (divAuthor?.children.isEmpty ?? true) {
           return '';
         }
-        final aLink = divAuthor?.children
-            .firstWhere((element) => element.localName == 'a');
+        final aLink = divAuthor?.children.firstWhere(
+            (element) => element.localName == 'a',
+            orElse: () => Element.tag('a'));
         return aLink?.innerHtml ?? '';
       }();
 

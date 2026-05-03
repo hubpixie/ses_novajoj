@@ -9,6 +9,7 @@ import 'package:ses_novajoj/foundation//log_util.dart';
 import 'package:ses_novajoj/foundation/connect_util.dart';
 import 'package:ses_novajoj/foundation/data/date_util.dart';
 import 'package:ses_novajoj/foundation/data/string_util.dart';
+import 'package:ses_novajoj/foundation/data/user_data.dart';
 import 'package:ses_novajoj/foundation/data/user_types.dart';
 import 'package:ses_novajoj/foundation/data/result.dart';
 import 'package:ses_novajoj/networking/api_client/base_api_client.dart';
@@ -29,6 +30,16 @@ class BaseNovaWebApi {
   static bool _logined = false;
 
   final FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.instance;
+
+  static String getBaseUrl(String urlString) {
+    try {
+      final uri = Uri.parse(urlString);
+      return '${uri.scheme}://${uri.host}${uri.port != 80 && uri.port != 443 ? ':${uri.port}' : ''}';
+    } catch (e) {
+      print('URLの解析に失敗しました: $e');
+      return ''; // またはエラー処理
+    }
+  }
 
   ///
   ////api name: fetchNovaItemThumbUrl
@@ -875,6 +886,120 @@ extension BaseNovaWebApiForAuth on BaseNovaWebApi {
       return Result.failure(error: AppError.fromException(error));
     }
   }
+}
+
+Future<dynamic> validateLogin(
+    String htmlUrl, String username, String password) async {
+  const String USER = "picho6park";
+  const String PASS = "wahaha";
+// ログインに必要な情報
+  const String loginUrl = '/pub_page/home_login.php'; // 実際のログインURLに合わせてください
+  const String usernameSelector = 'input[name="username"]';
+  const String passwordSelector = 'input[name="password"]';
+  const String loginButtonSelector = 'button[name="dologin"]';
+  const String cookieKey = 'session_cookie'; // Cookieを保存する際のキー
+
+  try {
+    // HTMLファイルを取得（タイムアウトなし）
+    var response = await BaseApiClient.client.get(Uri.parse(htmlUrl));
+
+    if (response.statusCode != 200) {
+      // get failure
+      return response;
+    }
+
+    var document = html_parser.parse(response.body);
+
+    // ログインフォームを探す
+    final loginForm = document.querySelector('.login-form');
+    if (loginForm == null) {
+      print('ログインフォームが見つかりませんでした。');
+      return response;
+    }
+
+    // ユーザー名とパスワードの入力フィールドを探す
+    final usernameInput = loginForm.querySelector(usernameSelector);
+    final passwordInput = loginForm.querySelector(passwordSelector);
+    final loginButton = loginForm.querySelector(loginButtonSelector);
+
+    if (usernameInput == null || passwordInput == null || loginButton == null) {
+      print('ログインフォームの要素が見つかりませんでした。');
+      return response;
+    }
+
+    // フォームのaction属性を取得
+    final formAction = loginForm.attributes['action'];
+    if (formAction == null || formAction.isEmpty) {
+      print('フォームのアクションURLが見つかりません。');
+      return response;
+    }
+
+    // ログイン処理を行うURLを構築
+    String baseUrl = BaseNovaWebApi.getBaseUrl(htmlUrl);
+    final loginProcessUrl = Uri.parse('$baseUrl$formAction');
+
+    // ログインデータを送信
+    response = await BaseApiClient.client.post(
+      loginProcessUrl,
+      body: {
+        usernameInput.attributes['name']!: USER,
+        passwordInput.attributes['name']!: PASS,
+        loginButton.attributes['name']!:
+            loginButton.attributes['value'] ?? '', // ボタンにvalue属性がない場合は空文字列
+      },
+    );
+
+    List<Element> loginingDivs() {
+      List<Element> matchingDivs = [];
+      // div1の特定条件: role="alert" 属性が存在する div 要素
+      final div1Elements = document.querySelectorAll('div[role="alert"]');
+      matchingDivs.addAll(div1Elements);
+
+      // div2の特定条件: class="row" 属性を持ち、かつ子孫要素に <a class="" href=""> が存在する div 要素
+      final div2Elements =
+          document.querySelectorAll('div.row'); // class="row" を持つ div を最初に絞り込む
+      for (final divElement in div2Elements) {
+        final descendantLinks =
+            divElement.querySelectorAll('a[class=""][href]');
+        if (descendantLinks.isNotEmpty) {
+          matchingDivs.add(divElement);
+        }
+      }
+      return matchingDivs;
+    }
+
+    if (response.statusCode == 200) {
+      document = html_parser.parse(response.body);
+      if (loginingDivs().isNotEmpty) {
+        log.warning('imgElements.isEmpty');
+        throw AppError(
+            type: AppErrorType.unauthorized,
+            reason: FailureReason.exception,
+            innerMessage: response.body);
+      } else {
+        print('ログイン成功！..レスポンスボディ: ${response.body}');
+      }
+      // Cookieを保存
+      final cookies = response.headers['set-cookie'];
+      if (cookies != null) {
+        UserData().saveCookie(key: cookieKey, value: cookies);
+        print('Cookieを保存しました: $cookies');
+        //await Future.delayed(const Duration(seconds: 5));
+        return await BaseApiClient.client.get(Uri.parse(htmlUrl));
+      } else {
+        print('Cookieが見つかりませんでした。');
+      }
+    } else {
+      print('ログインに失敗しました。ステータスコード: ${response.statusCode}');
+      print('レスポンスボディ: ${response.body}');
+    }
+    return response;
+  } on Exception catch (e) {
+    print('エラーが発生しました: $e');
+  } finally {
+    //BaseApiClient.client.close(); // クライアントを閉じる
+  }
+  return null;
 }
 
 extension BaseNovaWebSettings on BaseNovaWebApi {

@@ -86,6 +86,10 @@ class UserData {
         : null;
   }
 
+  Future<bool> saveCookie({required String key, required String value}) async {
+    return await _preferences.setString(key, value);
+  }
+
   ///
   /// _getUuidFileName
   ///

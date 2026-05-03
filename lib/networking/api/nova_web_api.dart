@@ -109,7 +109,7 @@ class NovaWebApi extends BaseNovaWebApi {
                   orElse: () => nlistDiv)
               : nlistDiv;
           // ul
-          Element? retElem = nlistSubDiv?.children.firstWhere(
+          Element? retElem = nlistSubDiv.children.firstWhere(
               (element) => element.localName == 'ul',
               orElse: () => Element.tag('ul'));
           return retElem;
@@ -303,7 +303,8 @@ class NovaWebApi extends BaseNovaWebApi {
             reason: FailureReason.missingRootNode);
       }
       final jsonText = StringUtil()
-          .substring(jsonElement.innerHtml, start: "_PageData =", end: ";");
+          .substring(jsonElement.innerHtml, start: "_PageData =", end: ";\n")
+          .trim();
       final jsonData = await json.decode(jsonText);
       if (jsonData is List) {
         List<dynamic> itemListData = jsonData;

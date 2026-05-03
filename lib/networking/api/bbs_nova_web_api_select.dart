@@ -37,6 +37,7 @@ extension BbsNovaWebApiSelect on BbsNovaWebApi {
         group.add(_parseLiItems(
             parameter: parameter,
             rootElement: document.getElementById("d_list"),
+            bodyElement: document.body,
             startId: 100));
         group.close();
         final responses = await group.future;
@@ -75,6 +76,7 @@ extension BbsNovaWebApiSelect on BbsNovaWebApi {
   Future<Result<List<BbsNovaSelectListItemRes>>> _parseLiItems(
       {required NovaItemParameter parameter,
       Element? rootElement,
+      Element? bodyElement,
       int startId = 0}) async {
     try {
       List<BbsNovaSelectListItemRes> retArr = [];
@@ -95,7 +97,10 @@ extension BbsNovaWebApiSelect on BbsNovaWebApi {
       if (ulElement?.children.isEmpty ?? true) {
         print("totolItemCount= _parseDivItems ...  START");
         return _parseDivItems(
-            parameter: parameter, rootElement: rootElement, startId: 100);
+            parameter: parameter,
+            rootElement: rootElement,
+            bodyElement: bodyElement,
+            startId: 100);
       }
 
       int index = 0;
@@ -171,6 +176,7 @@ extension BbsNovaWebApiSelect on BbsNovaWebApi {
   Future<Result<List<BbsNovaSelectListItemRes>>> _parseDivItems(
       {required NovaItemParameter parameter,
       Element? rootElement,
+      Element? bodyElement,
       int startId = 0}) async {
     try {
       List<BbsNovaSelectListItemRes> retArr = [];
@@ -188,11 +194,16 @@ extension BbsNovaWebApiSelect on BbsNovaWebApi {
           orElse: () => Element.tag('div'));
 
       if (divListBody?.children.isEmpty ?? true) {
-        log.severe('divListBody?.children');
-        throw AppError(
-            type: AppErrorType.dataError,
-            reason: FailureReason.missingListNode);
+        if (bodyElement == null) {
+          log.severe('divListBody?.children');
+          throw AppError(
+              type: AppErrorType.dataError,
+              reason: FailureReason.missingListNode);
+        } else {
+          return _parseJsonItems(bodyElement: bodyElement, startId: startId);
+        }
       }
+
       int index = 0;
       for (Element divLi in divListBody?.children ?? []) {
         BbsNovaSelectListItemRes? novaListItemRes = await _createNovaLiItem(
@@ -230,6 +241,187 @@ extension BbsNovaWebApiSelect on BbsNovaWebApi {
     } on Exception catch (error) {
       return Result.failure(error: AppError.fromException(error));
     }
+  }
+
+  Future<Result<List<BbsNovaSelectListItemRes>>> _parseJsonItems(
+      {Element? bodyElement, int startId = 0}) async {
+    NovaItemParameter parameter = _itemParameter!;
+    Element? jsonElement = bodyElement?.children.firstWhere((element) =>
+        element.localName == "script" &&
+        element.innerHtml.contains("_PageData ="));
+
+    List<BbsNovaSelectListItemRes> retArr = [];
+    Map<int, BbsNovaSelectListItemRes> keepedResponseInfo =
+        _responsedInfo?[parameter.targetUrl.hashCode] ?? {};
+
+    String parentUrl = _parentUrl(url: parameter.targetUrl);
+    try {
+      if (jsonElement == null) {
+        log.severe('jsonElement is null');
+        throw AppError(
+            type: AppErrorType.dataError,
+            reason: FailureReason.missingRootNode);
+      }
+
+      // first parentUrl
+      String? refUrl = () {
+        final headElement = bodyElement?.parent;
+        var foundText = "";
+        if (headElement != null) {
+          final scriptElements = headElement.querySelectorAll('script');
+          for (final scriptElement in scriptElements) {
+            final scriptContent = scriptElement.innerHtml;
+            if (scriptContent.isEmpty) {
+              continue;
+            }
+            if (scriptContent.contains("_viewUrl =")) {
+              foundText = scriptContent;
+              break;
+            }
+          }
+        }
+        String subUrl =
+            StringUtil().substring(foundText, start: "_viewUrl = '", end: "';");
+        return "$parentUrl/$subUrl";
+      }();
+
+      final jsonText = StringUtil()
+          .substring(jsonElement.innerHtml, start: "_PageData =", end: ";\n")
+          .trim();
+      final jsonData = await json.decode(jsonText);
+      if (jsonData is List) {
+        List<dynamic> itemListData = jsonData;
+
+        int index = 0;
+        int totolItemCount = itemListData.length;
+        int pageBlockIndex =
+            parameter.pageBlockIndex < 1 ? 1 : parameter.pageBlockIndex;
+        int takenStart = (pageBlockIndex - 1) * parameter.limitPerBlock;
+        int takenEnd =
+            min(pageBlockIndex * parameter.limitPerBlock, totolItemCount);
+        List<dynamic> subList = itemListData.sublist(takenStart, takenEnd);
+        for (dynamic item in subList) {
+          if (parameter.fetchedBlockItemIndex < 1 && index >= 10) {
+            break;
+          }
+          if (keepedResponseInfo[item.hashCode] != null) {
+            retArr.add(
+                keepedResponseInfo[item.hashCode] as BbsNovaSelectListItemRes);
+            index++;
+          } else {
+            BbsNovaSelectListItemRes? novaListItemRes =
+                await _createNovajsonItem(refUrl,
+                    index: index,
+                    jsonItem: item,
+                    totolItemCount: totolItemCount);
+            if (novaListItemRes != null) {
+              novaListItemRes.itemInfo.id =
+                  novaListItemRes.itemInfo.id + startId;
+              retArr.add(novaListItemRes);
+              keepedResponseInfo[item.hashCode] = novaListItemRes;
+              index++;
+            }
+          }
+        }
+        _responsedInfo?[parameter.targetUrl.hashCode] = keepedResponseInfo;
+      } else {
+        log.severe('jsonData isn ot List');
+        throw AppError(
+            type: AppErrorType.dataError,
+            reason: FailureReason.missingRootNode);
+      }
+      return Result.success(data: retArr);
+    } on AppError catch (error) {
+      return Result.failure(error: error);
+    } on Exception catch (error) {
+      return Result.failure(error: AppError.fromException(error));
+    }
+  }
+
+  Future<BbsNovaSelectListItemRes?> _createNovajsonItem(String url,
+      {required int index,
+      required dynamic jsonItem,
+      required int totolItemCount}) async {
+    int id = index;
+    String thunnailUrlString = "";
+    String title = "";
+    String urlString = "";
+    String source = "";
+    String commentUrlString = "";
+    int commentCount = 0;
+    DateTime? createAt;
+    int reads = 0;
+    bool isRead = false;
+    bool isNew = false;
+
+    bool networkIsOK = await ConnectUtil.isAvailable();
+
+    // title, urlString
+    dynamic detailResponsedBody;
+    title = jsonItem["subject"];
+    urlString = (String refUrl, String subUrl) {
+      if (RegExp(r'^https?://').hasMatch(subUrl)) {
+        return subUrl;
+      }
+      return refUrl.replaceFirst("{TID}", subUrl);
+    }(url, "${jsonItem['tid']}");
+
+    // thumbUrlString
+    // detailResponsedBody ??=
+    //     networkIsOK ? await BaseApiClient.client.get(Uri.parse(urlString)) : "";
+    // if (urlString.isNotEmpty &&
+    //     index < _kThumbLimit &&
+    //     detailResponsedBody != "") {
+    //   Result<String> thumbUrlResult = await fetchNovaItemThumbUrl(
+    //       parameter: NovaItemParameter(
+    //           targetUrl: urlString, docType: NovaDocType.thumb),
+    //       httpBody: detailResponsedBody);
+    //   thumbUrlResult.when(
+    //       success: (value) {
+    //         thunnailUrlString = value;
+    //       },
+    //       failure: (value) {});
+    // }
+
+    // createAt
+    createAt = DateUtil().fromString(jsonItem["dateline"]);
+    if (createAt == null) {
+      detailResponsedBody ??= networkIsOK
+          ? await BaseApiClient.client.get(Uri.parse(urlString))
+          : "";
+      Result<String> createdAtStrRes = detailResponsedBody != ""
+          ? await fetchNovaItemCreatedAt(
+              parameter: NovaItemParameter(
+                  targetUrl: urlString, docType: NovaDocType.thumb),
+              httpBody: detailResponsedBody)
+          : const Result.success(data: "");
+      createdAtStrRes.when(
+          success: (value) {
+            createAt =
+                DateUtil().fromString(value, format: "yyyy-MM-dd HH:mm:ss");
+          },
+          failure: (value) {});
+    }
+
+    NovaItemInfo itemInfo = NovaItemInfo(
+        id: id,
+        thunnailUrlString: thunnailUrlString,
+        title: title,
+        urlString: urlString,
+        source: source,
+        author: '',
+        createAt: createAt ?? DateTime.now(),
+        loadCommentAt: '',
+        commentUrlString: commentUrlString,
+        commentCount: commentCount,
+        reads: reads,
+        isNew: isNew,
+        isRead: isRead,
+        blockIndex: _itemParameter!.pageBlockIndex,
+        fetchedBlockItemIndex: index,
+        limitPerBlock: _itemParameter!.limitPerBlock,
+        totolItemClount: totolItemCount);
+    return BbsNovaSelectListItemRes(itemInfo: itemInfo);
   }
 
   Future<BbsNovaSelectListItemRes?> _createNovaLiItem(String url,
